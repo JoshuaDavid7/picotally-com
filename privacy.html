@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Picotally</title>
+  <style>
+    :root { --brand: #1565C0; --bg: #FAFAFA; --text: #212121; --muted: #616161; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; }
+    .container { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
+    h1 { font-size: 28px; margin-bottom: 8px; color: var(--brand); }
+    .effective { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
+    h2 { font-size: 20px; margin: 32px 0 12px; color: var(--text); }
+    p, li { font-size: 16px; margin-bottom: 12px; }
+    ul { padding-left: 24px; margin-bottom: 16px; }
+    a { color: var(--brand); }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
+    th, td { text-align: left; padding: 10px 12px; border: 1px solid #DDD; }
+    th { background: #E3F2FD; font-weight: 600; }
+    footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #DDD; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+<h1>Privacy Policy</h1>
+<p class="effective">Effective date: April 18, 2026</p>
+
+<p>Picotally ("the App") is published by Pico Apps LLC ("we", "us", "our"). This policy explains what data we collect, why, and how we protect it.</p>
+
+<h2>1. Data We Collect</h2>
+
+<table>
+  <tr><th>Category</th><th>Examples</th><th>Purpose</th></tr>
+  <tr><td>Account</td><td>Email address, name (if provided via Google/Apple sign-in)</td><td>Authentication and account management</td></tr>
+  <tr><td>Business profile</td><td>Business name, address, phone, tax ID, hourly rate</td><td>Populating your invoices and quotes</td></tr>
+  <tr><td>Customer records</td><td>Client name, email, phone, address, notes</td><td>Invoice delivery and CRM</td></tr>
+  <tr><td>Financial records</td><td>Invoices, quotes, expenses, payments, receipt images</td><td>Core app functionality</td></tr>
+  <tr><td>Media</td><td>Photos (receipts, project sites), voice memos</td><td>Receipt scanning, voice-to-invoice</td></tr>
+  <tr><td>Crash reports</td><td>Error stack traces, device model, OS version (no personal identifiers)</td><td>Fixing bugs and improving stability</td></tr>
+</table>
+
+<p>We do <strong>not</strong> collect location data, contacts, health data, browsing history, or advertising identifiers.</p>
+
+<h2>2. How We Use Your Data</h2>
+<ul>
+  <li><strong>Core functionality</strong> &mdash; creating invoices, tracking expenses, managing customers, generating PDFs.</li>
+  <li><strong>AI features</strong> &mdash; receipt text is sent to Google Gemini for itemisation; voice memos are sent to Deepgram for transcription, and the resulting transcript is sent to Anthropic Claude to interpret your intent (e.g., &quot;mark invoice 42 paid&quot;). All three calls are processed server-side via secure edge functions; no AI keys are embedded in the app.</li>
+  <li><strong>On-device OCR</strong> &mdash; Google ML Kit extracts text from receipt images entirely on your device. No image data leaves your phone for OCR.</li>
+  <li><strong>Payments</strong> &mdash; when you use online payment links, Stripe processes the transaction. We store the payment status and session ID but never your card details.</li>
+  <li><strong>Crash reporting</strong> &mdash; if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
+</ul>
+
+<h2>3. Third-Party Services</h2>
+
+<table>
+  <tr><th>Service</th><th>Data received</th><th>Purpose</th></tr>
+  <tr><td>Supabase</td><td>All synced business data</td><td>Cloud database, authentication, file storage</td></tr>
+  <tr><td>Google Gemini</td><td>Receipt text (not images)</td><td>AI-powered receipt itemisation</td></tr>
+  <tr><td>Deepgram</td><td>Audio recordings</td><td>Voice-to-text transcription</td></tr>
+  <tr><td>Anthropic Claude</td><td>Voice transcript text (no audio)</td><td>Interpreting voice commands and extracting structured intent</td></tr>
+  <tr><td>Stripe</td><td>Payment amount, currency, client email</td><td>Payment processing for invoices you send to your customers</td></tr>
+  <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple &mdash; not us &mdash; sees your payment method.</td></tr>
+  <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
+  <tr><td>Google ML Kit</td><td>None (on-device only)</td><td>Text recognition from images</td></tr>
+</table>
+
+<p>We do not sell, rent, or share your data with advertisers, data brokers, or any party not listed above.</p>
+
+<h2>4. Device Permissions</h2>
+<ul>
+  <li><strong>Microphone</strong> &mdash; voice recording for the voice-to-invoice feature. Only active when you tap the record button.</li>
+  <li><strong>Camera</strong> &mdash; taking photos of receipts and project work.</li>
+  <li><strong>Photo library</strong> &mdash; selecting existing photos for receipt scanning or project documentation.</li>
+</ul>
+<p>Each permission is requested only when needed and can be revoked at any time in your device settings.</p>
+
+<h2>5. Data Storage and Security</h2>
+<ul>
+  <li>Cloud data is stored in Supabase (PostgreSQL) with row-level security. Each user can only access their own records &mdash; enforced at the database level, not just in app code.</li>
+  <li>A local copy is cached on your device in a SQLite database for offline use. The file is encrypted with SQLCipher (AES-256); the encryption key is generated on your device and stored in the iOS Keychain / Android Keystore, and never leaves the device.</li>
+  <li>All network communication uses HTTPS/TLS encryption.</li>
+  <li>API keys for Google Gemini, Deepgram, Anthropic Claude, and Stripe live only as server-side secrets. They are never bundled into the mobile app and cannot be extracted from an installed binary.</li>
+  <li>Crash reports sent to Sentry are passed through a PII scrubber that redacts emails, phone numbers, tokens, and truncates long free-form text before the report leaves your device.</li>
+</ul>
+
+<h2>6. Data Retention and Deletion</h2>
+<ul>
+  <li>Your data is retained for as long as your account is active.</li>
+  <li>You can delete individual records (invoices, expenses, customers) at any time from within the app.</li>
+  <li>You can permanently delete your entire account from <em>Settings &rarr; Account &rarr; Delete Account</em>. This removes all rows tied to your user ID across our database &mdash; invoices, quotes, expenses, receipts, customers, project notes, voice memos, uploaded logos and photos &mdash; plus your authentication record. The deletion is irreversible and typically completes within seconds.</li>
+  <li>The same in-app deletion also wipes the encrypted local database on your device, removes the SQLCipher key from the iOS Keychain / Android Keystore, and clears any saved sign-in credentials. <strong>Use the in-app Delete Account flow rather than just uninstalling</strong> &mdash; uninstalling removes the app's documents folder but, by default, the iOS Keychain entries survive uninstall and would persist until the device is wiped or you delete the Picotally entries via iOS Settings.</li>
+  <li>Audit logs of payment webhook events received from Stripe are retained for fraud-detection purposes; these contain transaction metadata (amount, currency, status) but no card numbers and no personal account information.</li>
+  <li>Database backups taken before your deletion request may continue to hold a copy of your data for up to 7 days, after which they are rotated out and unrecoverable. We do not access these backups except to recover from infrastructure failure.</li>
+</ul>
+
+<h2>7. Your Rights</h2>
+<p>You have the right to:</p>
+<ul>
+  <li>Access all data we hold about you (available directly in the app).</li>
+  <li>Correct inaccurate data (editable in the app).</li>
+  <li>Delete your data and account.</li>
+  <li>Export your data (invoices can be exported as PDF).</li>
+</ul>
+<p>If you are in the EU/EEA, you also have rights under GDPR including data portability and the right to lodge a complaint with a supervisory authority.</p>
+
+<h2>8. Children's Privacy</h2>
+<p>Picotally is a business tool designed for adults. We do not knowingly collect data from anyone under 16. If we learn that we have collected data from a child, we will delete it promptly.</p>
+
+<h2>9. Changes to This Policy</h2>
+<p>We may update this policy from time to time. Material changes will be communicated via an in-app notice. The "effective date" at the top of this page will be updated accordingly.</p>
+
+<h2>10. Contact</h2>
+<p>If you have questions about this privacy policy or your data, contact us at:</p>
+<p><strong>Email:</strong> <a href="mailto:support@picotally.com">support@picotally.com</a></p>
+
+<footer>
+  <p>&copy; 2026 Pico Apps LLC. All rights reserved.</p>
+</footer>
+
+</div>
+</body>
+</html>
