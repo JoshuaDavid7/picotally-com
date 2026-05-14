@@ -11,6 +11,11 @@ mobile invoicing app for tradespeople published by Pico Apps LLC.
 | `privacy.html` | `picotally.com/privacy` | Privacy policy (referenced by App Store Privacy questionnaire and the in-app paywall footer) |
 | `terms.html` | `picotally.com/terms` | Terms of service (referenced by the in-app paywall footer) |
 | `support.html` | `picotally.com/support` | Support contact page (Apple App Review requires a live support URL) |
+| `stripe-return.html` | `picotally.com/stripe/return` | Where Stripe redirects after a tradesperson completes hosted Connect onboarding (via `_redirects`). |
+| `stripe-refresh.html` | `picotally.com/stripe/refresh` | Where Stripe redirects when an onboarding AccountLink expires before completion (via `_redirects`). |
+| `payment-success.html` | `picotally.com/payment-success` | Where Stripe Checkout redirects the customer after a successful payment. |
+| `payment-cancel.html` | `picotally.com/payment-cancel` | Where Stripe Checkout redirects the customer if they cancel out of payment. |
+| `_redirects` | — | Cloudflare Pages rewrite rules for paths containing slashes (`/stripe/return`, `/stripe/refresh`). |
 
 ## Hosting
 

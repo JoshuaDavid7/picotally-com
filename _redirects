@@ -1,0 +1,14 @@
+# Cloudflare Pages redirect rules.
+#
+# Why this exists: the Stripe Connect onboarding redirect and the
+# Stripe Checkout success/cancel URLs we configure on Supabase use
+# slash-separated paths (e.g. /stripe/return). Cloudflare Pages serves
+# `foo.html` at `/foo` out of the box, but a path like `/stripe/return`
+# would otherwise need a `stripe/` subdirectory or explicit rewrite.
+# We keep the HTML at the top level (for clarity) and rewrite here.
+#
+# Format: source-path  destination  status-code
+# 200 = serve destination at source URL (rewrite, no redirect).
+
+/stripe/return    /stripe-return.html    200
+/stripe/refresh   /stripe-refresh.html   200
