@@ -1257,5 +1257,143 @@
 })();
 </script>
 
+<!-- ============================================================
+     Early-access modal — replaces the prior mailto: behaviour on
+     every "Get early access" CTA. Submits via FormSubmit AJAX to
+     support@picotally.com (no third-party JS, just a POST).
+     ============================================================ -->
+<style>
+  .ea-modal { border: none; padding: 0; max-width: 480px; width: calc(100vw - 32px); border-radius: 24px; box-shadow: 0 30px 80px -10px rgba(0,0,0,0.35), 0 8px 32px -8px rgba(0,0,0,0.18); background: var(--bg); color: var(--text); }
+  .ea-modal::backdrop { background: rgba(10, 10, 10, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .ea-modal[open] { animation: ea-pop 200ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+  @keyframes ea-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+  .ea-body { position: relative; padding: 40px 32px 32px; }
+  .ea-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border: none; border-radius: 18px; background: transparent; color: var(--text-mute); font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 120ms; }
+  .ea-close:hover { background: var(--bg-soft); color: var(--text); }
+  .ea-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); margin-bottom: 8px; }
+  .ea-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text); }
+  .ea-lede { color: var(--text-soft); margin: 0 0 24px; font-size: 15px; line-height: 1.5; }
+  .ea-form { display: flex; flex-direction: column; gap: 14px; }
+  .ea-field { display: flex; flex-direction: column; gap: 6px; }
+  .ea-label { font-size: 13px; font-weight: 600; color: var(--text-soft); }
+  .ea-label .ea-optional { font-weight: 400; color: var(--text-light); }
+  .ea-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; transition: border-color 120ms, box-shadow 120ms; }
+  .ea-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+  .ea-submit { margin-top: 8px; }
+  .ea-submit:disabled { opacity: 0.6; cursor: wait; }
+  .ea-success { text-align: center; padding: 24px 8px 8px; }
+  .ea-success-icon { width: 56px; height: 56px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 28px; background: var(--brand-soft); color: var(--brand); font-size: 28px; }
+  .ea-success h3 { margin: 0 0 8px; font-size: 22px; font-weight: 700; color: var(--text); }
+  .ea-success p { margin: 0; color: var(--text-soft); font-size: 15px; line-height: 1.5; }
+  .ea-error { margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; background: #FEF2F2; color: #991B1B; font-size: 14px; }
+  .ea-error[hidden] { display: none; }
+  .ea-foot { margin: 18px 0 0; font-size: 12px; color: var(--text-light); text-align: center; line-height: 1.5; }
+  .ea-foot a { color: var(--text-mute); text-decoration: underline; }
+</style>
+
+<dialog id="ea-modal" class="ea-modal" aria-labelledby="ea-title">
+  <div class="ea-body">
+    <button type="button" class="ea-close" data-ea-close aria-label="Close">&times;</button>
+    <div class="ea-eyebrow">Join the waitlist</div>
+    <h2 id="ea-title" class="ea-title">Get early access to PicoTally</h2>
+    <p class="ea-lede">Be among the first tradespeople to try the personal AI for your business. We&rsquo;ll email you the moment we open enrollment.</p>
+    <p class="ea-error" id="ea-error" hidden></p>
+    <form class="ea-form" id="ea-form" novalidate>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-name">Name</label>
+        <input class="ea-input" type="text" id="ea-name" name="name" autocomplete="name" required>
+      </div>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-email">Email</label>
+        <input class="ea-input" type="email" id="ea-email" name="email" autocomplete="email" required>
+      </div>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-trade">Your trade <span class="ea-optional">(optional)</span></label>
+        <input class="ea-input" type="text" id="ea-trade" name="trade" placeholder="Plumber, electrician, HVAC&hellip;" autocomplete="off">
+      </div>
+      <button type="submit" class="btn btn-primary ea-submit" id="ea-submit">Request access</button>
+    </form>
+    <div class="ea-success" id="ea-success" hidden>
+      <div class="ea-success-icon" aria-hidden="true">&#x2713;</div>
+      <h3>You&rsquo;re on the list.</h3>
+      <p>We&rsquo;ll be in touch the moment we open enrollment. Welcome aboard.</p>
+    </div>
+    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a> &mdash; nothing else. See our <a href="/privacy.html">privacy policy</a>.</p>
+  </div>
+</dialog>
+
+<script>
+(function() {
+  var modal = document.getElementById('ea-modal');
+  if (!modal || typeof HTMLDialogElement === 'undefined') return; // ancient browser — leave mailto fallback alone
+  var form = document.getElementById('ea-form');
+  var submitBtn = document.getElementById('ea-submit');
+  var successEl = document.getElementById('ea-success');
+  var errorEl = document.getElementById('ea-error');
+
+  function openModal(e) {
+    if (e) e.preventDefault();
+    // Reset state on every open
+    form.reset();
+    form.hidden = false;
+    successEl.hidden = true;
+    errorEl.hidden = true;
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Request access';
+    modal.showModal();
+    setTimeout(function() { document.getElementById('ea-name').focus(); }, 50);
+  }
+
+  // Intercept every "Get early access" CTA — they all point at mailto:support@picotally.com?subject=Early%20access
+  document.querySelectorAll('a[href^="mailto:support@picotally.com?subject=Early"]').forEach(function(a) {
+    a.addEventListener('click', openModal);
+  });
+
+  // Close handlers
+  modal.querySelectorAll('[data-ea-close]').forEach(function(el) {
+    el.addEventListener('click', function() { modal.close(); });
+  });
+  // Click outside the inner card (on the dialog backdrop) closes it
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.close();
+  });
+
+  // Submit via FormSubmit AJAX endpoint
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+
+    errorEl.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+
+    var payload = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      trade: form.trade.value.trim() || '(not specified)',
+      _subject: 'PicoTally early access request',
+      _template: 'table'
+    };
+
+    fetch('https://formsubmit.co/ajax/support@picotally.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function() {
+      form.hidden = true;
+      successEl.hidden = false;
+    }).catch(function() {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Try again';
+      errorEl.textContent = 'Hmm, that didn’t go through. You can email support@picotally.com directly and we’ll add you manually.';
+      errorEl.hidden = false;
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
