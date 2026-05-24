@@ -134,12 +134,12 @@
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       font-weight: 700;
-      font-size: 22px;
+      font-size: 26px;
       letter-spacing: -0.02em;
     }
-    .nav-logo img { width: 36px; height: 36px; border-radius: 9px; }
+    .nav-logo img { width: 52px; height: 52px; border-radius: 13px; }
     .nav-links {
       display: flex;
       align-items: center;
@@ -218,11 +218,11 @@
        subtle inner highlight to suggest the curved glass edge. No fake
        Dynamic Island — the screenshot has the real one. */
     .iphone {
-      max-width: 380px;
+      max-width: 440px;
       margin: 0 auto;
-      padding: 10px;
+      padding: 12px;
       background: linear-gradient(145deg, #2C2C30 0%, #0C0C0C 100%);
-      border-radius: 58px;
+      border-radius: 66px;
       box-shadow:
         inset 0 0 0 0.5px rgba(255,255,255,0.10),
         0 60px 120px -20px rgba(0,0,0,0.28),
@@ -230,7 +230,7 @@
       position: relative;
     }
     .iphone-screen {
-      border-radius: 48px;
+      border-radius: 54px;
       overflow: hidden;
       position: relative;
       background: var(--bg-dark);
@@ -714,8 +714,8 @@
     /* ---------- Mobile tweaks ---------- */
     @media (max-width: 640px) {
       .vs-card { padding: 28px 22px; }
-      .iphone { max-width: 320px; padding: 8px; border-radius: 50px; }
-      .iphone-screen { border-radius: 42px; }
+      .iphone { max-width: 360px; padding: 10px; border-radius: 56px; }
+      .iphone-screen { border-radius: 46px; }
       .nav-inner { padding: 10px 16px; gap: 12px; }
       .nav-logo span { display: none; }
       .footer-links a { display: inline-block; margin-bottom: 8px; }
@@ -779,7 +779,7 @@
       <div class="iphone-screen">
         <picture>
           <source srcset="/screenshots/02-chat-overdue.webp 2x, /screenshots/02-chat-overdue@3x.webp 3x" type="image/webp">
-          <img src="/screenshots/02-chat-overdue.png" srcset="/screenshots/02-chat-overdue.png 2x, /screenshots/02-chat-overdue@3x.png 3x" alt="PicoTally AI assistant answering 'Who owes me the most?' — Daniel Smith $5,106.06 on an invoice due May 17 (7 days overdue), with Steven ($535, 42 days overdue) and Michael Jones ($274, 29 days overdue) as the next biggest balances" width="720" height="1565" fetchpriority="high">
+          <img src="/screenshots/02-chat-overdue.png" srcset="/screenshots/02-chat-overdue.png 2x, /screenshots/02-chat-overdue@3x.png 3x" alt="PicoTally AI assistant answering two questions in one conversation: 'Who owes me the most?' returns Daniel Smith $5,106.06 plus a complete itemised list of 7 other customers with their overdue days and a $1,427.96 total across 8 unpaid invoices; 'How much did I collect last month?' returns $8,988.63 in April across 5 payments with the biggest payments named" width="832" height="1809" fetchpriority="high">
         </picture>
       </div>
     </div>
@@ -854,7 +854,7 @@
           <div class="iphone-screen">
             <picture>
               <source srcset="/screenshots/03-voice-quote-draft.webp 2x, /screenshots/03-voice-quote-draft@3x.webp 3x" type="image/webp">
-              <img src="/screenshots/03-voice-quote-draft.png" srcset="/screenshots/03-voice-quote-draft.png 2x, /screenshots/03-voice-quote-draft@3x.png 3x" alt="Voice-generated quote draft for Daniel Smith, $1,250 flat fee for kitchen plumbing, pre-filled and ready to send" width="720" height="1565" loading="lazy" decoding="async">
+              <img src="/screenshots/03-voice-quote-draft.png" srcset="/screenshots/03-voice-quote-draft.png 2x, /screenshots/03-voice-quote-draft@3x.png 3x" alt="Voice-generated quote draft for Daniel Smith with full client details populated — address 4815 W 6th St Austin TX, phone (512) 555-0142, email daniel.smith@example.com — $1,250 flat fee for kitchen plumbing, pre-filled and ready to send" width="832" height="1809" loading="lazy" decoding="async">
             </picture>
           </div>
         </div>
@@ -878,7 +878,7 @@
           <div class="iphone-screen">
             <picture>
               <source srcset="/screenshots/04-receipt-costco.webp 2x, /screenshots/04-receipt-costco@3x.webp 3x" type="image/webp">
-              <img src="/screenshots/04-receipt-costco.png" srcset="/screenshots/04-receipt-costco.png 2x, /screenshots/04-receipt-costco@3x.png 3x" alt="Receipt detail view: Kroger vendor pill, $6.48 total, itemised line-item table showing Daisy Sour Cream $2.99 and Kroger Milk $3.49, with subtotal $6.48, tax $0.00, total $6.48 plus Edit and Delete actions" width="720" height="1565" loading="lazy" decoding="async">
+              <img src="/screenshots/04-receipt-costco.png" srcset="/screenshots/04-receipt-costco.png 2x, /screenshots/04-receipt-costco@3x.png 3x" alt="Receipt detail view: Kroger vendor pill, $6.48 total, itemised line-item table showing Daisy Sour Cream $2.99 and Kroger Milk $3.49, with subtotal $6.48, tax $0.00, total $6.48 plus Edit and Delete actions" width="832" height="1809" loading="lazy" decoding="async">
             </picture>
           </div>
         </div>
@@ -892,7 +892,7 @@
           <div class="iphone-screen">
             <picture>
               <source srcset="/screenshots/01-home.webp 2x, /screenshots/01-home@3x.webp 3x" type="image/webp">
-              <img src="/screenshots/01-home.png" srcset="/screenshots/01-home.png 2x, /screenshots/01-home@3x.png 3x" alt="PicoTally home dashboard: $6,534 awaiting payment with 8 unpaid pill, $20,628 monthly gross income, $6,998 expenses, $13,629 net income, plus an urgent customer list with Rachel Williams awaiting payment and Daniel Smith overdue" width="720" height="1565" loading="lazy" decoding="async">
+              <img src="/screenshots/01-home.png" srcset="/screenshots/01-home.png 2x, /screenshots/01-home@3x.png 3x" alt="PicoTally home dashboard: $6,534 awaiting payment with 8 unpaid pill, $20,628 monthly gross income, $6,998 expenses, $13,629 net income, plus an urgent customer list with Rachel Williams awaiting payment, Daniel Smith overdue $5,106, and Michael Jones overdue $274" width="832" height="1809" loading="lazy" decoding="async">
             </picture>
           </div>
         </div>
