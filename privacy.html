@@ -25,7 +25,7 @@
 <div class="container">
 
 <h1>Privacy Policy</h1>
-<p class="effective">Effective date: April 18, 2026</p>
+<p class="effective">Effective date: May 23, 2026</p>
 
 <p>PicoTally ("the App") is published by Pico Apps LLC ("we", "us", "our"). This policy explains what data we collect, why, and how we protect it.</p>
 
@@ -46,7 +46,13 @@
 <h2>2. How We Use Your Data</h2>
 <ul>
   <li><strong>Core functionality</strong> &mdash; creating invoices, tracking expenses, managing customers, generating PDFs.</li>
-  <li><strong>AI features</strong> &mdash; receipt text is sent to Google Gemini for itemisation; voice memos are sent to Deepgram for transcription, and the resulting transcript is sent to Anthropic Claude to interpret your intent (e.g., &quot;mark invoice 42 paid&quot;). All three calls are processed server-side via secure edge functions; no AI keys are embedded in the app.</li>
+  <li><strong>AI assistant</strong> &mdash; when you use the in-app AI assistant (by voice or by typing), the following is sent to <strong>Anthropic Claude</strong> on each turn of the conversation:
+    <ul>
+      <li>Your message text;</li>
+      <li>A snapshot of your business data &mdash; your customer list with outstanding balances, your recent invoices, recent expenses, recent payments, current-screen context, and current-month summary statistics &mdash; so the assistant can answer your question in the context of your books;</li>
+      <li>If the assistant needs an exact total or a longer list to answer accurately, it may run a query against your own records and the result of that query is returned to Claude in the same conversation.</li>
+    </ul>
+    Voice input is first transcribed by <strong>Deepgram</strong>; only the resulting transcript text (no audio) is sent to Claude. Receipt scanning is a separate flow: the extracted text is sent to <strong>Google Gemini</strong> for itemisation (the receipt image itself is never sent). All AI calls are processed server-side via secure edge functions; no AI provider keys are embedded in the app.</li>
   <li><strong>On-device OCR</strong> &mdash; Google ML Kit extracts text from receipt images entirely on your device. No image data leaves your phone for OCR.</li>
   <li><strong>Payments</strong> &mdash; when you use online payment links, Stripe processes the transaction. We store the payment status and session ID but never your card details.</li>
   <li><strong>Crash reporting</strong> &mdash; if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
@@ -59,7 +65,7 @@
   <tr><td>Supabase</td><td>All synced business data</td><td>Cloud database, authentication, file storage</td></tr>
   <tr><td>Google Gemini</td><td>Receipt text (not images)</td><td>AI-powered receipt itemisation</td></tr>
   <tr><td>Deepgram</td><td>Audio recordings</td><td>Voice-to-text transcription</td></tr>
-  <tr><td>Anthropic Claude</td><td>Voice transcript text (no audio)</td><td>Interpreting voice commands and extracting structured intent</td></tr>
+  <tr><td>Anthropic Claude</td><td>Your assistant message (voice transcript or typed text) plus a snapshot of your business data &mdash; customer names with balances, recent invoices, recent expenses, recent payments, and current-month statistics. May also receive additional rows from your own records when the assistant runs a query mid-conversation.</td><td>Powering the in-app AI assistant: answering questions about your books and drafting invoices, expenses, and payments on command</td></tr>
   <tr><td>Stripe</td><td>Payment amount, currency, client email</td><td>Payment processing for invoices you send to your customers</td></tr>
   <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple &mdash; not us &mdash; sees your payment method.</td></tr>
   <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
