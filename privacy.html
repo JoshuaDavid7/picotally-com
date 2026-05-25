@@ -3,33 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy - PicoTally</title>
+  <title>Privacy Policy &mdash; PicoTally</title>
+  <meta name="description" content="What data PicoTally collects, why, and how we protect it.">
+  <link rel="icon" type="image/png" href="/picotally-icon.png">
+  <link rel="apple-touch-icon" href="/picotally-icon.png">
   <style>
-    :root { --brand: #1565C0; --bg: #FAFAFA; --text: #212121; --muted: #616161; }
+    /* ---------- Design tokens (match index.html) ---------- */
+    :root {
+      --bg: #FFFFFF;
+      --bg-soft: #F7F7F8;
+      --bg-dark: #0F0F11;
+      --text: #0A0A0A;
+      --text-soft: #424246;
+      --text-mute: #71717A;
+      --text-light: #A1A1AA;
+      --border: #E4E4E7;
+      --border-dark: #27272A;
+      --brand: #1565C0;
+      --brand-deep: #0D47A1;
+      --brand-soft: #E8F0FA;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; }
-    .container { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
-    h1 { font-size: 28px; margin-bottom: 8px; color: var(--brand); }
-    .effective { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
-    h2 { font-size: 20px; margin: 32px 0 12px; color: var(--text); }
-    p, li { font-size: 16px; margin-bottom: 12px; }
-    ul { padding-left: 24px; margin-bottom: 16px; }
-    a { color: var(--brand); }
-    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
-    th, td { text-align: left; padding: 10px 12px; border: 1px solid #DDD; }
-    th { background: #E3F2FD; font-weight: 600; }
-    footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #DDD; color: var(--muted); font-size: 13px; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .container-narrow { max-width: 740px; margin: 0 auto; padding: 0 24px; }
+
+    /* ---------- Nav ---------- */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; gap: 32px;
+      max-width: 1180px; margin: 0 auto;
+      padding: 12px 24px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 16px;
+      font-weight: 700; font-size: 32px; letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .nav-logo:hover { text-decoration: none; }
+    .nav-logo img { width: 72px; height: 72px; border-radius: 18px; }
+    .nav-links {
+      display: flex; align-items: center; gap: 28px;
+      margin-left: auto;
+    }
+    .nav-links a {
+      color: var(--text-soft); font-size: 15px; font-weight: 500;
+      transition: color 120ms;
+    }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ---------- Button ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      font-size: 15px; font-weight: 600;
+      text-decoration: none;
+      transition: transform 160ms ease, box-shadow 160ms ease;
+      cursor: pointer; border: none; font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.18); text-decoration: none; }
+    .btn-sm { padding: 10px 18px; font-size: 14px; }
+
+    /* ---------- Page hero ---------- */
+    .page-hero {
+      padding: 72px 0 56px;
+      background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-hero .eyebrow {
+      display: inline-flex; align-items: center;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 14px;
+    }
+    .page-hero .eyebrow::before {
+      content: ''; display: inline-block;
+      width: 24px; height: 2px;
+      background: var(--brand);
+      margin-right: 10px; border-radius: 2px;
+    }
+    .page-hero h1 {
+      font-size: 44px; font-weight: 700;
+      letter-spacing: -0.025em; line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .page-hero .effective {
+      color: var(--text-mute);
+      font-size: 15px;
+    }
+
+    /* ---------- Page body ---------- */
+    .page-body { padding: 56px 0 80px; }
+    .page-body p {
+      font-size: 17px; line-height: 1.65;
+      color: var(--text-soft);
+      margin-bottom: 18px;
+    }
+    .page-body h2 {
+      font-size: 24px; font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text);
+      margin: 48px 0 16px;
+    }
+    .page-body h2:first-child { margin-top: 0; }
+    .page-body h3 {
+      font-size: 18px; font-weight: 600;
+      color: var(--text);
+      margin: 28px 0 12px;
+    }
+    .page-body ul, .page-body ol { padding-left: 22px; margin-bottom: 20px; }
+    .page-body li {
+      font-size: 17px; line-height: 1.65;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+    }
+    .page-body li strong { color: var(--text); font-weight: 600; }
+    .page-body p strong { color: var(--text); font-weight: 600; }
+    .page-body ul ul, .page-body ol ol, .page-body ul ol, .page-body ol ul {
+      margin-top: 8px; margin-bottom: 8px;
+    }
+
+    /* ---------- Table ---------- */
+    .page-body table {
+      width: 100%;
+      border-collapse: separate; border-spacing: 0;
+      margin: 24px 0 32px;
+      font-size: 15px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .page-body th, .page-body td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-soft);
+      vertical-align: top; line-height: 1.5;
+    }
+    .page-body tr:last-child td { border-bottom: none; }
+    .page-body th {
+      background: var(--bg-soft);
+      font-weight: 600;
+      color: var(--text);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Footer (match index.html) ---------- */
+    footer {
+      background: var(--bg-dark);
+      color: rgba(255,255,255,0.7);
+      padding: 56px 0 32px;
+      margin-top: 40px;
+    }
+    .footer-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .footer-brand img { width: 24px; height: 24px; border-radius: 6px; }
+    .footer-brand-name { font-weight: 700; color: #fff; font-size: 16px; letter-spacing: -0.01em; }
+    .footer-tag { font-size: 14px; max-width: 260px; line-height: 1.5; color: rgba(255,255,255,0.55); }
+    .footer-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { color: rgba(255,255,255,0.7); font-size: 14px; }
+    .footer-links a:hover { color: #fff; text-decoration: none; }
+    .footer-legal {
+      padding-top: 24px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.6;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 720px) {
+      .nav-logo span { display: none; }
+      .nav-logo img { width: 52px; height: 52px; border-radius: 13px; }
+      .nav-links { gap: 18px; }
+      .nav-links a { font-size: 14px; }
+      .nav-inner { gap: 16px; padding: 10px 16px; }
+      .page-hero { padding: 48px 0 36px; }
+      .page-hero h1 { font-size: 32px; }
+      .page-body { padding: 36px 0 56px; }
+      .page-body p, .page-body li { font-size: 16px; }
+      .page-body h2 { font-size: 21px; margin-top: 36px; }
+      .page-body table { font-size: 14px; }
+      .page-body th, .page-body td { padding: 10px 12px; }
+      .footer-row { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    /* ---------- Early-access modal ---------- */
+    .ea-modal { border: none; padding: 0; max-width: 480px; width: calc(100vw - 32px); border-radius: 24px; box-shadow: 0 30px 80px -10px rgba(0,0,0,0.35), 0 8px 32px -8px rgba(0,0,0,0.18); background: var(--bg); color: var(--text); }
+    .ea-modal::backdrop { background: rgba(10, 10, 10, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .ea-modal[open] { animation: ea-pop 200ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+    @keyframes ea-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+    .ea-body { position: relative; padding: 40px 32px 32px; }
+    .ea-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border: none; border-radius: 18px; background: transparent; color: var(--text-mute); font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 120ms; }
+    .ea-close:hover { background: var(--bg-soft); color: var(--text); }
+    .ea-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); margin-bottom: 8px; }
+    .ea-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text); }
+    .ea-lede { color: var(--text-soft); margin: 0 0 24px; font-size: 15px; line-height: 1.5; }
+    .ea-form { display: flex; flex-direction: column; gap: 14px; }
+    .ea-field { display: flex; flex-direction: column; gap: 6px; }
+    .ea-label { font-size: 13px; font-weight: 600; color: var(--text-soft); }
+    .ea-label .ea-optional { font-weight: 400; color: var(--text-light); }
+    .ea-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; transition: border-color 120ms, box-shadow 120ms; }
+    .ea-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+    .ea-submit { margin-top: 8px; }
+    .ea-submit:disabled { opacity: 0.6; cursor: wait; }
+    .ea-success { text-align: center; padding: 24px 8px 8px; }
+    .ea-success-icon { width: 56px; height: 56px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 28px; background: var(--brand-soft); color: var(--brand); font-size: 28px; }
+    .ea-success h3 { margin: 0 0 8px; font-size: 22px; font-weight: 700; color: var(--text); }
+    .ea-success p { margin: 0; color: var(--text-soft); font-size: 15px; line-height: 1.5; }
+    .ea-error { margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; background: #FEF2F2; color: #991B1B; font-size: 14px; }
+    .ea-error[hidden] { display: none; }
+    .ea-foot { margin: 18px 0 0; font-size: 12px; color: var(--text-light); text-align: center; line-height: 1.5; }
+    .ea-foot a { color: var(--text-mute); text-decoration: underline; }
   </style>
 </head>
 <body>
-<div class="container">
 
-<h1>Privacy Policy</h1>
-<p class="effective">Effective date: May 23, 2026</p>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <picture>
+        <source srcset="/picotally-icon.webp" type="image/webp">
+        <img src="/picotally-icon.png" alt="" width="72" height="72">
+      </picture>
+      <span>PicoTally</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/#trust">Trust</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/#about">About</a>
+    </div>
+    <a href="mailto:support@picotally.com?subject=Early%20access" class="btn btn-primary btn-sm">Get early access</a>
+  </div>
+</nav>
 
-<p>PicoTally ("the App") is published by Pico Apps LLC ("we", "us", "our"). This policy explains what data we collect, why, and how we protect it.</p>
+<header class="page-hero">
+  <div class="container-narrow">
+    <div class="eyebrow">Legal</div>
+    <h1>Privacy Policy</h1>
+    <p class="effective">Effective May 23, 2026</p>
+  </div>
+</header>
 
-<h2>1. Data We Collect</h2>
+<main class="page-body">
+  <div class="container-narrow">
+
+<p>PicoTally (&ldquo;the App&rdquo;) is published by Pico Apps LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;). This policy explains what data we collect, why, and how we protect it.</p>
+
+<h2>1. Data we collect</h2>
 
 <table>
   <tr><th>Category</th><th>Examples</th><th>Purpose</th></tr>
@@ -43,7 +293,7 @@
 
 <p>We do <strong>not</strong> collect location data, contacts, health data, browsing history, or advertising identifiers.</p>
 
-<h2>2. How We Use Your Data</h2>
+<h2>2. How we use your data</h2>
 <ul>
   <li><strong>Core functionality</strong> &mdash; creating invoices, tracking expenses, managing customers, generating PDFs.</li>
   <li><strong>AI assistant</strong> &mdash; when you use the in-app AI assistant (by voice or by typing), the following is sent to <strong>Anthropic Claude</strong> on each turn of the conversation:
@@ -58,7 +308,7 @@
   <li><strong>Crash reporting</strong> &mdash; if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
 </ul>
 
-<h2>3. Third-Party Services</h2>
+<h2>3. Third-party services</h2>
 
 <table>
   <tr><th>Service</th><th>Data received</th><th>Purpose</th></tr>
@@ -70,12 +320,12 @@
   <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple &mdash; not us &mdash; sees your payment method.</td></tr>
   <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
   <tr><td>Google ML Kit</td><td>None (on-device only)</td><td>Text recognition from images</td></tr>
-  <tr><td>FormSubmit</td><td>Marketing-site only: name, email, and optionally the trade you entered into the "Get early access" form on picotally.com. Not used inside the app.</td><td>Relays your waitlist signup to our inbox so we can contact you when enrollment opens</td></tr>
+  <tr><td>FormSubmit</td><td>Marketing-site only: name, email, and optionally the trade you entered into the &ldquo;Get early access&rdquo; form on picotally.com. Not used inside the app.</td><td>Relays your waitlist signup to our inbox so we can contact you when enrollment opens</td></tr>
 </table>
 
 <p>We do not sell, rent, or share your data with advertisers, data brokers, or any party not listed above.</p>
 
-<h2>4. Device Permissions</h2>
+<h2>4. Device permissions</h2>
 <ul>
   <li><strong>Microphone</strong> &mdash; voice recording for the voice-to-invoice feature. Only active when you tap the record button.</li>
   <li><strong>Camera</strong> &mdash; taking photos of receipts and project work.</li>
@@ -83,7 +333,7 @@
 </ul>
 <p>Each permission is requested only when needed and can be revoked at any time in your device settings.</p>
 
-<h2>5. Data Storage and Security</h2>
+<h2>5. Data storage and security</h2>
 <ul>
   <li>Cloud data is stored in Supabase (PostgreSQL) with row-level security. Each user can only access their own records &mdash; enforced at the database level, not just in app code.</li>
   <li>A local copy is cached on your device in a SQLite database for offline use. The file is encrypted with SQLCipher (AES-256); the encryption key is generated on your device and stored in the iOS Keychain / Android Keystore, and never leaves the device.</li>
@@ -92,17 +342,17 @@
   <li>Crash reports sent to Sentry are passed through a PII scrubber that redacts emails, phone numbers, tokens, and truncates long free-form text before the report leaves your device.</li>
 </ul>
 
-<h2>6. Data Retention and Deletion</h2>
+<h2>6. Data retention and deletion</h2>
 <ul>
   <li>Your data is retained for as long as your account is active.</li>
   <li>You can delete individual records (invoices, expenses, customers) at any time from within the app.</li>
   <li>You can permanently delete your entire account from <em>Settings &rarr; Account &rarr; Delete Account</em>. This removes all rows tied to your user ID across our database &mdash; invoices, quotes, expenses, receipts, customers, project notes, voice memos, uploaded logos and photos &mdash; plus your authentication record. The deletion is irreversible and typically completes within seconds.</li>
-  <li>The same in-app deletion also wipes the encrypted local database on your device, removes the SQLCipher key from the iOS Keychain / Android Keystore, and clears any saved sign-in credentials. <strong>Use the in-app Delete Account flow rather than just uninstalling</strong> &mdash; uninstalling removes the app's documents folder but, by default, the iOS Keychain entries survive uninstall and would persist until the device is wiped or you delete the PicoTally entries via iOS Settings.</li>
+  <li>The same in-app deletion also wipes the encrypted local database on your device, removes the SQLCipher key from the iOS Keychain / Android Keystore, and clears any saved sign-in credentials. <strong>Use the in-app Delete Account flow rather than just uninstalling</strong> &mdash; uninstalling removes the app&rsquo;s documents folder but, by default, the iOS Keychain entries survive uninstall and would persist until the device is wiped or you delete the PicoTally entries via iOS Settings.</li>
   <li>Audit logs of payment webhook events received from Stripe are retained for fraud-detection purposes; these contain transaction metadata (amount, currency, status) but no card numbers and no personal account information.</li>
   <li>Database backups taken before your deletion request may continue to hold a copy of your data for up to 7 days, after which they are rotated out and unrecoverable. We do not access these backups except to recover from infrastructure failure.</li>
 </ul>
 
-<h2>7. Your Rights</h2>
+<h2>7. Your rights</h2>
 <p>You have the right to:</p>
 <ul>
   <li>Access all data we hold about you (available directly in the app).</li>
@@ -112,20 +362,145 @@
 </ul>
 <p>If you are in the EU/EEA, you also have rights under GDPR including data portability and the right to lodge a complaint with a supervisory authority.</p>
 
-<h2>8. Children's Privacy</h2>
+<h2>8. Children&rsquo;s privacy</h2>
 <p>PicoTally is a business tool designed for adults. We do not knowingly collect data from anyone under 16. If we learn that we have collected data from a child, we will delete it promptly.</p>
 
-<h2>9. Changes to This Policy</h2>
-<p>We may update this policy from time to time. Material changes will be communicated via an in-app notice. The "effective date" at the top of this page will be updated accordingly.</p>
+<h2>9. Changes to this policy</h2>
+<p>We may update this policy from time to time. Material changes will be communicated via an in-app notice. The &ldquo;effective date&rdquo; at the top of this page will be updated accordingly.</p>
 
 <h2>10. Contact</h2>
 <p>If you have questions about this privacy policy or your data, contact us at:</p>
 <p><strong>Email:</strong> <a href="mailto:support@picotally.com">support@picotally.com</a></p>
 
+  </div>
+</main>
+
 <footer>
-  <p>&copy; 2026 Pico Apps LLC. All rights reserved.</p>
+  <div class="container">
+    <div class="footer-row">
+      <div>
+        <div class="footer-brand">
+          <picture>
+            <source srcset="/picotally-icon.webp" type="image/webp">
+            <img src="/picotally-icon.png" alt="" width="24" height="24" loading="lazy">
+          </picture>
+          <span class="footer-brand-name">PicoTally</span>
+        </div>
+        <p class="footer-tag">The personal AI for your trade business.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/support">Support</a>
+      </div>
+      <div>
+        <a href="mailto:support@picotally.com" style="color: var(--brand);">support@picotally.com</a>
+      </div>
+    </div>
+    <div class="footer-legal">
+      &copy; 2026 Pico Apps LLC. All rights reserved.<br>
+      &ldquo;PicoTally&rdquo; is an assumed name of Pico Apps LLC, registered with the Texas Secretary of State (Document #&nbsp;1581268360003). The PicoTally name and logo are trademarks of Pico Apps LLC.
+    </div>
+  </div>
 </footer>
 
-</div>
+<!-- Early-access modal -->
+<dialog id="ea-modal" class="ea-modal" aria-labelledby="ea-title">
+  <div class="ea-body">
+    <button type="button" class="ea-close" data-ea-close aria-label="Close">&times;</button>
+    <div class="ea-eyebrow">Join the waitlist</div>
+    <h2 id="ea-title" class="ea-title">Get early access to PicoTally</h2>
+    <p class="ea-lede">Be among the first tradespeople to try the personal AI for your business. We&rsquo;ll email you the moment we open enrollment.</p>
+    <p class="ea-error" id="ea-error" hidden></p>
+    <form class="ea-form" id="ea-form" novalidate>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-name">Name</label>
+        <input class="ea-input" type="text" id="ea-name" name="name" autocomplete="name" required>
+      </div>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-email">Email</label>
+        <input class="ea-input" type="email" id="ea-email" name="email" autocomplete="email" required>
+      </div>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-trade">Your trade <span class="ea-optional">(optional)</span></label>
+        <input class="ea-input" type="text" id="ea-trade" name="trade" placeholder="Plumber, electrician, HVAC&hellip;" autocomplete="off">
+      </div>
+      <button type="submit" class="btn btn-primary ea-submit" id="ea-submit">Request access</button>
+    </form>
+    <div class="ea-success" id="ea-success" hidden>
+      <div class="ea-success-icon" aria-hidden="true">&#x2713;</div>
+      <h3>You&rsquo;re on the list.</h3>
+      <p>We&rsquo;ll be in touch the moment we open enrollment. Welcome aboard.</p>
+    </div>
+    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a> &mdash; nothing else. See our <a href="/privacy">privacy policy</a>.</p>
+  </div>
+</dialog>
+
+<script>
+(function() {
+  var modal = document.getElementById('ea-modal');
+  if (!modal || typeof HTMLDialogElement === 'undefined') return;
+  var form = document.getElementById('ea-form');
+  var submitBtn = document.getElementById('ea-submit');
+  var successEl = document.getElementById('ea-success');
+  var errorEl = document.getElementById('ea-error');
+
+  function openModal(e) {
+    if (e) e.preventDefault();
+    form.reset();
+    form.hidden = false;
+    successEl.hidden = true;
+    errorEl.hidden = true;
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Request access';
+    modal.showModal();
+    setTimeout(function() { document.getElementById('ea-name').focus(); }, 50);
+  }
+
+  document.querySelectorAll('a[href^="mailto:support@picotally.com?subject=Early"]').forEach(function(a) {
+    a.addEventListener('click', openModal);
+  });
+
+  modal.querySelectorAll('[data-ea-close]').forEach(function(el) {
+    el.addEventListener('click', function() { modal.close(); });
+  });
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.close();
+  });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    errorEl.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    var payload = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      trade: form.trade.value.trim() || '(not specified)',
+      _subject: 'PicoTally early access request',
+      _template: 'table'
+    };
+    fetch('https://formsubmit.co/ajax/support@picotally.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function() {
+      form.hidden = true;
+      successEl.hidden = false;
+    }).catch(function() {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Try again';
+      errorEl.textContent = 'Hmm, that didn’t go through. You can email support@picotally.com directly and we’ll add you manually.';
+      errorEl.hidden = false;
+    });
+  });
+})();
+</script>
+
 </body>
 </html>
