@@ -3,30 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terms of Service - PicoTally</title>
+  <title>Terms of Service &mdash; PicoTally</title>
+  <meta name="description" content="The terms that govern your use of PicoTally.">
+  <link rel="icon" type="image/png" href="/picotally-icon.png">
+  <link rel="apple-touch-icon" href="/picotally-icon.png">
   <style>
-    :root { --brand: #1565C0; --bg: #FAFAFA; --text: #212121; --muted: #616161; }
+    :root {
+      --bg: #FFFFFF; --bg-soft: #F7F7F8; --bg-dark: #0F0F11;
+      --text: #0A0A0A; --text-soft: #424246; --text-mute: #71717A; --text-light: #A1A1AA;
+      --border: #E4E4E7; --border-dark: #27272A;
+      --brand: #1565C0; --brand-deep: #0D47A1; --brand-soft: #E8F0FA;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; }
-    .container { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
-    h1 { font-size: 28px; margin-bottom: 8px; color: var(--brand); }
-    .effective { color: var(--muted); font-size: 14px; margin-bottom: 40px; }
-    h2 { font-size: 20px; margin: 32px 0 12px; color: var(--text); }
-    p, li { font-size: 16px; margin-bottom: 12px; }
-    ul, ol { padding-left: 24px; margin-bottom: 16px; }
-    a { color: var(--brand); }
-    footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #DDD; color: var(--muted); font-size: 13px; }
+    html { scroll-behavior: smooth; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .container-narrow { max-width: 740px; margin: 0 auto; padding: 0 24px; }
+
+    nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; gap: 32px; max-width: 1180px; margin: 0 auto; padding: 12px 24px; }
+    .nav-logo { display: flex; align-items: center; gap: 16px; font-weight: 700; font-size: 32px; letter-spacing: -0.02em; color: var(--text); }
+    .nav-logo:hover { text-decoration: none; }
+    .nav-logo img { width: 72px; height: 72px; border-radius: 18px; }
+    .nav-links { display: flex; align-items: center; gap: 28px; margin-left: auto; }
+    .nav-links a { color: var(--text-soft); font-size: 15px; font-weight: 500; transition: color 120ms; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 14px; font-size: 15px; font-weight: 600; text-decoration: none; transition: transform 160ms ease, box-shadow 160ms ease; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.18); text-decoration: none; }
+    .btn-sm { padding: 10px 18px; font-size: 14px; }
+
+    .page-hero { padding: 72px 0 56px; background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); border-bottom: 1px solid var(--border); }
+    .page-hero .eyebrow { display: inline-flex; align-items: center; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); margin-bottom: 14px; }
+    .page-hero .eyebrow::before { content: ''; display: inline-block; width: 24px; height: 2px; background: var(--brand); margin-right: 10px; border-radius: 2px; }
+    .page-hero h1 { font-size: 44px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+    .page-hero .effective { color: var(--text-mute); font-size: 15px; }
+
+    .page-body { padding: 56px 0 80px; }
+    .page-body p { font-size: 17px; line-height: 1.65; color: var(--text-soft); margin-bottom: 18px; }
+    .page-body h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.015em; color: var(--text); margin: 48px 0 16px; }
+    .page-body h2:first-child { margin-top: 0; }
+    .page-body h3 { font-size: 18px; font-weight: 600; color: var(--text); margin: 28px 0 12px; }
+    .page-body ul, .page-body ol { padding-left: 22px; margin-bottom: 20px; }
+    .page-body li { font-size: 17px; line-height: 1.65; color: var(--text-soft); margin-bottom: 10px; }
+    .page-body li strong { color: var(--text); font-weight: 600; }
+    .page-body p strong { color: var(--text); font-weight: 600; }
+
+    footer { background: var(--bg-dark); color: rgba(255,255,255,0.7); padding: 56px 0 32px; margin-top: 40px; }
+    .footer-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .footer-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .footer-brand img { width: 24px; height: 24px; border-radius: 6px; }
+    .footer-brand-name { font-weight: 700; color: #fff; font-size: 16px; letter-spacing: -0.01em; }
+    .footer-tag { font-size: 14px; max-width: 260px; line-height: 1.5; color: rgba(255,255,255,0.55); }
+    .footer-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { color: rgba(255,255,255,0.7); font-size: 14px; }
+    .footer-links a:hover { color: #fff; text-decoration: none; }
+    .footer-legal { padding-top: 24px; font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+
+    @media (max-width: 720px) {
+      .nav-logo span { display: none; }
+      .nav-logo img { width: 52px; height: 52px; border-radius: 13px; }
+      .nav-links { gap: 18px; }
+      .nav-links a { font-size: 14px; }
+      .nav-inner { gap: 16px; padding: 10px 16px; }
+      .page-hero { padding: 48px 0 36px; }
+      .page-hero h1 { font-size: 32px; }
+      .page-body { padding: 36px 0 56px; }
+      .page-body p, .page-body li { font-size: 16px; }
+      .page-body h2 { font-size: 21px; margin-top: 36px; }
+      .footer-row { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    .ea-modal { border: none; padding: 0; max-width: 480px; width: calc(100vw - 32px); border-radius: 24px; box-shadow: 0 30px 80px -10px rgba(0,0,0,0.35), 0 8px 32px -8px rgba(0,0,0,0.18); background: var(--bg); color: var(--text); }
+    .ea-modal::backdrop { background: rgba(10, 10, 10, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .ea-modal[open] { animation: ea-pop 200ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+    @keyframes ea-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+    .ea-body { position: relative; padding: 40px 32px 32px; }
+    .ea-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border: none; border-radius: 18px; background: transparent; color: var(--text-mute); font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 120ms; }
+    .ea-close:hover { background: var(--bg-soft); color: var(--text); }
+    .ea-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); margin-bottom: 8px; }
+    .ea-title { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 8px; color: var(--text); }
+    .ea-lede { color: var(--text-soft); margin: 0 0 24px; font-size: 15px; line-height: 1.5; }
+    .ea-form { display: flex; flex-direction: column; gap: 14px; }
+    .ea-field { display: flex; flex-direction: column; gap: 6px; }
+    .ea-label { font-size: 13px; font-weight: 600; color: var(--text-soft); }
+    .ea-label .ea-optional { font-weight: 400; color: var(--text-light); }
+    .ea-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; transition: border-color 120ms, box-shadow 120ms; }
+    .ea-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+    .ea-submit { margin-top: 8px; }
+    .ea-submit:disabled { opacity: 0.6; cursor: wait; }
+    .ea-success { text-align: center; padding: 24px 8px 8px; }
+    .ea-success-icon { width: 56px; height: 56px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 28px; background: var(--brand-soft); color: var(--brand); font-size: 28px; }
+    .ea-success h3 { margin: 0 0 8px; font-size: 22px; font-weight: 700; color: var(--text); }
+    .ea-success p { margin: 0; color: var(--text-soft); font-size: 15px; line-height: 1.5; }
+    .ea-error { margin: 0 0 12px; padding: 12px 14px; border-radius: 10px; background: #FEF2F2; color: #991B1B; font-size: 14px; }
+    .ea-error[hidden] { display: none; }
+    .ea-foot { margin: 18px 0 0; font-size: 12px; color: var(--text-light); text-align: center; line-height: 1.5; }
+    .ea-foot a { color: var(--text-mute); text-decoration: underline; }
   </style>
 </head>
 <body>
-<div class="container">
 
-<h1>Terms of Service</h1>
-<p class="effective">Effective date: April 18, 2026</p>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <picture>
+        <source srcset="/picotally-icon.webp" type="image/webp">
+        <img src="/picotally-icon.png" alt="" width="72" height="72">
+      </picture>
+      <span>PicoTally</span>
+    </a>
+    <div class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/#trust">Trust</a>
+      <a href="/#faq">FAQ</a>
+      <a href="/#about">About</a>
+    </div>
+    <a href="mailto:support@picotally.com?subject=Early%20access" class="btn btn-primary btn-sm">Get early access</a>
+  </div>
+</nav>
 
-<p>These terms govern your use of PicoTally ("the App"), published by Pico Apps LLC ("we", "us", "our"). By creating an account or using the App you agree to these terms.</p>
+<header class="page-hero">
+  <div class="container-narrow">
+    <div class="eyebrow">Legal</div>
+    <h1>Terms of Service</h1>
+    <p class="effective">Effective April 18, 2026</p>
+  </div>
+</header>
 
-<h2>1. The Service</h2>
+<main class="page-body">
+  <div class="container-narrow">
+
+<p>These terms govern your use of PicoTally (&ldquo;the App&rdquo;), published by Pico Apps LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;). By creating an account or using the App you agree to these terms.</p>
+
+<h2>1. The service</h2>
 <p>PicoTally is a business management tool that helps tradespeople create invoices, track expenses, manage customers, and accept payments. The App includes AI-powered features for receipt scanning and voice-to-invoice creation.</p>
 
 <h2>2. Accounts</h2>
@@ -37,7 +150,7 @@
   <li>One person or business entity per account. Account sharing is not permitted.</li>
 </ul>
 
-<h2>3. Subscription Plans</h2>
+<h2>3. Subscription plans</h2>
 <ul>
   <li><strong>Free</strong> &mdash; core invoicing and expense tracking with usage limits.</li>
   <li><strong>Pro</strong> &mdash; removes the usage limits and unlocks receipt OCR, voice-to-invoice, and advanced analytics.</li>
@@ -45,15 +158,15 @@
 <p>Pro subscriptions are purchased and renewed through the Apple App Store using your Apple ID. Apple handles payment, renewal, and refund requests under their own terms &mdash; we receive only a confirmation that your subscription is active. You can view, pause, or cancel your subscription at any time in <em>Settings &rarr; [your name] &rarr; Subscriptions</em> on your iOS device. If you cancel, Pro features remain available until the end of the current billing period; we do not issue partial refunds.</p>
 <p>Refund requests for Apple-billed purchases must be submitted to Apple at <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>.</p>
 
-<h2>4. Your Data</h2>
+<h2>4. Your data</h2>
 <ul>
   <li>You own all data you enter into the App (invoices, customer records, expenses, photos, voice memos).</li>
   <li>We do not claim any intellectual property rights over your content.</li>
   <li>You grant us a limited licence to process your data solely to provide and improve the service (e.g., sending your receipt text to our AI service for itemisation).</li>
-  <li>See our <a href="privacy.html">Privacy Policy</a> for details on how we handle your data.</li>
+  <li>See our <a href="/privacy">Privacy Policy</a> for details on how we handle your data.</li>
 </ul>
 
-<h2>5. Acceptable Use</h2>
+<h2>5. Acceptable use</h2>
 <p>You agree not to:</p>
 <ul>
   <li>Use the App for any unlawful purpose or to process fraudulent invoices.</li>
@@ -63,14 +176,14 @@
   <li>Upload content that is malicious, harmful, or violates the rights of others.</li>
 </ul>
 
-<h2>6. AI Features Disclaimer</h2>
+<h2>6. AI features disclaimer</h2>
 <ul>
-  <li>AI-powered features (receipt scanning, voice transcription, voice-to-invoice intent) are provided as productivity aids and rely on third-party services (Google Gemini, Deepgram, Anthropic Claude). See our <a href="privacy.html">Privacy Policy</a> for the full subprocessor list and what data each one receives.</li>
+  <li>AI-powered features (receipt scanning, voice transcription, voice-to-invoice intent) are provided as productivity aids and rely on third-party services (Google Gemini, Deepgram, Anthropic Claude). See our <a href="/privacy">Privacy Policy</a> for the full subprocessor list and what data each one receives.</li>
   <li>AI output may contain errors. You are responsible for reviewing and verifying all generated content before using it in invoices, quotes, or financial records.</li>
   <li>We are not liable for inaccuracies in AI-generated content.</li>
 </ul>
 
-<h2>7. Invoicing and Payment Collection</h2>
+<h2>7. Invoicing and payment collection</h2>
 <ul>
   <li>The App facilitates invoice creation and payment collection but is not a financial institution.</li>
   <li>Payments that <em>your</em> customers make against invoices you send are processed by Stripe, which is a separate service with its own terms and fees. Payouts go directly from Stripe to the bank account you connect &mdash; we do not hold your funds.</li>
@@ -78,17 +191,17 @@
   <li>You are solely responsible for the accuracy of your invoices, expenses, and tax calculations.</li>
 </ul>
 
-<h2>8. Availability and Support</h2>
+<h2>8. Availability and support</h2>
 <ul>
   <li>We aim for high availability but do not guarantee uninterrupted service.</li>
   <li>The App works offline with local data; cloud sync requires an internet connection.</li>
   <li>We may perform maintenance that temporarily limits functionality, with reasonable notice when possible.</li>
 </ul>
 
-<h2>9. Limitation of Liability</h2>
+<h2>9. Limitation of liability</h2>
 <p>To the maximum extent permitted by law:</p>
 <ul>
-  <li>The App is provided "as is" without warranties of any kind, express or implied.</li>
+  <li>The App is provided &ldquo;as is&rdquo; without warranties of any kind, express or implied.</li>
   <li>We are not liable for any indirect, incidental, special, or consequential damages arising from your use of the App.</li>
   <li>Our total liability for any claim related to the service is limited to the amount you paid us in the 12 months preceding the claim, or $100, whichever is greater.</li>
 </ul>
@@ -100,20 +213,117 @@
   <li>Upon termination, your right to use the App ceases. Provisions that should survive termination (liability, disputes) will remain in effect.</li>
 </ul>
 
-<h2>11. Changes to These Terms</h2>
+<h2>11. Changes to these terms</h2>
 <p>We may update these terms from time to time. Material changes will be communicated via email or an in-app notice at least 14 days before they take effect. Continued use of the App after the effective date constitutes acceptance of the updated terms.</p>
 
-<h2>12. Governing Law</h2>
+<h2>12. Governing law</h2>
 <p>These terms are governed by the laws of the State of Texas, United States. Any disputes will be resolved in the state or federal courts located in Texas.</p>
 
 <h2>13. Contact</h2>
 <p>For questions about these terms, contact us at:</p>
 <p><strong>Email:</strong> <a href="mailto:support@picotally.com">support@picotally.com</a></p>
 
+  </div>
+</main>
+
 <footer>
-  <p>&copy; 2026 Pico Apps LLC. All rights reserved.</p>
+  <div class="container">
+    <div class="footer-row">
+      <div>
+        <div class="footer-brand">
+          <picture>
+            <source srcset="/picotally-icon.webp" type="image/webp">
+            <img src="/picotally-icon.png" alt="" width="24" height="24" loading="lazy">
+          </picture>
+          <span class="footer-brand-name">PicoTally</span>
+        </div>
+        <p class="footer-tag">The personal AI for your trade business.</p>
+      </div>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
+        <a href="/support">Support</a>
+      </div>
+      <div>
+        <a href="mailto:support@picotally.com" style="color: var(--brand);">support@picotally.com</a>
+      </div>
+    </div>
+    <div class="footer-legal">
+      &copy; 2026 Pico Apps LLC. All rights reserved.<br>
+      &ldquo;PicoTally&rdquo; is an assumed name of Pico Apps LLC, registered with the Texas Secretary of State (Document #&nbsp;1581268360003). The PicoTally name and logo are trademarks of Pico Apps LLC.
+    </div>
+  </div>
 </footer>
 
-</div>
+<dialog id="ea-modal" class="ea-modal" aria-labelledby="ea-title">
+  <div class="ea-body">
+    <button type="button" class="ea-close" data-ea-close aria-label="Close">&times;</button>
+    <div class="ea-eyebrow">Join the waitlist</div>
+    <h2 id="ea-title" class="ea-title">Get early access to PicoTally</h2>
+    <p class="ea-lede">Be among the first tradespeople to try the personal AI for your business. We&rsquo;ll email you the moment we open enrollment.</p>
+    <p class="ea-error" id="ea-error" hidden></p>
+    <form class="ea-form" id="ea-form" novalidate>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-name">Name</label>
+        <input class="ea-input" type="text" id="ea-name" name="name" autocomplete="name" required>
+      </div>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-email">Email</label>
+        <input class="ea-input" type="email" id="ea-email" name="email" autocomplete="email" required>
+      </div>
+      <div class="ea-field">
+        <label class="ea-label" for="ea-trade">Your trade <span class="ea-optional">(optional)</span></label>
+        <input class="ea-input" type="text" id="ea-trade" name="trade" placeholder="Plumber, electrician, HVAC&hellip;" autocomplete="off">
+      </div>
+      <button type="submit" class="btn btn-primary ea-submit" id="ea-submit">Request access</button>
+    </form>
+    <div class="ea-success" id="ea-success" hidden>
+      <div class="ea-success-icon" aria-hidden="true">&#x2713;</div>
+      <h3>You&rsquo;re on the list.</h3>
+      <p>We&rsquo;ll be in touch the moment we open enrollment. Welcome aboard.</p>
+    </div>
+    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a> &mdash; nothing else. See our <a href="/privacy">privacy policy</a>.</p>
+  </div>
+</dialog>
+
+<script>
+(function() {
+  var modal = document.getElementById('ea-modal');
+  if (!modal || typeof HTMLDialogElement === 'undefined') return;
+  var form = document.getElementById('ea-form');
+  var submitBtn = document.getElementById('ea-submit');
+  var successEl = document.getElementById('ea-success');
+  var errorEl = document.getElementById('ea-error');
+  function openModal(e) {
+    if (e) e.preventDefault();
+    form.reset();
+    form.hidden = false; successEl.hidden = true; errorEl.hidden = true;
+    submitBtn.disabled = false; submitBtn.textContent = 'Request access';
+    modal.showModal();
+    setTimeout(function() { document.getElementById('ea-name').focus(); }, 50);
+  }
+  document.querySelectorAll('a[href^="mailto:support@picotally.com?subject=Early"]').forEach(function(a) {
+    a.addEventListener('click', openModal);
+  });
+  modal.querySelectorAll('[data-ea-close]').forEach(function(el) { el.addEventListener('click', function() { modal.close(); }); });
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.close(); });
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    errorEl.hidden = true; submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
+    var payload = { name: form.name.value.trim(), email: form.email.value.trim(), trade: form.trade.value.trim() || '(not specified)', _subject: 'PicoTally early access request', _template: 'table' };
+    fetch('https://formsubmit.co/ajax/support@picotally.com', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function() { form.hidden = true; successEl.hidden = false; })
+      .catch(function() {
+        submitBtn.disabled = false; submitBtn.textContent = 'Try again';
+        errorEl.textContent = 'Hmm, that didn’t go through. You can email support@picotally.com directly and we’ll add you manually.';
+        errorEl.hidden = false;
+      });
+  });
+})();
+</script>
+
 </body>
 </html>
