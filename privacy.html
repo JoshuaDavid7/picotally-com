@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy &mdash; PicoTally</title>
+  <title>Privacy Policy. PicoTally</title>
   <meta name="description" content="What data PicoTally collects, why, and how we protect it.">
   <link rel="icon" type="image/png" href="/picotally-icon.png">
   <link rel="apple-touch-icon" href="/picotally-icon.png">
@@ -201,7 +201,7 @@
 
     /* ---------- Responsive ---------- */
     @media (max-width: 720px) {
-      .nav-logo span { display: none; }
+      .nav-logo span { display: inline; }
       .nav-logo img { width: 52px; height: 52px; border-radius: 13px; }
       .nav-links { gap: 18px; }
       .nav-links a { font-size: 14px; }
@@ -233,7 +233,7 @@
     .ea-label .ea-optional { font-weight: 400; color: var(--text-light); }
     .ea-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; transition: border-color 120ms, box-shadow 120ms; }
     .ea-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
-    .ea-submit { margin-top: 8px; }
+    .ea-submit { margin-top: 8px; justify-content: center; }
     .ea-submit:disabled { opacity: 0.6; cursor: wait; }
     .ea-success { text-align: center; padding: 24px 8px 8px; }
     .ea-success-icon { width: 56px; height: 56px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; border-radius: 28px; background: var(--brand-soft); color: var(--brand); font-size: 28px; }
@@ -251,6 +251,13 @@
     }
   
     /* ---------- Mobile hamburger nav ---------- */
+    /* Hide the inline Get-early-access CTA on phones — the hamburger
+       drawer is the primary path on mobile, and the hero has a giant
+       CTA one scroll below the nav. */
+    @media (max-width: 720px) {
+      .nav-inner > a.btn-primary { display: none; }
+    }
+    
     .nav-toggle {
       display: none;
       width: 44px; height: 44px;
@@ -296,7 +303,7 @@
     }
 
     /* Lock horizontal scroll — fixes the "page wobbles side-to-side" on mobile */
-    html, body { overflow-x: hidden; max-width: 100vw; }
+    html, body { overflow-x: clip; max-width: 100vw; }
 
 </style>
 </head>
@@ -356,17 +363,17 @@
 
 <h2>2. How we use your data</h2>
 <ul>
-  <li><strong>Core functionality</strong> &mdash; creating invoices, tracking expenses, managing customers, generating PDFs.</li>
-  <li><strong>AI assistant</strong> &mdash; when you use the in-app AI assistant (by voice or by typing), the following is sent to <strong>Anthropic Claude</strong> on each turn of the conversation:
+  <li><strong>Core functionality</strong>, creating invoices, tracking expenses, managing customers, generating PDFs.</li>
+  <li><strong>AI assistant</strong>, when you use the in-app AI assistant (by voice or by typing), the following is sent to <strong>Anthropic Claude</strong> on each turn of the conversation:
     <ul>
       <li>Your message text;</li>
-      <li>A snapshot of your business data &mdash; your customer list with outstanding balances, your recent invoices, recent expenses, recent payments, current-screen context, and current-month summary statistics &mdash; so the assistant can answer your question in the context of your business;</li>
+      <li>A snapshot of your business data, your customer list with outstanding balances, your recent invoices, recent expenses, recent payments, current-screen context, and current-month summary statistics, so the assistant can answer your question in the context of your business;</li>
       <li>If the assistant needs an exact total or a longer list to answer accurately, it may run a query against your own records and the result of that query is returned to Claude in the same conversation.</li>
     </ul>
     Voice input is first transcribed by <strong>Deepgram</strong>; only the resulting transcript text (no audio) is sent to Claude. Receipt scanning is a separate flow: the extracted text is sent to <strong>Google Gemini</strong> for itemisation (the receipt image itself is never sent). All AI calls are processed server-side via secure edge functions; no AI provider keys are embedded in the app.</li>
-  <li><strong>On-device OCR</strong> &mdash; Google ML Kit extracts text from receipt images entirely on your device. No image data leaves your phone for OCR.</li>
-  <li><strong>Payments</strong> &mdash; when you use online payment links, Stripe processes the transaction. We store the payment status and session ID but never your card details.</li>
-  <li><strong>Crash reporting</strong> &mdash; if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
+  <li><strong>On-device OCR</strong>. Google ML Kit extracts text from receipt images entirely on your device. No image data leaves your phone for OCR.</li>
+  <li><strong>Payments</strong>, when you use online payment links, Stripe processes the transaction. We store the payment status and session ID but never your card details.</li>
+  <li><strong>Crash reporting</strong>, if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
 </ul>
 
 <h2>3. Third-party services</h2>
@@ -376,28 +383,28 @@
   <tr><td>Supabase</td><td>All synced business data</td><td>Cloud database, authentication, file storage</td></tr>
   <tr><td>Google Gemini</td><td>Receipt text (not images)</td><td>AI-powered receipt itemisation</td></tr>
   <tr><td>Deepgram</td><td>Audio recordings</td><td>Voice-to-text transcription</td></tr>
-  <tr><td>Anthropic Claude</td><td>Your assistant message (voice transcript or typed text) plus a snapshot of your business data &mdash; customer names with balances, recent invoices, recent expenses, recent payments, and current-month statistics. May also receive additional rows from your own records when the assistant runs a query mid-conversation.</td><td>Powering the in-app AI assistant: answering questions about your business and drafting invoices, expenses, and payments on command</td></tr>
+  <tr><td>Anthropic Claude</td><td>Your assistant message (voice transcript or typed text) plus a snapshot of your business data, customer names with balances, recent invoices, recent expenses, recent payments, and current-month statistics. May also receive additional rows from your own records when the assistant runs a query mid-conversation.</td><td>Powering the in-app AI assistant: answering questions about your business and drafting invoices, expenses, and payments on command</td></tr>
   <tr><td>Stripe</td><td>Payment amount, currency, client email</td><td>Payment processing for invoices you send to your customers</td></tr>
-  <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple &mdash; not us &mdash; sees your payment method.</td></tr>
+  <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple, not us, sees your payment method.</td></tr>
   <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
   <tr><td>Google ML Kit</td><td>None (on-device only)</td><td>Text recognition from images</td></tr>
 </table>
 
-<p>Waitlist signups submitted via the &ldquo;Get early access&rdquo; form on picotally.com are received by a Cloudflare Pages Function that runs on the same infrastructure as the website itself. The submission (name, email, optional trade) stays on our Cloudflare account &mdash; the same provider that hosts the marketing site &mdash; and is not shared with any third-party form processor.</p>
+<p>Waitlist signups submitted via the &ldquo;Get early access&rdquo; form on picotally.com are received by a Cloudflare Pages Function that runs on the same infrastructure as the website itself. The submission (name, email, optional trade) stays on our Cloudflare account, the same provider that hosts the marketing site, and is not shared with any third-party form processor.</p>
 
 <p>We do not sell, rent, or share your data with advertisers, data brokers, or any party not listed above.</p>
 
 <h2>4. Device permissions</h2>
 <ul>
-  <li><strong>Microphone</strong> &mdash; voice recording for the voice-to-invoice feature. Only active when you tap the record button.</li>
-  <li><strong>Camera</strong> &mdash; taking photos of receipts and project work.</li>
-  <li><strong>Photo library</strong> &mdash; selecting existing photos for receipt scanning or project documentation.</li>
+  <li><strong>Microphone</strong>, voice recording for the voice-to-invoice feature. Only active when you tap the record button.</li>
+  <li><strong>Camera</strong>, taking photos of receipts and project work.</li>
+  <li><strong>Photo library</strong>, selecting existing photos for receipt scanning or project documentation.</li>
 </ul>
 <p>Each permission is requested only when needed and can be revoked at any time in your device settings.</p>
 
 <h2>5. Data storage and security</h2>
 <ul>
-  <li>Cloud data is stored in Supabase (PostgreSQL) with row-level security. Each user can only access their own records &mdash; enforced at the database level, not just in app code.</li>
+  <li>Cloud data is stored in Supabase (PostgreSQL) with row-level security. Each user can only access their own records, enforced at the database level, not just in app code.</li>
   <li>A local copy is cached on your device in a SQLite database for offline use. The file is encrypted with SQLCipher (AES-256); the encryption key is generated on your device and stored in the iOS Keychain / Android Keystore, and never leaves the device.</li>
   <li>All network communication uses HTTPS/TLS encryption.</li>
   <li>API keys for Google Gemini, Deepgram, Anthropic Claude, and Stripe live only as server-side secrets. They are never bundled into the mobile app and cannot be extracted from an installed binary.</li>
@@ -408,8 +415,8 @@
 <ul>
   <li>Your data is retained for as long as your account is active.</li>
   <li>You can delete individual records (invoices, expenses, customers) at any time from within the app.</li>
-  <li>You can permanently delete your entire account from <em>Settings &rarr; Account &rarr; Delete Account</em>. This removes all rows tied to your user ID across our database &mdash; invoices, quotes, expenses, receipts, customers, project notes, voice memos, uploaded logos and photos &mdash; plus your authentication record. The deletion is irreversible and typically completes within seconds.</li>
-  <li>The same in-app deletion also wipes the encrypted local database on your device, removes the SQLCipher key from the iOS Keychain / Android Keystore, and clears any saved sign-in credentials. <strong>Use the in-app Delete Account flow rather than just uninstalling</strong> &mdash; uninstalling removes the app&rsquo;s documents folder but, by default, the iOS Keychain entries survive uninstall and would persist until the device is wiped or you delete the PicoTally entries via iOS Settings.</li>
+  <li>You can permanently delete your entire account from <em>Settings &rarr; Account &rarr; Delete Account</em>. This removes all rows tied to your user ID across our database, invoices, quotes, expenses, receipts, customers, project notes, voice memos, uploaded logos and photos, plus your authentication record. The deletion is irreversible and typically completes within seconds.</li>
+  <li>The same in-app deletion also wipes the encrypted local database on your device, removes the SQLCipher key from the iOS Keychain / Android Keystore, and clears any saved sign-in credentials. <strong>Use the in-app Delete Account flow rather than just uninstalling</strong>, uninstalling removes the app&rsquo;s documents folder but, by default, the iOS Keychain entries survive uninstall and would persist until the device is wiped or you delete the PicoTally entries via iOS Settings.</li>
   <li>Audit logs of payment webhook events received from Stripe are retained for fraud-detection purposes; these contain transaction metadata (amount, currency, status) but no card numbers and no personal account information.</li>
   <li>Database backups taken before your deletion request may continue to hold a copy of your data for up to 7 days, after which they are rotated out and unrecoverable. We do not access these backups except to recover from infrastructure failure.</li>
 </ul>
@@ -495,7 +502,7 @@
       <h3>You&rsquo;re on the list.</h3>
       <p>We&rsquo;ll be in touch the moment we open enrollment. Welcome aboard.</p>
     </div>
-    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a> &mdash; nothing else. See our <a href="/privacy">privacy policy</a>.</p>
+    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a>, nothing else. See our <a href="/privacy">privacy policy</a>.</p>
   </div>
 </dialog>
 
