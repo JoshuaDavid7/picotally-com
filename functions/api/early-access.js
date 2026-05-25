@@ -112,11 +112,54 @@ export async function onRequestPost({ request, env }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        text: `New PicoTally waitlist signup: ${name} <${email}>${trade ? ' — ' + trade : ''}`,
+        text: `New PicoTally waitlist signup: ${name} <${email}>${trade ? ', ' + trade : ''}`,
         submission,
       }),
     }).catch((err) => {
       console.error('EARLY_ACCESS_WEBHOOK_FAILED', err?.message || String(err));
+    });
+  }
+
+  // Optional Resend email delivery. If RESEND_API_KEY is set, every
+  // submission also gets emailed as a plain notification. Sign up
+  // at resend.com (free, 100 emails/day), paste the API key as a
+  // Cloudflare Pages env var named RESEND_API_KEY. Optionally set
+  // RESEND_TO (default: support@picotally.com) and RESEND_FROM
+  // (default: PicoTally Waitlist <onboarding@resend.dev>, which
+  // works without verifying picotally.com as a sending domain).
+  if (env.RESEND_API_KEY) {
+    const to = env.RESEND_TO || 'support@picotally.com';
+    const from = env.RESEND_FROM || 'PicoTally Waitlist <onboarding@resend.dev>';
+    const safeName = String(name).replace(/[<>&]/g, '');
+    const safeEmail = String(email).replace(/[<>&]/g, '');
+    const safeTrade = (trade ? String(trade).replace(/[<>&]/g, '') : '(not specified)');
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from,
+        to,
+        reply_to: safeEmail,
+        subject: `New PicoTally early access: ${safeName}`,
+        html: `<h2>New waitlist signup</h2>
+<p><strong>Name:</strong> ${safeName}</p>
+<p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
+<p><strong>Trade:</strong> ${safeTrade}</p>
+<p><strong>When:</strong> ${submission.ts}</p>
+<p><strong>Country:</strong> ${submission.country || 'unknown'}</p>
+<hr>
+<p style="color:#888;font-size:12px;">Sent by the picotally.com Cloudflare Pages Function. Reply to this email to respond to ${safeName} directly.</p>`,
+      }),
+    }).then(async (r) => {
+      if (!r.ok) {
+        const body = await r.text().catch(() => '');
+        console.error('EARLY_ACCESS_RESEND_FAILED', r.status, body.slice(0, 200));
+      }
+    }).catch((err) => {
+      console.error('EARLY_ACCESS_RESEND_FAILED', err?.message || String(err));
     });
   }
 
