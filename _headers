@@ -1,0 +1,14 @@
+# Cloudflare Pages _headers file
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+# Screenshots: never cache. Means whenever we re-shoot, the new
+# version shows up on the next visit, no hard-refresh needed.
+/screenshots/*
+  Cache-Control: no-cache, must-revalidate
+
+# HTML always revalidates already (Cloudflare default), but be explicit.
+/*.html
+  Cache-Control: no-cache, must-revalidate
+
+/
+  Cache-Control: no-cache, must-revalidate
