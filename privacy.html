@@ -217,10 +217,10 @@
     }
 
     /* ---------- Early-access modal ---------- */
-    .ea-modal { border: none; padding: 0; max-width: 480px; width: calc(100vw - 32px); border-radius: 24px; box-shadow: 0 30px 80px -10px rgba(0,0,0,0.35), 0 8px 32px -8px rgba(0,0,0,0.18); background: var(--bg); color: var(--text); }
+    .ea-modal { position: fixed; top: 50%; left: 50%; margin: 0; transform: translate(-50%, -50%); border: none; padding: 0; max-width: 480px; width: min(480px, calc(100vw - 32px)); border-radius: 24px; box-shadow: 0 30px 80px -10px rgba(0,0,0,0.35), 0 8px 32px -8px rgba(0,0,0,0.18); background: var(--bg); color: var(--text); }
     .ea-modal::backdrop { background: rgba(10, 10, 10, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .ea-modal[open] { animation: ea-pop 200ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
-    @keyframes ea-pop { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: none; } }
+    @keyframes ea-pop { from { opacity: 0; transform: translate(-50%, -50%) translateY(8px) scale(0.97); } to { opacity: 1; transform: translate(-50%, -50%); } }
     .ea-body { position: relative; padding: 40px 32px 32px; }
     .ea-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border: none; border-radius: 18px; background: transparent; color: var(--text-mute); font-size: 22px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 120ms; }
     .ea-close:hover { background: var(--bg-soft); color: var(--text); }
@@ -243,6 +243,12 @@
     .ea-error[hidden] { display: none; }
     .ea-foot { margin: 18px 0 0; font-size: 12px; color: var(--text-light); text-align: center; line-height: 1.5; }
     .ea-foot a { color: var(--text-mute); text-decoration: underline; }
+    @media (max-width: 480px) {
+      .ea-body { padding: 32px 22px 24px; }
+      .ea-title { font-size: 22px; line-height: 1.18; }
+      .ea-lede { font-size: 14px; margin-bottom: 20px; }
+      .ea-modal { border-radius: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -257,6 +263,7 @@
       <span>PicoTally</span>
     </a>
     <div class="nav-links">
+      <a href="/#vs">vs Generic AI</a>
       <a href="/#features">Features</a>
       <a href="/#trust">Trust</a>
       <a href="/#faq">FAQ</a>
@@ -320,8 +327,9 @@
   <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple &mdash; not us &mdash; sees your payment method.</td></tr>
   <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
   <tr><td>Google ML Kit</td><td>None (on-device only)</td><td>Text recognition from images</td></tr>
-  <tr><td>FormSubmit</td><td>Marketing-site only: name, email, and optionally the trade you entered into the &ldquo;Get early access&rdquo; form on picotally.com. Not used inside the app.</td><td>Relays your waitlist signup to our inbox so we can contact you when enrollment opens</td></tr>
 </table>
+
+<p>Waitlist signups submitted via the &ldquo;Get early access&rdquo; form on picotally.com are received by a Cloudflare Pages Function that runs on the same infrastructure as the website itself. The submission (name, email, optional trade) stays on our Cloudflare account &mdash; the same provider that hosts the marketing site &mdash; and is not shared with any third-party form processor.</p>
 
 <p>We do not sell, rent, or share your data with advertisers, data brokers, or any party not listed above.</p>
 
@@ -482,7 +490,7 @@
       _subject: 'PicoTally early access request',
       _template: 'table'
     };
-    fetch('https://formsubmit.co/ajax/support@picotally.com', {
+    fetch('/api/early-access', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify(payload)
