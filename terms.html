@@ -69,7 +69,7 @@
       .nav-links { gap: 18px; }
       .nav-links a { font-size: 14px; }
       .nav-inner { gap: 16px; padding: 10px 16px; }
-      .page-hero { padding: 48px 0 36px; }
+      .page-hero { padding: 56px 0 36px; }
       .page-hero h1 { font-size: 32px; }
       .page-body { padding: 36px 0 56px; }
       .page-body p, .page-body li { font-size: 16px; }
@@ -144,11 +144,26 @@
     @media (max-width: 720px) {
       .nav-inner { position: relative; }
       .nav-toggle { display: inline-flex; }
-      /* Unified mobile nav across all pages */
-      .nav-inner { gap: 12px !important; padding: 10px 16px !important; }
-      .nav-logo { gap: 10px !important; font-size: 22px !important; }
+      /* Unified mobile nav across all pages.
+         min-height + explicit padding split nails the total nav-inner
+         height to exactly 64 device px (44 logo + 10 top + 10 bottom)
+         on every page, eliminating any font-metric drift between
+         the home and aux page nav rendering. */
+      .nav-inner {
+        gap: 12px !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        min-height: 64px !important;
+      }
+      .nav-logo {
+        gap: 10px !important;
+        font-size: 22px !important;
+        line-height: 1 !important;
+      }
       .nav-logo img { width: 44px !important; height: 44px !important; border-radius: 11px !important; }
-      .nav-logo span { display: inline !important; }
+      .nav-logo span { display: inline !important; line-height: 1 !important; }
       
       .nav-links {
         display: none !important;
@@ -332,7 +347,7 @@
     </div>
     <div class="footer-legal">
       &copy; 2026 Pico Apps LLC. All rights reserved.<br>
-      &ldquo;PicoTally&rdquo; is an assumed name of Pico Apps LLC, registered with the Texas Secretary of State (Document #&nbsp;1581268360003). The PicoTally name and logo are trademarks of Pico Apps LLC.
+      &ldquo;PicoTally&rdquo; is an assumed name of Pico Apps LLC, registered with the Texas Secretary of State (Document #&nbsp;1581268360003).
     </div>
   </div>
 </footer>
