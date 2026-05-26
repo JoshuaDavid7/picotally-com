@@ -20,7 +20,7 @@
   <meta name="twitter:description" content="The personal AI for your trade business. Ask anything by voice or text.">
   <meta name="twitter:image" content="https://picotally.com/picotally-icon.png">
 
-  <link rel="preload" as="image" href="/screenshots/02-chat-overdue.webp?v=20260525f" imagesrcset="/screenshots/02-chat-overdue.webp?v=20260525f 2x, /screenshots/02-chat-overdue@3x.webp?v=20260525f 3x" type="image/webp">
+  <link rel="preload" as="image" href="/screenshots/02-chat-overdue.webp?v=20260525g" imagesrcset="/screenshots/02-chat-overdue.webp?v=20260525g 2x, /screenshots/02-chat-overdue@3x.webp?v=20260525g 3x" type="image/webp">
   <link rel="icon" type="image/png" href="/picotally-icon.png">
   <link rel="apple-touch-icon" href="/picotally-icon.png">
 
@@ -734,23 +734,36 @@
     
     .nav-toggle {
       display: none;
-      width: 44px; height: 44px;
+      width: 40px; height: 40px;
       flex-direction: column; align-items: center; justify-content: center;
       gap: 5px;
       margin-left: auto;
-      border: none; background: transparent; cursor: pointer; padding: 10px;
-      border-radius: 12px;
-      transition: background 120ms ease;
+      border: none; background: transparent; cursor: pointer; padding: 0;
+      border-radius: 10px;
+      transition: background 160ms ease;
+      -webkit-tap-highlight-color: transparent;
     }
-    .nav-toggle:hover { background: var(--bg-soft); }
-    .nav-toggle-bar { width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: transform 0.22s ease, opacity 0.18s ease; }
-    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) { opacity: 0; }
-    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-toggle:hover { background: rgba(0, 0, 0, 0.04); }
+    .nav-toggle:active { background: rgba(0, 0, 0, 0.07); }
+    .nav-toggle-bar {
+      width: 18px; height: 1.5px;
+      background: var(--text);
+      border-radius: 1.5px;
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease;
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) { opacity: 0; transform: scaleX(0.4); }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
     @media (max-width: 720px) {
       .nav-inner { position: relative; }
       .nav-toggle { display: inline-flex; }
+      /* Unified mobile nav across all pages */
+      .nav-inner { gap: 12px !important; padding: 10px 16px !important; }
+      .nav-logo { gap: 10px !important; font-size: 22px !important; }
+      .nav-logo img { width: 44px !important; height: 44px !important; border-radius: 11px !important; }
+      .nav-logo span { display: inline !important; }
+      
       .nav-links {
         display: none !important;
         position: absolute;
@@ -839,8 +852,8 @@
     <div class="iphone iphone-glow reveal">
       <div class="iphone-screen">
         <picture>
-          <source srcset="/screenshots/02-chat-overdue.webp?v=20260525f 2x, /screenshots/02-chat-overdue@3x.webp?v=20260525f 3x" type="image/webp">
-          <img src="/screenshots/02-chat-overdue.png?v=20260525f" srcset="/screenshots/02-chat-overdue.png?v=20260525f 2x, /screenshots/02-chat-overdue@3x.png?v=20260525f 3x" alt="PicoTally AI assistant answering two questions in one conversation: 'Who owes me the most?' returns Daniel Smith $5,106.06 plus a numbered top-4 breakdown (Steven, Michael Jones, Mike) with a $7,234.02 total across 8 unpaid invoices; 'How much did I spend on pipes in the last 2 months?' returns $343.98 across 5 items, attributed mostly to Daniel Smith's jobs at $194.98" width="832" height="1809" fetchpriority="high">
+          <source srcset="/screenshots/02-chat-overdue.webp?v=20260525g 2x, /screenshots/02-chat-overdue@3x.webp?v=20260525g 3x" type="image/webp">
+          <img src="/screenshots/02-chat-overdue.png?v=20260525g" srcset="/screenshots/02-chat-overdue.png?v=20260525g 2x, /screenshots/02-chat-overdue@3x.png?v=20260525g 3x" alt="PicoTally AI assistant answering two questions in one conversation: 'Who owes me the most?' returns Daniel Smith $5,106.06 plus a numbered top-4 breakdown (Steven, Michael Jones, Mike) with a $7,234.02 total across 8 unpaid invoices; 'How much did I spend on pipes in the last 2 months?' returns $343.98 across 5 items, attributed mostly to Daniel Smith's jobs at $194.98" width="832" height="1809" fetchpriority="high">
         </picture>
       </div>
     </div>
@@ -914,8 +927,8 @@
         <div class="iphone">
           <div class="iphone-screen">
             <picture>
-              <source srcset="/screenshots/03-voice-quote-draft.webp?v=20260525f 2x, /screenshots/03-voice-quote-draft@3x.webp?v=20260525f 3x" type="image/webp">
-              <img src="/screenshots/03-voice-quote-draft.png?v=20260525f" srcset="/screenshots/03-voice-quote-draft.png?v=20260525f 2x, /screenshots/03-voice-quote-draft@3x.png?v=20260525f 3x" alt="Voice-generated quote draft for Daniel Smith — $708.00 estimated total, 6 hours of kitchen plumbing labor at $85 per hour, plus itemised Materials and Parts: 100 feet of PEX pipe at $1.50 per foot and 4 quarter-turn shut-off valves at $12 each. Client section pre-filled with Daniel's address, phone, and email." width="832" height="1808" loading="lazy" decoding="async">
+              <source srcset="/screenshots/03-voice-quote-draft.webp?v=20260525g 2x, /screenshots/03-voice-quote-draft@3x.webp?v=20260525g 3x" type="image/webp">
+              <img src="/screenshots/03-voice-quote-draft.png?v=20260525g" srcset="/screenshots/03-voice-quote-draft.png?v=20260525g 2x, /screenshots/03-voice-quote-draft@3x.png?v=20260525g 3x" alt="Voice-generated quote draft for Daniel Smith — $708.00 estimated total, 6 hours of kitchen plumbing labor at $85 per hour, plus itemised Materials and Parts: 100 feet of PEX pipe at $1.50 per foot and 4 quarter-turn shut-off valves at $12 each. Client section pre-filled with Daniel's address, phone, and email." width="832" height="1808" loading="lazy" decoding="async">
             </picture>
           </div>
         </div>
@@ -938,8 +951,8 @@
         <div class="iphone">
           <div class="iphone-screen">
             <picture>
-              <source srcset="/screenshots/04-receipt-costco.webp?v=20260525f 2x, /screenshots/04-receipt-costco@3x.webp?v=20260525f 3x" type="image/webp">
-              <img src="/screenshots/04-receipt-costco.png?v=20260525f" srcset="/screenshots/04-receipt-costco.png?v=20260525f 2x, /screenshots/04-receipt-costco@3x.png?v=20260525f 3x" alt="Receipt detail view: Kroger vendor pill, $6.48 total, itemised line-item table showing Daisy Sour Cream $2.99 and Kroger Milk $3.49, with subtotal $6.48, tax $0.00, total $6.48, plus a meta panel showing date Thursday Apr 30 2026, vendor Kroger, category Meals & Entertainment, payment Credit/Debit Card, receipt Attached, and Edit / Delete actions" width="832" height="1809" loading="lazy" decoding="async">
+              <source srcset="/screenshots/04-receipt-costco.webp?v=20260525g 2x, /screenshots/04-receipt-costco@3x.webp?v=20260525g 3x" type="image/webp">
+              <img src="/screenshots/04-receipt-costco.png?v=20260525g" srcset="/screenshots/04-receipt-costco.png?v=20260525g 2x, /screenshots/04-receipt-costco@3x.png?v=20260525g 3x" alt="Receipt detail view: Kroger vendor pill, $6.48 total, itemised line-item table showing Daisy Sour Cream $2.99 and Kroger Milk $3.49, with subtotal $6.48, tax $0.00, total $6.48, plus a meta panel showing date Thursday Apr 30 2026, vendor Kroger, category Meals & Entertainment, payment Credit/Debit Card, receipt Attached, and Edit / Delete actions" width="832" height="1809" loading="lazy" decoding="async">
             </picture>
           </div>
         </div>
@@ -952,8 +965,8 @@
         <div class="iphone">
           <div class="iphone-screen">
             <picture>
-              <source srcset="/screenshots/01-home.webp?v=20260525f 2x, /screenshots/01-home@3x.webp?v=20260525f 3x" type="image/webp">
-              <img src="/screenshots/01-home.png?v=20260525f" srcset="/screenshots/01-home.png?v=20260525f 2x, /screenshots/01-home@3x.png?v=20260525f 3x" alt="PicoTally home dashboard: $6,534 awaiting payment with 8 unpaid pill, $20,628 monthly gross income, $6,998 expenses, $13,629 net income, plus an urgent customer list with Rachel Williams awaiting payment, Daniel Smith overdue $5,106, and Michael Jones overdue $274" width="832" height="1809" loading="lazy" decoding="async">
+              <source srcset="/screenshots/01-home.webp?v=20260525g 2x, /screenshots/01-home@3x.webp?v=20260525g 3x" type="image/webp">
+              <img src="/screenshots/01-home.png?v=20260525g" srcset="/screenshots/01-home.png?v=20260525g 2x, /screenshots/01-home@3x.png?v=20260525g 3x" alt="PicoTally home dashboard: $6,534 awaiting payment with 8 unpaid pill, $20,628 monthly gross income, $6,998 expenses, $13,629 net income, plus an urgent customer list with Rachel Williams awaiting payment, Daniel Smith overdue $5,106, and Michael Jones overdue $274" width="832" height="1809" loading="lazy" decoding="async">
             </picture>
           </div>
         </div>
