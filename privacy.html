@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy. PicoTally</title>
+  <title>Privacy Policy &mdash; PicoTally</title>
   <meta name="description" content="What data PicoTally collects, why, and how we protect it.">
   <link rel="icon" type="image/png" href="/picotally-icon.png">
   <link rel="apple-touch-icon" href="/picotally-icon.png">
@@ -260,23 +260,36 @@
     
     .nav-toggle {
       display: none;
-      width: 44px; height: 44px;
+      width: 40px; height: 40px;
       flex-direction: column; align-items: center; justify-content: center;
       gap: 5px;
       margin-left: auto;
-      border: none; background: transparent; cursor: pointer; padding: 10px;
-      border-radius: 12px;
-      transition: background 120ms ease;
+      border: none; background: transparent; cursor: pointer; padding: 0;
+      border-radius: 10px;
+      transition: background 160ms ease;
+      -webkit-tap-highlight-color: transparent;
     }
-    .nav-toggle:hover { background: var(--bg-soft); }
-    .nav-toggle-bar { width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: transform 0.22s ease, opacity 0.18s ease; }
-    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) { opacity: 0; }
-    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-toggle:hover { background: rgba(0, 0, 0, 0.04); }
+    .nav-toggle:active { background: rgba(0, 0, 0, 0.07); }
+    .nav-toggle-bar {
+      width: 18px; height: 1.5px;
+      background: var(--text);
+      border-radius: 1.5px;
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.18s ease;
+    }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) { opacity: 0; transform: scaleX(0.4); }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
     @media (max-width: 720px) {
       .nav-inner { position: relative; }
       .nav-toggle { display: inline-flex; }
+      /* Unified mobile nav across all pages */
+      .nav-inner { gap: 12px !important; padding: 10px 16px !important; }
+      .nav-logo { gap: 10px !important; font-size: 22px !important; }
+      .nav-logo img { width: 44px !important; height: 44px !important; border-radius: 11px !important; }
+      .nav-logo span { display: inline !important; }
+      
       .nav-links {
         display: none !important;
         position: absolute;
