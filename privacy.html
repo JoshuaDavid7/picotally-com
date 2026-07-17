@@ -366,7 +366,7 @@
   <div class="container-narrow">
     <div class="eyebrow">Legal</div>
     <h1>Privacy Policy</h1>
-    <p class="effective">Effective May 23, 2026</p>
+    <p class="effective">Effective July 16, 2026</p>
   </div>
 </header>
 
@@ -398,8 +398,14 @@
       <li>A snapshot of your business data, your customer list with outstanding balances, your recent invoices, recent expenses, recent payments, current-screen context, and current-month summary statistics, so the assistant can answer your question in the context of your business;</li>
       <li>If the assistant needs an exact total or a longer list to answer accurately, it may run a query against your own records and the result of that query is returned to Claude in the same conversation.</li>
     </ul>
-    Voice input is first transcribed by <strong>Deepgram</strong>; only the resulting transcript text (no audio) is sent to Claude. Receipt scanning is a separate flow: the extracted text is sent to <strong>Google Gemini</strong> for itemisation (the receipt image itself is never sent). All AI calls are processed server-side via secure edge functions; no AI provider keys are embedded in the app.</li>
-  <li><strong>On-device OCR</strong>. Google ML Kit extracts text from receipt images entirely on your device. No image data leaves your phone for OCR.</li>
+    There are two voice paths, and they send your audio to different places.
+    <br><br>
+    <strong>Recorded voice notes</strong> (dictating a job) are uploaded and transcribed by <strong>Deepgram</strong>; only the resulting transcript text — not the audio — is then sent to Anthropic Claude or Google Gemini to extract the job details. When the assistant speaks back, the reply <em>text</em> is sent to Deepgram to be turned into speech.
+    <br><br>
+    <strong>Real-time voice ("Hey Pico", Pro&nbsp;Max)</strong> works differently. Your microphone audio streams live through <strong>LiveKit</strong> (a real-time media service) to our voice assistant, which runs on <strong>Fly.io</strong> servers in the United States, and on into <strong>Google Gemini Live</strong>, which listens and replies in the same conversation. In this mode your raw audio — not just a transcript — is handled by LiveKit, Fly.io and Google. The assistant also looks up your own business records while you talk, so that it can answer questions about them.
+    <br><br>
+    Receipt scanning is a separate flow again: the text read off the receipt is sent to <strong>Google Gemini</strong> for itemisation (the receipt image itself is never sent to Gemini). All AI calls are processed server-side via secure edge functions; no AI provider keys are embedded in the app.</li>
+  <li><strong>On-device OCR</strong>. Google ML Kit extracts text from receipt images entirely on your device, so no image is sent to any AI provider to be read. The receipt photo itself is still uploaded to your own Supabase storage, so it syncs across your devices and stays attached to the expense as evidence.</li>
   <li><strong>Payments</strong>, when you use online payment links, Stripe processes the transaction. We store the payment status and session ID but never your card details.</li>
   <li><strong>Crash reporting</strong>, if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
 </ul>
@@ -409,12 +415,16 @@
 <table>
   <tr><th>Service</th><th>Data received</th><th>Purpose</th></tr>
   <tr><td>Supabase</td><td>All synced business data</td><td>Cloud database, authentication, file storage</td></tr>
-  <tr><td>Google Gemini</td><td>Receipt text (not images)</td><td>AI-powered receipt itemisation</td></tr>
-  <tr><td>Deepgram</td><td>Audio recordings</td><td>Voice-to-text transcription</td></tr>
+  <tr><td>Google Gemini</td><td>Text read off your receipts (not the images), and transcripts of job voice notes</td><td>Itemising receipts and extracting job details</td></tr>
+  <tr><td>Google Gemini Live</td><td><strong>Your microphone audio, live</strong>, plus the business context the assistant needs to answer you</td><td>The real-time "Hey Pico" voice assistant (Pro&nbsp;Max)</td></tr>
+  <tr><td>LiveKit</td><td><strong>Your microphone audio, live</strong></td><td>Carrying the real-time voice conversation between your phone and the assistant (Pro&nbsp;Max)</td></tr>
+  <tr><td>Fly.io</td><td><strong>Your microphone audio, live</strong>, and the business records the assistant looks up to answer you</td><td>Running the voice assistant service itself, on servers in the United States (Pro&nbsp;Max)</td></tr>
+  <tr><td>Deepgram</td><td>Recorded voice notes (audio), and the assistant's reply text when it speaks back</td><td>Voice-to-text transcription, and text-to-speech</td></tr>
   <tr><td>Anthropic Claude</td><td>Your assistant message (voice transcript or typed text) plus a snapshot of your business data, customer names with balances, recent invoices, recent expenses, recent payments, and current-month statistics. May also receive additional rows from your own records when the assistant runs a query mid-conversation.</td><td>Powering the in-app AI assistant: answering questions about your business and drafting invoices, expenses, and payments on command</td></tr>
   <tr><td>Stripe</td><td>Payment amount, currency, client email</td><td>Payment processing for invoices you send to your customers</td></tr>
   <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription. Apple, not us, sees your payment method.</td></tr>
   <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
+  <tr><td>Resend</td><td>The recipient's email address and the invoice, quote or receipt PDF you chose to send, plus your account email for sign-in and password emails</td><td>Delivering the documents you send to your customers, and account emails to you</td></tr>
   <tr><td>Google ML Kit</td><td>None (on-device only)</td><td>Text recognition from images</td></tr>
 </table>
 
@@ -435,7 +445,7 @@
   <li>Cloud data is stored in Supabase (PostgreSQL) with row-level security. Each user can only access their own records, enforced at the database level, not just in app code.</li>
   <li>A local copy is cached on your device in a SQLite database for offline use. The file is encrypted with SQLCipher (AES-256); the encryption key is generated on your device and stored in the iOS Keychain / Android Keystore, and never leaves the device.</li>
   <li>All network communication uses HTTPS/TLS encryption.</li>
-  <li>API keys for Google Gemini, Deepgram, Anthropic Claude, and Stripe live only as server-side secrets. They are never bundled into the mobile app and cannot be extracted from an installed binary.</li>
+  <li>API keys for Google Gemini, Deepgram, Anthropic Claude, LiveKit, Resend, and Stripe live only as server-side secrets. They are never bundled into the mobile app and cannot be extracted from an installed binary.</li>
   <li>Crash reports sent to Sentry are passed through a PII scrubber that redacts emails, phone numbers, tokens, and truncates long free-form text before the report leaves your device.</li>
 </ul>
 
