@@ -52,6 +52,11 @@
 
     /* ---------- Reset ---------- */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* An <img> carries width/height attributes for layout stability. If CSS
+       then sets only width, the height ATTRIBUTE still applies as a
+       presentational hint and the picture stretches. height:auto here means a
+       screenshot can never be distorted just because a rule forgot to say so. */
+    img { height: auto; }
     html {
       scroll-behavior: smooth;
       scroll-padding-top: 88px;
