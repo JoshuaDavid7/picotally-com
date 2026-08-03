@@ -856,6 +856,8 @@
        makes the hero row so tall that the headline sits below the fold on a
        laptop. Cropping reads as deliberate and buys back about 300px. */
     .hero-phone-crop {
+      /* 520 keeps the hero CTA above the fold on a 1366x768 laptop. Going
+         deeper to expose the Hours row pushed the button under it. */
       max-height: 520px;
       overflow: hidden;
       -webkit-mask-image: linear-gradient(to bottom, #000 74%, transparent 100%);
@@ -1000,6 +1002,52 @@
       align-items: center;
       margin-top: 48px;
     }
+    /* ---------- Tax band ---------- */
+    .tax-split {
+      display: grid;
+      grid-template-columns: 0.95fr 1fr;
+      gap: 64px;
+      align-items: center;
+      margin-top: 48px;
+    }
+    .tax-shot { justify-self: center; max-width: 430px; width: 100%; }
+    /* Shown big and cut off partway down: at full height the report tables
+       shrink into unreadable texture, and the point of this shot is that it
+       looks like a real report. The fade makes the cut deliberate.
+       The radius also clips the pale backdrop baked into the image corners. */
+    .tax-shot-crop {
+      max-height: 640px;
+      overflow: hidden;
+      border-radius: 42px;
+      box-shadow: 0 24px 60px -18px rgba(0,0,0,0.28);
+      -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 84%, transparent 100%);
+    }
+    .tax-shot img { width: 100%; display: block; }
+    .tax-points { margin: 26px 0 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+    .tax-points li {
+      position: relative;
+      padding-left: 30px;
+      color: var(--text-soft);
+      font-size: 16.5px;
+      line-height: 1.55;
+    }
+    .tax-points li::before {
+      content: '';
+      position: absolute;
+      left: 4px; top: 8px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--brand);
+    }
+    .tax-caveat {
+      margin-top: 26px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-mute);
+      border-left: 3px solid var(--border);
+      padding-left: 16px;
+    }
     .voice-quotes { margin: 30px 0 0; display: grid; gap: 12px; }
     .voice-quote {
       background: rgba(255,255,255,0.055);
@@ -1075,6 +1123,8 @@
       .hero-split .hero-ctas { justify-content: center; }
       .say-bubble { margin-left: auto; margin-right: auto; }
       .voice-split { grid-template-columns: 1fr; gap: 42px; }
+      .tax-split { grid-template-columns: 1fr; gap: 40px; }
+      .tax-shot { order: 2; }
       .steps { grid-template-columns: 1fr; gap: 24px; }
       .outcomes { grid-template-columns: 1fr; }
       .price-grid { grid-template-columns: 1fr; }
@@ -1133,7 +1183,10 @@
       <div>
         <div class="say-bubble reveal">
           <span class="say-dot" aria-hidden="true"></span>
-          <span>&ldquo;Hey Pico, <span class="say-type" id="sayType">invoice Greg four hundred for the water heater</span>&rdquo;</span>
+          <!-- This line must keep describing the screenshot beside it: a QUOTE
+               for Daniel Smith, kitchen plumbing, 6 hrs. If the screenshot is
+               ever swapped, this sentence changes with it. -->
+          <span>&ldquo;Hey Pico, <span class="say-type" id="sayType">quote Daniel for the kitchen plumbing</span>&rdquo;</span>
         </div>
         <h1 class="hero-h1 reveal">Run your business.<br>Not your <span class="accent">paperwork.</span></h1>
         <p class="hero-sub reveal">PicoTally is the office manager in your pocket for electricians, plumbers, handymen and every one person shop. Say the invoice out loud. Snap the receipt. Get paid. Then go home.</p>
@@ -1287,6 +1340,37 @@
         <div class="outcome-icon" aria-hidden="true">&#128246;</div>
         <h3>Works where you work</h3>
         <p>Basements, crawl spaces, and the back of beyond. Everything keeps working with no signal and syncs itself the moment you have bars again.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TAX -->
+<section id="tax" class="section defer-render">
+  <div class="container">
+    <div class="tax-split">
+      <div class="tax-shot reveal">
+        <div class="tax-shot-crop">
+          <picture>
+            <source srcset="/screenshots/06-tax-report.webp?v=20260803" type="image/webp">
+            <img src="/screenshots/06-tax-report.png?v=20260803" alt="A tax deduction report totalling 9,903.84 dollars, broken down by category and Schedule C line, with every expense itemised below." width="832" height="1836" loading="lazy">
+          </picture>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow reveal">Tax time</div>
+        <h2 class="reveal">The worst week<br>of your year, gone.</h2>
+        <p class="reveal text-soft" style="font-size: 19px; line-height: 1.6; margin-top: 20px;">
+          Every receipt you photographed during the year already has a category on it. So when filing comes around there is no shoebox and no lost Saturday. It is one report, totalled, with every expense itemised down to the vendor and the date.
+        </p>
+        <ul class="tax-points reveal">
+          <li>Sorted into the categories your accountant expects, lined up against the Schedule C lines</li>
+          <li>Every expense itemised by date, vendor and what you actually bought</li>
+          <li>Share it to your accountant or print it, straight from your phone</li>
+        </ul>
+        <p class="reveal tax-caveat">
+          PicoTally gets the paperwork ready. It does not file for you and it will not pretend to give you tax advice, because that is a job for someone qualified.
+        </p>
       </div>
     </div>
   </div>
