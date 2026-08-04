@@ -57,6 +57,43 @@ function clean(value, max) {
   return value.replace(/\s+/g, ' ').trim().slice(0, max);
 }
 
+// The waitlist endpoint. Public by design and needing no configuration —
+// which is the whole point. The previous version depended on three separate
+// Cloudflare settings (KV, webhook, Resend key), none of which was ever set,
+// so every signup went to a log line Cloudflare does not keep. A setup step
+// that must be remembered is a step that will eventually be missed.
+const WAITLIST_ENDPOINT =
+  'https://txtgzycaopcmnfamwuam.supabase.co/functions/v1/join_waitlist';
+
+/**
+ * Store a signup durably. Returns {ok} rather than throwing, so the caller
+ * decides what the visitor is told.
+ *
+ * A duplicate is SUCCESS: someone signing up twice has done nothing wrong and
+ * is on the list, which is what they wanted.
+ */
+async function storeSignup(submission) {
+  try {
+    const res = await fetch(WAITLIST_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: submission.email,
+        name: submission.name,
+        trade: submission.trade,
+      }),
+      signal: AbortSignal.timeout(8000),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok || body.ok !== true) {
+      return { ok: false, error: res.status + ': ' + JSON.stringify(body).slice(0, 200) };
+    }
+    return { ok: true, duplicate: body.duplicate === true };
+  } catch (err) {
+    return { ok: false, error: String(err?.message || err).slice(0, 200) };
+  }
+}
+
 export async function onRequestPost({ request, env }) {
   let payload;
   try {
@@ -87,6 +124,28 @@ export async function onRequestPost({ request, env }) {
   // Floor: always log so submissions show up in Cloudflare's Pages
   // logs even before any KV / webhook is wired up.
   console.log('EARLY_ACCESS_SIGNUP', JSON.stringify(submission));
+
+  // DURABLE STORE. This is the only line here that actually keeps anything.
+  //
+  // Everything below it — KV, webhook, email — is gated on an environment
+  // variable, and on 2026-08-04 not one of the three had ever been set. That
+  // meant every signup lived only as the console.log above, which Cloudflare
+  // does not retain, while the form cheerfully said "You are on the list".
+  //
+  // So this deliberately needs NO configuration. The Supabase URL and anon key
+  // are public by design (the same pair ships inside the iOS app), and the
+  // waitlist table grants anon INSERT and no SELECT — a stranger can join the
+  // list and can never read it. A setup step that does not exist cannot be
+  // left half-done, which is the entire lesson of the bug this replaces.
+  const stored = await storeSignup(submission);
+  if (!stored.ok) {
+    // Tell the visitor the truth. The old code returned success the moment it
+    // started working, so people were told they were on a list that was not
+    // recording anything. A visible failure they can act on beats a green tick
+    // that means nothing.
+    console.error('EARLY_ACCESS_STORE_FAILED', stored.error);
+    return jsonResponse({ ok: false, error: 'store_failed' }, 502);
+  }
 
   // Persist to KV if bound. Keyed by epoch ms so a sorted listing is a
   // chronological feed; suffixed by email so a manual lookup is easy.
