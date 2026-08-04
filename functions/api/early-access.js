@@ -157,13 +157,63 @@ export async function onRequestPost({ request, env }) {
       if (!r.ok) {
         const body = await r.text().catch(() => '');
         console.error('EARLY_ACCESS_RESEND_FAILED', r.status, body.slice(0, 200));
+        return;
       }
+      // Tell PicoTally's monitoring we just used one of the shared Resend
+      // allowance. This site and the app's backend send through the SAME
+      // Resend account (~100/day on the free tier), but the app counts only
+      // its own sends — so without this line the monitoring undercounts the
+      // exact number it exists to protect. The failure it guards against is
+      // nasty and silent: cross the cap and new signups simply never receive
+      // their confirmation email, with nothing erroring anywhere.
+      await reportOpsUsage(env, 'resend', 'emails', 1);
     }).catch((err) => {
       console.error('EARLY_ACCESS_RESEND_FAILED', err?.message || String(err));
     });
   }
 
   return jsonResponse({ ok: true });
+}
+
+/**
+ * Report consumption of a shared third-party allowance to PicoTally's
+ * monitoring, so counters cover every sender rather than only the ones living
+ * inside Supabase.
+ *
+ * Deliberately best-effort and non-blocking. A counter is telemetry, not
+ * business logic: if this fails, the waitlist signup must still succeed and
+ * the visitor must never see a difference. Losing one tick of a counter is a
+ * rounding error; failing a signup because a metrics call timed out is a real
+ * outage, and this is a growth-critical form.
+ *
+ * Needs two Cloudflare Pages environment variables. If either is unset this is
+ * a silent no-op, so the site keeps working with no setup:
+ *   OPS_REPORT_URL     https://<project>.supabase.co/functions/v1/ops_usage_report
+ *   OPS_REPORT_SECRET  ops_cron_auth.report_secret from the PicoTally database
+ *
+ * The endpoint is write-only, can touch only meters the monitoring already
+ * tracks, and reads nothing back — so this secret is about as low-value as a
+ * credential gets. It is still kept out of the repo, in Cloudflare's env.
+ */
+async function reportOpsUsage(env, service, metric, units) {
+  if (!env.OPS_REPORT_URL || !env.OPS_REPORT_SECRET) return;
+  try {
+    const res = await fetch(env.OPS_REPORT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-ops-report-secret': env.OPS_REPORT_SECRET,
+      },
+      body: JSON.stringify({ service, metric, units }),
+      // Never let a slow monitoring endpoint hold the request open.
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) {
+      console.error('OPS_USAGE_REPORT_FAILED', res.status);
+    }
+  } catch (err) {
+    console.error('OPS_USAGE_REPORT_FAILED', err?.message || String(err));
+  }
 }
 
 // Anything other than POST gets a polite 405 — keeps random GET probes
