@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>PicoTally Mission Control</title>
+<!--
+  Mission Control — the operational picture of the company on one page.
+
+  WHY IT LIVES HERE, on Cloudflare, and not inside the PicoTally app:
+
+  Everything it reports on runs on Supabase. If Supabase degrades, an ops tool
+  hosted on Supabase goes down at the same moment you need it. And a dashboard
+  inside the mobile app cannot be changed for two days during an incident,
+  because Apple has to review it first. An ops tool you cannot reach or cannot
+  change during an outage is not an ops tool.
+
+  NO EXTERNAL SCRIPTS, deliberately. No CDN, no framework, no supabase-js.
+  Supabase auth is plain REST and the whole client below is about forty lines,
+  so the page has no supply chain, nothing to go stale, and nothing else that
+  can be down when this is the page you opened to find out what is down.
+
+  The anon key here is public by design — it is the same key compiled into the
+  shipped iOS app. It grants nothing on its own: the health endpoint validates
+  the caller's JWT and then checks the email against OWNER_EMAILS server-side.
+-->
+<style>
+  :root {
+    --bg: #0b0d10; --panel: #14171c; --panel-2: #1a1e24; --line: #262b33;
+    --ink: #e9edf3; --ink-dim: #98a2b3; --ink-faint: #6b7480;
+    --ok: #35c07f; --warn: #e8b13a; --crit: #f0663f; --dead: #e5484d;
+    --unknown: #7c8698; --accent: #4a90e2;
+    --radius: 14px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f7f9; --panel: #ffffff; --panel-2: #f2f4f7; --line: #e3e7ec;
+    --ink: #12161c; --ink-dim: #5a6472; --ink-faint: #8d97a5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); font-size: 15px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 22px 18px 80px; }
+
+  /* ── Header ─────────────────────────────────────────────── */
+  header.top {
+    display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap; margin-bottom: 22px;
+  }
+  .brand { font-weight: 700; font-size: 19px; letter-spacing: -0.2px; }
+  .brand span { color: var(--ink-faint); font-weight: 500; }
+  .top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .stamp { font-size: 12.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .btn {
+    background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 9px; padding: 7px 12px; font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:hover { border-color: var(--ink-faint); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+
+  /* ── The 30-second strip ────────────────────────────────── */
+  .strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+  .tile {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 15px 16px; position: relative; overflow: hidden;
+  }
+  .tile::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--tone, var(--ink-faint));
+  }
+  .tile-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-faint); }
+  .tile-value { font-size: 25px; font-weight: 700; margin-top: 5px; letter-spacing: -0.5px; }
+  .tile-note { font-size: 12.5px; color: var(--ink-dim); margin-top: 3px; }
+
+  /* ── Panels ─────────────────────────────────────────────── */
+  section.panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); margin-bottom: 18px; overflow: hidden;
+  }
+  .panel-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap;
+  }
+  .panel-head h2 { margin: 0; font-size: 14.5px; font-weight: 650; letter-spacing: -0.1px; }
+  .panel-sub { font-size: 12.5px; color: var(--ink-faint); }
+  .panel-head .grow { margin-left: auto; }
+  .filter {
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--ink);
+    border-radius: 8px; padding: 6px 10px; font-size: 13px; font-family: inherit; width: 190px;
+  }
+  .filter::placeholder { color: var(--ink-faint); }
+
+  /* ── Rows ───────────────────────────────────────────────── */
+  .row {
+    display: grid; grid-template-columns: 1.5fr 1.4fr 90px 26px;
+    gap: 12px; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .row:last-child { border-bottom: none; }
+  .row:hover { background: var(--panel-2); }
+  .row-name { font-weight: 600; font-size: 14px; }
+  .row-meta { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .bar { height: 6px; border-radius: 99px; background: var(--panel-2); overflow: hidden; }
+  .bar > i { display: block; height: 100%; border-radius: 99px; background: var(--tone); }
+  .bar-text { font-size: 11.5px; color: var(--ink-dim); margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .pct { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; font-size: 15px; }
+  .chev { color: var(--ink-faint); font-size: 12px; text-align: center; transition: transform .15s; }
+  .row.open .chev { transform: rotate(90deg); }
+  .detail {
+    padding: 0 16px 14px 16px; border-bottom: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-dim); background: var(--panel-2);
+  }
+  .detail dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 12px 0 0; }
+  .detail dt { color: var(--ink-faint); }
+  .detail dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+  .pill {
+    display: inline-block; padding: 2px 9px; border-radius: 99px;
+    font-size: 11.5px; font-weight: 650; letter-spacing: .02em;
+    background: color-mix(in srgb, var(--tone) 18%, transparent); color: var(--tone);
+    border: 1px solid color-mix(in srgb, var(--tone) 35%, transparent);
+  }
+  .t-ok { --tone: var(--ok); } .t-warn { --tone: var(--warn); }
+  .t-crit { --tone: var(--crit); } .t-dead { --tone: var(--dead); }
+  .t-unknown { --tone: var(--unknown); } .t-accent { --tone: var(--accent); }
+
+  .gap-row { display: flex; gap: 12px; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .gap-row:last-child { border-bottom: none; }
+  .gap-name { font-weight: 600; font-size: 14px; min-width: 150px; }
+  .gap-why { font-size: 12.5px; color: var(--ink-faint); flex: 1; min-width: 200px; }
+  a.gap-link { color: var(--accent); font-size: 12.5px; text-decoration: none; white-space: nowrap; }
+  a.gap-link:hover { text-decoration: underline; }
+
+  .empty { padding: 26px 16px; text-align: center; color: var(--ink-faint); font-size: 13.5px; }
+  .note { padding: 12px 16px; font-size: 12.5px; color: var(--ink-faint); border-top: 1px solid var(--line); }
+
+  /* ── Login ──────────────────────────────────────────────── */
+  #login { max-width: 380px; margin: 14vh auto; padding: 0 18px; }
+  #login .panel { padding: 24px; }
+  #login h1 { font-size: 20px; margin: 0 0 6px; }
+  #login p.sub { color: var(--ink-dim); font-size: 13.5px; margin: 0 0 18px; }
+  #login label { display: block; font-size: 12.5px; color: var(--ink-dim); margin: 12px 0 5px; }
+  #login input {
+    width: 100%; padding: 10px 12px; border-radius: 9px; font-size: 14px;
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--ink);
+    font-family: inherit;
+  }
+  #login button { width: 100%; margin-top: 18px; padding: 11px; font-size: 14.5px; border-radius: 9px; }
+  .err { color: var(--crit); font-size: 13px; margin-top: 12px; }
+  .hidden { display: none !important; }
+
+  /* Grid and flex children default to min-width:auto, so a long word ("Good
+     standing", a 40-char service name) refuses to shrink and pushes the whole
+     page wider than the phone. Every track that holds text opts out. */
+  .tile, .row > *, .gap-row > * { min-width: 0; }
+  .tile-value { overflow-wrap: anywhere; }
+
+  @media (max-width: 860px) {
+    .strip { grid-template-columns: repeat(2, 1fr); }
+    .row { grid-template-columns: 1fr 68px 20px; row-gap: 8px; }
+    .row .bar-cell { grid-column: 1 / -1; }
+    .panel-head .grow { flex-basis: 100%; height: 0; }
+    .filter { width: 100%; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 16px 12px 60px; }
+    .strip { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tile { padding: 12px 13px; }
+    .tile-value { font-size: 19px; letter-spacing: -0.3px; }
+    .tile-label { font-size: 10.5px; }
+    .tile-note { font-size: 11.5px; }
+    header.top { gap: 10px; }
+    .brand { font-size: 17px; width: 100%; }
+    .top-right { margin-left: 0; width: 100%; flex-wrap: wrap; }
+    .gap-name { min-width: 0; flex: 1 1 100%; }
+    .gap-why { min-width: 0; }
+    a.gap-link { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Login gate ────────────────────────────────────────── -->
+<div id="login">
+  <div class="panel" style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)">
+    <h1>Mission Control</h1>
+    <p class="sub">Owner access only. Sign in with your PicoTally account.</p>
+    <form id="login-form">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <button class="btn btn-primary" type="submit" id="login-btn">Sign in</button>
+    </form>
+    <div class="err hidden" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ── Dashboard ─────────────────────────────────────────── -->
+<div class="wrap hidden" id="app">
+  <header class="top">
+    <div class="brand">PicoTally <span>Mission Control</span></div>
+    <div class="top-right">
+      <span class="stamp" id="stamp"></span>
+      <button class="btn" id="theme-btn" title="Toggle light / dark">◐</button>
+      <button class="btn" id="refresh-btn">Refresh</button>
+      <button class="btn" id="signout-btn">Sign out</button>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="tile" id="tile-overall"><div class="tile-label">Services</div><div class="tile-value" id="v-overall">—</div><div class="tile-note" id="n-overall"></div></div>
+    <div class="tile" id="tile-vendors"><div class="tile-label">Vendor accounts</div><div class="tile-value" id="v-vendors">—</div><div class="tile-note" id="n-vendors"></div></div>
+    <div class="tile" id="tile-monitor"><div class="tile-label">Monitoring</div><div class="tile-value" id="v-monitor">—</div><div class="tile-note" id="n-monitor"></div></div>
+    <div class="tile" id="tile-cost"><div class="tile-label">Cost confidence</div><div class="tile-value" id="v-cost">—</div><div class="tile-note" id="n-cost"></div></div>
+  </div>
+
+  <section class="panel hidden" id="warn-panel">
+    <div class="panel-head"><h2>Configuration warnings</h2><span class="panel-sub">limits that contradict each other</span></div>
+    <div id="warn-body"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Usage against limits</h2>
+      <span class="panel-sub">counted by us, not read from the vendor</span>
+      <span class="grow"></span>
+      <input class="filter" id="svc-filter" placeholder="Filter services…" aria-label="Filter services">
+    </div>
+    <div id="svc-body"></div>
+    <div class="note">A percentage alone can round a real number to nothing, so each row shows what it counted. Projections apply to counters only — extrapolating a database size is meaningless.</div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Vendor accounts</h2><span class="panel-sub">is the billing relationship still healthy</span></div>
+    <div id="vendor-body"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Cost</h2><span class="panel-sub" id="cost-sub"></span></div>
+    <div id="cost-body"></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Public config. The anon key is the same one compiled into the shipped iOS
+  // app; it authorises nothing by itself. Every byte of data on this page comes
+  // from an endpoint that validates the JWT and then checks the caller's email
+  // against OWNER_EMAILS on the server.
+  var SUPABASE_URL = "https://txtgzycaopcmnfamwuam.supabase.co";
+  var ANON_KEY = "sb_publishable_Z4hE3v7xUGIjti_T_ph5iQ_C42UA0_5";
+  var HEALTH = SUPABASE_URL + "/functions/v1/service_health";
+  var TOKEN_KEY = "pt_ops_token";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var token = null;
+
+  // ── Theme ────────────────────────────────────────────────
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("pt_ops_theme"); } catch (e) {}
+  if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+  $("theme-btn").addEventListener("click", function () {
+    var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("pt_ops_theme", next); } catch (e) {}
+  });
+
+  // ── Auth (plain REST — no SDK, nothing to go stale) ──────
+  function signIn(email, password) {
+    return fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: ANON_KEY },
+      body: JSON.stringify({ email: email, password: password })
+    }).then(function (r) {
+      return r.json().then(function (b) {
+        if (!r.ok) throw new Error(b.error_description || b.msg || b.error || "Sign in failed");
+        return b.access_token;
+      });
+    });
+  }
+
+  $("login-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var btn = $("login-btn"), err = $("login-err");
+    err.classList.add("hidden");
+    btn.disabled = true; btn.textContent = "Signing in…";
+    signIn($("email").value.trim(), $("password").value)
+      .then(function (t) {
+        token = t;
+        try { sessionStorage.setItem(TOKEN_KEY, t); } catch (e) {}
+        return load();
+      })
+      .catch(function (e2) {
+        err.textContent = e2.message;
+        err.classList.remove("hidden");
+      })
+      .then(function () { btn.disabled = false; btn.textContent = "Sign in"; });
+  });
+
+  $("signout-btn").addEventListener("click", function () {
+    token = null;
+    try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    $("app").classList.add("hidden");
+    $("login").classList.remove("hidden");
+  });
+  $("refresh-btn").addEventListener("click", function () { load(); });
+
+  // ── Formatting ───────────────────────────────────────────
+  function fmtUnits(n, label) {
+    n = Number(n || 0);
+    if (label === "bytes") {
+      return n >= 1e9 ? (n / 1e9).toFixed(2) + " GB" : (n / 1e6).toFixed(1) + " MB";
+    }
+    if (label === "cents") return "$" + (n / 100).toFixed(2);
+    if (label === "seconds") {
+      // Nobody thinks in 6,000 minutes. Past a couple of hours, hours read.
+      var mins = n / 60;
+      if (mins >= 120) return Math.round(mins / 60).toLocaleString() + " hours";
+      return Math.round(mins).toLocaleString() + " min";
+    }
+    return n.toLocaleString() + " " + label;
+  }
+  function money(n) { return "$" + Number(n || 0).toFixed(2); }
+  function toneFor(status) {
+    if (status === "exceeded" || status === "past_due" || status === "critical") return "t-crit";
+    if (status === "warn" || status === "projected_breach" || status === "at_risk") return "t-warn";
+    if (status === "unknown") return "t-unknown";
+    return "t-ok";
+  }
+  function ago(iso) {
+    if (!iso) return "never";
+    var mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return mins + " min ago";
+    var h = Math.floor(mins / 60);
+    if (h < 24) return h + "h ago";
+    return Math.floor(h / 24) + "d ago";
+  }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // ── Render ───────────────────────────────────────────────
+  var current = null;
+
+  function render(d) {
+    current = d;
+    $("stamp").textContent = "checked " + ago(d.generated_at);
+
+    // Services tile
+    var svcs = d.services || [];
+    var bad = svcs.filter(function (s) { return s.status !== "ok"; });
+    setTile("overall", bad.length ? bad.length + " need attention" : "All clear",
+      svcs.length + " meters watched", bad.length ? toneFor(bad[0].status) : "t-ok");
+
+    // Vendors tile
+    var vend = d.billing || [];
+    var vbad = vend.filter(function (b) { return b.severity !== "ok"; });
+    setTile("vendors", vend.length === 0 ? "None tracked" : (vbad.length ? vbad.length + " to check" : "Good standing"),
+      vend.length + " polled", vend.length === 0 ? "t-unknown" : (vbad.length ? toneFor(vbad[0].severity) : "t-ok"));
+
+    // Monitoring tile — the dead-man's switch
+    var m = d.monitor || {};
+    var alive = m.scheduled && m.active && m.last_status === "succeeded";
+    setTile("monitor", alive ? "Alive" : "Check it",
+      m.last_run ? "ran " + ago(m.last_run) : "never run", alive ? "t-ok" : "t-crit");
+
+    // Cost tile
+    var c = d.cost_confidence || {};
+    var gaps = d.cost_gaps || [];
+    setTile("cost", money(c.total_usd),
+      (Number(c.pct_verified || 0)) + "% invoiced · " + gaps.length + " untracked",
+      Number(c.pct_verified || 0) >= 80 ? "t-ok" : (gaps.length ? "t-warn" : "t-unknown"));
+
+    renderWarnings(d.config_warnings || []);
+    renderServices(svcs);
+    renderVendors(vend);
+    renderCost(c, gaps);
+  }
+
+  function setTile(key, value, note, toneClass) {
+    $("v-" + key).textContent = value;
+    $("n-" + key).textContent = note;
+    var tile = $("tile-" + key);
+    tile.className = "tile " + toneClass;
+  }
+
+  function renderWarnings(warnings) {
+    var panel = $("warn-panel");
+    if (!warnings.length) { panel.classList.add("hidden"); return; }
+    panel.classList.remove("hidden");
+    $("warn-body").innerHTML = warnings.map(function (w) {
+      return '<div class="gap-row t-warn"><span class="pill">check</span>' +
+        '<span class="gap-why">' + esc(typeof w === "string" ? w : JSON.stringify(w)) + "</span></div>";
+    }).join("");
+  }
+
+  function renderServices(rows) {
+    var q = ($("svc-filter").value || "").toLowerCase();
+    var shown = rows.filter(function (r) {
+      if (!q) return true;
+      return (r.display_name + " " + r.service + " " + r.metric).toLowerCase().indexOf(q) >= 0;
+    });
+    // Worst first: a dashboard that buries the problem under alphabetical
+    // order makes you hunt for the thing it exists to show you.
+    var rank = { exceeded: 4, critical: 3, warn: 2, projected_breach: 1, ok: 0 };
+    shown.sort(function (a, b) {
+      return (rank[b.status] || 0) - (rank[a.status] || 0) || b.pct_used - a.pct_used;
+    });
+
+    if (!shown.length) { $("svc-body").innerHTML = '<div class="empty">Nothing matches that filter.</div>'; return; }
+
+    $("svc-body").innerHTML = shown.map(function (r, i) {
+      var tone = toneFor(r.status);
+      var pct = Math.min(100, Number(r.pct_used || 0));
+      var proj = r.status === "projected_breach"
+        ? "on pace for " + r.projected_pct + "% by period end" : "";
+      return '' +
+      '<div class="row ' + tone + '" data-i="' + i + '">' +
+        '<div><div class="row-name">' + esc(r.display_name || r.service) + '</div>' +
+        '<div class="row-meta">' + esc(r.metric) + " · per " + esc(r.period) +
+          (r.plan ? " · " + esc(r.plan) : "") + '</div></div>' +
+        '<div class="bar-cell"><div class="bar"><i style="width:' + pct + '%"></i></div>' +
+        '<div class="bar-text">' + esc(fmtUnits(r.used_units, r.unit_label)) + " of " +
+          esc(fmtUnits(r.limit_units, r.unit_label)) + (proj ? " · " + esc(proj) : "") + '</div></div>' +
+        '<div class="pct">' + Number(r.pct_used || 0).toFixed(1) + "%</div>" +
+        '<div class="chev">▶</div>' +
+      "</div>" +
+      '<div class="detail hidden" data-d="' + i + '">' +
+        (r.notes ? "<div style=\"margin-top:12px\">" + esc(r.notes) + "</div>" : "") +
+        "<dl>" +
+          "<dt>Status</dt><dd>" + esc(r.status) + "</dd>" +
+          "<dt>Counted</dt><dd>" + esc(fmtUnits(r.used_units, r.unit_label)) + "</dd>" +
+          "<dt>Limit</dt><dd>" + esc(fmtUnits(r.limit_units, r.unit_label)) + "</dd>" +
+          "<dt>Warn at</dt><dd>" + esc(r.warn_pct) + "% · critical at " + esc(r.critical_pct) + "%</dd>" +
+        "</dl>" +
+      "</div>";
+    }).join("");
+
+    // Drill-down
+    Array.prototype.forEach.call($("svc-body").querySelectorAll(".row"), function (el) {
+      el.addEventListener("click", function () {
+        var d = $("svc-body").querySelector('[data-d="' + el.getAttribute("data-i") + '"]');
+        el.classList.toggle("open");
+        d.classList.toggle("hidden");
+      });
+    });
+  }
+
+  function renderVendors(rows) {
+    if (!rows.length) {
+      $("vendor-body").innerHTML = '<div class="empty">No vendor accounts are being polled yet.</div>';
+      return;
+    }
+    $("vendor-body").innerHTML = rows.map(function (b) {
+      var tone = toneFor(b.severity);
+      var detail = b.check_error
+        ? "could not check: " + b.check_error
+        : (b.credit_usd != null ? money(b.credit_usd) + " credit remaining" : "standing: " + b.standing);
+      return '<div class="gap-row ' + tone + '">' +
+        '<span class="gap-name">' + esc(b.display_name || b.service_key) + "</span>" +
+        '<span class="pill">' + esc(b.severity === "ok" ? "healthy" : b.severity) + "</span>" +
+        '<span class="gap-why">' + esc(detail) + "</span></div>";
+    }).join("");
+  }
+
+  function renderCost(c, gaps) {
+    $("cost-sub").textContent = money(c.total_usd) + " recorded · " +
+      money(c.known_usd) + " from invoices";
+
+    var html = "";
+    if (gaps.length) {
+      html += '<div class="note" style="border-top:none;border-bottom:1px solid var(--line)">' +
+        "These services cost money and have no figure this month. The total above excludes them." +
+        "</div>";
+      html += gaps.map(function (g) {
+        var why = g.billing_access === "automated" ? "pollable, not yet recorded"
+          : g.billing_access === "needs_credential" ? "needs a one-time credential"
+          : "manual entry";
+        return '<div class="gap-row t-warn">' +
+          '<span class="gap-name">' + esc(g.display_name || g.service_key) + "</span>" +
+          '<span class="pill">no figure</span>' +
+          '<span class="gap-why">' + esc(why) + "</span>" +
+          (g.billing_url ? '<a class="gap-link" href="' + esc(g.billing_url) +
+            '" target="_blank" rel="noopener">Open billing →</a>' : "") +
+          "</div>";
+      }).join("");
+    } else {
+      html += '<div class="empty">Every service that costs money has a figure this month.</div>';
+    }
+    html += '<div class="note">A cost is recorded with its source. Invoiced figures are ' +
+      "trusted over estimates, and where no honest number exists the service is listed above " +
+      "rather than guessed at.</div>";
+    $("cost-body").innerHTML = html;
+  }
+
+  $("svc-filter").addEventListener("input", function () {
+    if (current) renderServices(current.services || []);
+  });
+
+  // ── Load ─────────────────────────────────────────────────
+  function load() {
+    if (!token) return Promise.resolve();
+    return fetch(HEALTH, {
+      headers: { Authorization: "Bearer " + token, apikey: ANON_KEY }
+    }).then(function (r) {
+      if (r.status === 401 || r.status === 403) {
+        throw new Error(r.status === 403
+          ? "That account is not on the owner list."
+          : "Session expired. Sign in again.");
+      }
+      if (!r.ok) throw new Error("Health check returned " + r.status);
+      return r.json();
+    }).then(function (d) {
+      $("login").classList.add("hidden");
+      $("app").classList.remove("hidden");
+      render(d);
+    }).catch(function (e) {
+      token = null;
+      try { sessionStorage.removeItem(TOKEN_KEY); } catch (e2) {}
+      $("app").classList.add("hidden");
+      $("login").classList.remove("hidden");
+      var err = $("login-err");
+      err.textContent = e.message;
+      err.classList.remove("hidden");
+    });
+  }
+
+  // Resume an existing session rather than asking again on every reload.
+  try { token = sessionStorage.getItem(TOKEN_KEY); } catch (e) {}
+  if (token) load();
+})();
+</script>
+</body>
+</html>
