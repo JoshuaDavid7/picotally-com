@@ -411,7 +411,10 @@
     var q = ($("svc-filter").value || "").toLowerCase();
     var shown = rows.filter(function (r) {
       if (!q) return true;
-      return (r.display_name + " " + r.service + " " + r.metric).toLowerCase().indexOf(q) >= 0;
+      // Search what is on screen AND what is underneath it: typing "storage"
+      // should find it, and so should typing the raw metric key I would use.
+      return (r.metric_label + " " + r.display_name + " " + r.service + " " + r.metric)
+        .toLowerCase().indexOf(q) >= 0;
     });
     // Worst first: a dashboard that buries the problem under alphabetical
     // order makes you hunt for the thing it exists to show you.
@@ -429,9 +432,12 @@
         ? "on pace for " + r.projected_pct + "% by period end" : "";
       return '' +
       '<div class="row ' + tone + '" data-i="' + i + '">' +
-        '<div><div class="row-name">' + esc(r.display_name || r.service) + '</div>' +
-        '<div class="row-meta">' + esc(r.metric) + " · per " + esc(r.period) +
-          (r.plan ? " · " + esc(r.plan) : "") + '</div></div>' +
+        // The meter's human label leads, with the vendor as context beneath.
+        // Two rows both saying "Supabase" told you nothing; "File storage"
+        // and "Database size" tell you which one is filling up.
+        '<div><div class="row-name">' + esc(r.metric_label || r.metric) + '</div>' +
+        '<div class="row-meta">' + esc(r.display_name || r.service) + " · per " +
+          esc(r.period) + (r.plan ? " · " + esc(r.plan) : "") + '</div></div>' +
         '<div class="bar-cell"><div class="bar"><i style="width:' + pct + '%"></i></div>' +
         '<div class="bar-text">' + esc(fmtUnits(r.used_units, r.unit_label)) + " of " +
           esc(fmtUnits(r.limit_units, r.unit_label)) + (proj ? " · " + esc(proj) : "") + '</div></div>' +
