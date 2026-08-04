@@ -1664,7 +1664,10 @@
 
     errorEl.hidden = true;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending&hellip;';
+    // textContent, not innerHTML — so '&hellip;' would print as those literal
+    // eight characters, which is exactly what it did. The real character goes
+    // in directly. Same trap anywhere else here that assigns .textContent.
+    submitBtn.textContent = 'Sending…';
 
     fetch('/api/early-access', {
       method: 'POST',
