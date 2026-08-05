@@ -192,6 +192,17 @@
   .cost-msg.bad { color: var(--crit); }
 
 
+
+  /* Plan control + dependency map */
+  .plan-wrap { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .plan-pill { font-variant-numeric: tabular-nums; }
+  .plan-select {
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--ink);
+    border-radius: 8px; padding: 5px 8px; font-size: 12.5px; font-family: inherit;
+    max-width: 220px;
+  }
+  .reg-config { color: var(--ink-faint); font-size: 11.5px; }
+
   /* Cost, grouped by how the figure is obtained */
   .cost-group { border-bottom: 1px solid var(--line); }
   .cost-group:last-of-type { border-bottom: none; }
@@ -299,6 +310,12 @@
   <section class="panel">
     <div class="panel-head"><h2>Cost</h2><span class="panel-sub" id="cost-sub"></span></div>
     <div id="cost-body"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Everything we depend on</h2>
+      <span class="panel-sub">the complete map — what breaks if each one fails</span></div>
+    <div id="registry-body"></div>
   </section>
 </div>
 
@@ -508,7 +525,8 @@
     renderServices(svcs);
     renderVendors(vend);
     renderInfra(d.infra);
-    renderCost(c, d.cost_overview);
+    renderCost(c, d.cost_overview, d.plans, d.committed_monthly_usd);
+    renderRegistry(d.registry || []);
   }
 
   function setTile(key, value, note, toneClass) {
@@ -523,8 +541,14 @@
     if (!warnings.length) { panel.classList.add("hidden"); return; }
     panel.classList.remove("hidden");
     $("warn-body").innerHTML = warnings.map(function (w) {
+      // Structured warnings carry {service, warning, detail}. A CFO does not
+      // read JSON; name the service, say what disagrees.
+      var text = typeof w === "string" ? w
+        : w.service
+          ? "[" + w.service + "] " + (w.detail || w.warning || "")
+          : JSON.stringify(w);
       return '<div class="gap-row t-warn"><span class="pill">check</span>' +
-        '<span class="gap-why">' + esc(typeof w === "string" ? w : JSON.stringify(w)) + "</span></div>";
+        '<span class="gap-why">' + esc(text) + "</span></div>";
     }).join("");
   }
 
@@ -629,6 +653,121 @@
    * with source 'owner_entered', which ranks below an invoice — a typed number
    * never masquerades as verified.
    */
+  /**
+   * The plan control: the current plan as a fact, other plans as one-click
+   * switches. Switching is the operation the owner asked for by name: "if I
+   * upgrade Supabase, how does Mission Control recalibrate?" — this is how.
+   * One confirm, one call, and every ceiling that plan grants moves together
+   * server-side in a single transaction.
+   */
+  function planControl(serviceKey, servicePlans) {
+    if (!servicePlans || !servicePlans.length) return "";
+    var current = servicePlans.filter(function (p) { return p.is_current; })[0];
+    var others = servicePlans.filter(function (p) { return !p.is_current; });
+
+    var html = '<span class="plan-wrap" data-service="' + esc(serviceKey) + '">';
+    if (current) {
+      var since = current.last_selected_at
+        ? " · since " + new Date(current.last_selected_at).toLocaleDateString("en-US",
+            { month: "short", day: "numeric" })
+        : "";
+      html += '<span class="pill t-accent plan-pill">on ' + esc(current.display_name) +
+        (current.monthly_usd !== null && current.monthly_usd !== undefined
+          ? " · " + money(current.monthly_usd) + "/mo" : "") +
+        esc(since) + "</span>";
+    }
+    if (others.length) {
+      html += '<select class="plan-select" aria-label="Change plan for ' + esc(serviceKey) + '">' +
+        '<option value="">change plan…</option>' +
+        others.map(function (p) {
+          var label = p.display_name +
+            (p.monthly_usd !== null && p.monthly_usd !== undefined
+              ? " — " + money(p.monthly_usd) + "/mo" : "") +
+            (p.limit_rows === 0 ? " (limits not catalogued)" : "");
+          return '<option value="' + esc(p.plan_key) + '">' + esc(label) + "</option>";
+        }).join("") +
+        "</select>" +
+        '<span class="cost-msg plan-msg"></span>';
+    }
+    return html + "</span>";
+  }
+
+  function recordPlan(serviceKey, planKey, planLabel, selectEl, msgEl) {
+    // A plan switch rewrites every ceiling for the service. Deliberate action,
+    // so it gets a confirm — the only one on the page.
+    if (!window.confirm("Switch " + serviceKey + " to " + planLabel +
+        "?\n\nEvery usage ceiling for this service will recalibrate to the new plan.")) {
+      selectEl.value = "";
+      return;
+    }
+    selectEl.disabled = true;
+    msgEl.className = "cost-msg plan-msg";
+    msgEl.textContent = "switching…";
+    authedFetch(SUPABASE_URL + "/functions/v1/owner_set_service_plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ serviceKey: serviceKey, planKey: planKey })
+    }).then(function (r) {
+      return r.json().then(function (b) {
+        if (!r.ok) throw new Error(b.error || ("HTTP " + r.status));
+        return b;
+      });
+    }).then(function (b) {
+      var n = (b.result && b.result.derived_limit_rows) || 0;
+      msgEl.className = "cost-msg ok";
+      msgEl.textContent = n > 0
+        ? "switched — " + n + " ceiling" + (n === 1 ? "" : "s") + " recalibrated"
+        : "switched — ceilings left hand-managed (plan has no catalogued limits)";
+      // Re-read everything: usage bars, cost, warnings and the pill all
+      // depend on the plan, and the server owns all of them.
+      return load();
+    }).catch(function (e) {
+      msgEl.className = "cost-msg bad";
+      msgEl.textContent = e.message === "unknown_plan"
+        ? "that plan is not in the catalog"
+        : e.message;
+      selectEl.disabled = false;
+      selectEl.value = "";
+    });
+  }
+
+  /**
+   * The complete dependency map. Sorted by criticality because the question
+   * this panel answers is "what should I worry about first", not "what starts
+   * with A". Data recorded service-by-service during the Phase A audit.
+   */
+  function renderRegistry(rows) {
+    if (!rows.length) {
+      $("registry-body").innerHTML = '<div class="empty">No registry data.</div>';
+      return;
+    }
+    var order = { critical: 0, high: 1, medium: 2, low: 3 };
+    rows.sort(function (a, b) {
+      var d = (order[a.criticality] ?? 9) - (order[b.criticality] ?? 9);
+      return d !== 0 ? d : String(a.display_name).localeCompare(String(b.display_name));
+    });
+    var tones = { critical: "t-crit", high: "t-warn", medium: "t-accent", low: "t-ok" };
+    $("registry-body").innerHTML = rows.map(function (r) {
+      return '<div class="gap-row ' + (tones[r.criticality] || "t-unknown") + '">' +
+        '<span class="gap-name">' + esc(r.display_name) + "</span>" +
+        '<span class="pill">' + esc(r.criticality || "unrated") + "</span>" +
+        '<span class="gap-why">' +
+          esc(r.impact_if_down || r.subtitle || "") +
+          (r.config_location
+            ? ' <span class="reg-config">· configured in ' + esc(r.config_location) + "</span>"
+            : "") +
+        "</span>" +
+        (r.dashboard_url
+          ? '<a class="gap-link" href="' + esc(r.dashboard_url) +
+            '" target="_blank" rel="noopener">Vendor console →</a>'
+          : "") +
+        "</div>";
+    }).join("") +
+    '<div class="note">Criticality and impact were recorded per service during the ' +
+    "dependency audit. If a failure scenario is missing here, it is missing from the " +
+    "plan for handling it.</div>";
+  }
+
   function recordCost(serviceKey, amount, btn, msgEl) {
     btn.disabled = true;
     msgEl.className = "cost-msg";
@@ -682,9 +821,18 @@
    * also put an amount box next to Claude and Gemini, whose cost we compute
    * hourly from our own usage and which no human should be typing over.
    */
-  function renderCost(c, overview) {
+  function renderCost(c, overview, plans, committedUsd) {
+    // Three numbers, three provenances, never blended: what was recorded,
+    // what an invoice confirms, and what the plans we are ON commit us to.
     $("cost-sub").textContent = money(c.total_usd) + " this month · " +
-      money(c.known_usd) + " confirmed by invoice";
+      money(c.known_usd) + " confirmed by invoice · " +
+      money(committedUsd || 0) + "/mo committed by plans";
+
+    // Plans indexed by service for the pickers below.
+    var plansBy = {};
+    (plans || []).forEach(function (p) {
+      (plansBy[p.service_key] = plansBy[p.service_key] || []).push(p);
+    });
 
     var rows = overview || [];
     var groups = [
@@ -744,6 +892,7 @@
             ? '<a class="gap-link" href="' + esc(r.billing_url) +
               '" target="_blank" rel="noopener">Open billing →</a>' : "") +
           (r.editable ? costForm(r.service_key, r.amount_usd) : "") +
+          (r.editable ? planControl(r.service_key, plansBy[r.service_key]) : "") +
           "</div>";
       }).join("");
 
@@ -756,6 +905,16 @@
       "outranks a typed figure, a measured figure is never overwritten by hand, and " +
       "where no honest number exists the service says so rather than showing a zero.</div>";
     $("cost-body").innerHTML = html;
+
+    Array.prototype.forEach.call($("cost-body").querySelectorAll(".plan-select"), function (sel) {
+      sel.addEventListener("change", function () {
+        if (!sel.value) return;
+        var wrap = sel.closest(".plan-wrap");
+        var key = wrap.getAttribute("data-service");
+        var label = sel.options[sel.selectedIndex].textContent;
+        recordPlan(key, sel.value, label, sel, wrap.querySelector(".plan-msg"));
+      });
+    });
 
     Array.prototype.forEach.call($("cost-body").querySelectorAll(".cost-form"), function (f) {
       var key = f.getAttribute("data-service");
