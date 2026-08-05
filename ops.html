@@ -162,6 +162,35 @@
   .tile, .row > *, .gap-row > * { min-width: 0; }
   .tile-value { overflow-wrap: anywhere; }
 
+
+  /* Running setup + inline cost entry */
+  .infra-row { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap;
+    padding: 13px 16px; border-bottom: 1px solid var(--line); }
+  .infra-row:last-child { border-bottom: none; }
+  .infra-name { font-weight: 600; font-size: 14px; min-width: 130px; }
+  .infra-shape { font-size: 13px; color: var(--ink-dim); }
+  .infra-ceiling { margin-left: auto; font-variant-numeric: tabular-nums;
+    font-weight: 650; font-size: 14px; white-space: nowrap; }
+  .infra-ceiling small { display: block; font-weight: 400; font-size: 11px;
+    color: var(--ink-faint); text-align: right; }
+
+  .cost-form { display: flex; gap: 6px; align-items: center; }
+  .cost-form input {
+    width: 82px; padding: 5px 8px; border-radius: 7px; font-size: 13px;
+    background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+    font-family: inherit; font-variant-numeric: tabular-nums;
+  }
+  .cost-form input::placeholder { color: var(--ink-faint); }
+  .cost-form button {
+    padding: 5px 10px; font-size: 12.5px; border-radius: 7px; cursor: pointer;
+    background: var(--accent); border: 1px solid var(--accent); color: #fff;
+    font-weight: 600; font-family: inherit;
+  }
+  .cost-form button:disabled { opacity: .5; cursor: default; }
+  .cost-msg { font-size: 12px; margin-left: 6px; }
+  .cost-msg.ok { color: var(--ok); }
+  .cost-msg.bad { color: var(--crit); }
+
   @media (max-width: 860px) {
     .strip { grid-template-columns: repeat(2, 1fr); }
     .row { grid-template-columns: 1fr 68px 20px; row-gap: 8px; }
@@ -236,6 +265,20 @@
     </div>
     <div id="svc-body"></div>
     <div class="note">A percentage alone can round a real number to nothing, so each row shows what it counted. Projections apply to counters only — extrapolating a database size is meaningless.</div>
+  </section>
+
+  <section class="panel" id="infra-panel">
+    <div class="panel-head">
+      <h2>Running setup</h2>
+      <span class="panel-sub">what is switched on, and the most it can cost</span>
+    </div>
+    <div id="infra-body"></div>
+    <div class="note">
+      Some services bill for time rather than requests, and publish no invoice
+      amount. What they charge is decided by how much is running, so that is
+      what gets watched. Nothing here changes on its own: if it moves, somebody
+      deployed or resized it.
+    </div>
   </section>
 
   <section class="panel">
@@ -387,7 +430,8 @@
     renderWarnings(d.config_warnings || []);
     renderServices(svcs);
     renderVendors(vend);
-    renderCost(c, gaps);
+    renderInfra(d.infra);
+    renderCost(c, gaps, d.cost_staleness);
   }
 
   function setTile(key, value, note, toneClass) {
@@ -465,6 +509,82 @@
     });
   }
 
+
+  function renderInfra(rows) {
+    if (!rows || !rows.length) {
+      $("infra-body").innerHTML =
+        '<div class="empty">Nothing here bills for time.</div>';
+      return;
+    }
+    $("infra-body").innerHTML = rows.map(function (i) {
+      var tone = i.status === "match" ? "t-ok"
+        : i.status === "drift" ? "t-crit" : "t-unknown";
+      var label = i.status === "match" ? "as expected"
+        : i.status === "drift" ? "changed"
+        : i.status === "stale" ? "not confirmed recently"
+        : i.status === "never_checked" ? "never checked" : "could not check";
+
+      var shape = i.actual_machines == null
+        ? "could not read the running machines"
+        : i.actual_machines + (i.actual_machines === 1 ? " machine" : " machines")
+          + " · " + esc(i.actual_size || "unknown size")
+          + (i.actual_memory_mb ? " · " + i.actual_memory_mb + " MB" : "");
+
+      // A resized machine invalidates the calibrated rate. Showing a number
+      // derived from the old shape would be a confident wrong figure, which is
+      // the single thing this dashboard is built to avoid.
+      var ceiling = i.estimate_valid
+        ? "$" + Number(i.estimated_month_usd_max).toFixed(2) +
+          "<small>most it can cost</small>"
+        : "<small>no estimate — the machine size changed</small>";
+
+      return '<div class="infra-row ' + tone + '">' +
+        '<span class="infra-name">' + esc(i.display_name || i.service_key) + "</span>" +
+        '<span class="pill">' + esc(label) + "</span>" +
+        '<span class="infra-shape">' + shape + "</span>" +
+        '<span class="infra-ceiling">' + ceiling + "</span>" +
+        "</div>";
+    }).join("");
+  }
+
+  /**
+   * Record a cost from the dashboard. The endpoint files it as a ledger claim
+   * with source 'owner_entered', which ranks below an invoice — a typed number
+   * never masquerades as verified.
+   */
+  function recordCost(serviceKey, amount, btn, msgEl) {
+    btn.disabled = true;
+    msgEl.className = "cost-msg";
+    msgEl.textContent = "saving…";
+    return fetch(SUPABASE_URL + "/functions/v1/owner_set_service_cost", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+        apikey: ANON_KEY
+      },
+      body: JSON.stringify({ serviceKey: serviceKey, monthlyUsd: amount })
+    }).then(function (r) {
+      return r.json().then(function (b) {
+        if (!r.ok) throw new Error(b.error || ("HTTP " + r.status));
+        return b;
+      });
+    }).then(function () {
+      msgEl.className = "cost-msg ok";
+      msgEl.textContent = "saved";
+      // Re-read rather than patching the page. The server decides what the
+      // total and the confidence now are; guessing here is how two views of
+      // the same number start disagreeing.
+      return load();
+    }).catch(function (e) {
+      msgEl.className = "cost-msg bad";
+      msgEl.textContent = e.message === "not_editable"
+        ? "metered service — cost is measured, not typed"
+        : e.message;
+      btn.disabled = false;
+    });
+  }
+
   function renderVendors(rows) {
     if (!rows.length) {
       $("vendor-body").innerHTML = '<div class="empty">No vendor accounts are being polled yet.</div>';
@@ -482,14 +602,32 @@
     }).join("");
   }
 
-  function renderCost(c, gaps) {
+  function renderCost(c, gaps, staleness) {
     $("cost-sub").textContent = money(c.total_usd) + " recorded · " +
       money(c.known_usd) + " from invoices";
 
     var html = "";
+
+    // Figures that exist but nobody has revisited. Not an alarm — nothing is
+    // broken — but this is where a plan upgrade hides: the number stays
+    // confident while the truth moves on.
+    var stale = (staleness || []).filter(function (s2) { return s2.staleness === "stale"; });
+    if (stale.length) {
+      html += stale.map(function (s2) {
+        return '<div class="gap-row t-warn">' +
+          '<span class="gap-name">' + esc(s2.display_name || s2.service_key) + "</span>" +
+          '<span class="pill">' + s2.days_since_confirmed + " days old</span>" +
+          '<span class="gap-why">Last confirmed at ' + money(s2.last_amount_usd) +
+          ". If the plan changed since, this is wrong.</span>" +
+          costForm(s2.service_key) +
+          "</div>";
+      }).join("");
+    }
+
     if (gaps.length) {
       html += '<div class="note" style="border-top:none;border-bottom:1px solid var(--line)">' +
-        "These services cost money and have no figure this month. The total above excludes them." +
+        "These cost money and have no figure this month. The total above excludes them. " +
+        "Type what the vendor charges and it is recorded against this month." +
         "</div>";
       html += gaps.map(function (g) {
         var why = g.billing_access === "automated" ? "pollable, not yet recorded"
@@ -497,19 +635,51 @@
           : "manual entry";
         return '<div class="gap-row t-warn">' +
           '<span class="gap-name">' + esc(g.display_name || g.service_key) + "</span>" +
-          '<span class="pill">no figure</span>' +
           '<span class="gap-why">' + esc(why) + "</span>" +
           (g.billing_url ? '<a class="gap-link" href="' + esc(g.billing_url) +
             '" target="_blank" rel="noopener">Open billing →</a>' : "") +
+          costForm(g.service_key) +
           "</div>";
       }).join("");
-    } else {
-      html += '<div class="empty">Every service that costs money has a figure this month.</div>';
+    } else if (!stale.length) {
+      html += '<div class="empty">Every service that costs money has a current figure.</div>';
     }
-    html += '<div class="note">A cost is recorded with its source. Invoiced figures are ' +
-      "trusted over estimates, and where no honest number exists the service is listed above " +
-      "rather than guessed at.</div>";
+
+    html += '<div class="note">A cost is recorded with its source. Invoiced figures ' +
+      "are trusted over typed ones, and where no honest number exists the service " +
+      "is listed above rather than guessed at.</div>";
     $("cost-body").innerHTML = html;
+
+    // Wire the inputs after the markup exists.
+    Array.prototype.forEach.call($("cost-body").querySelectorAll(".cost-form"), function (f) {
+      var key = f.getAttribute("data-service");
+      var input = f.querySelector("input");
+      var btn = f.querySelector("button");
+      var msg = f.querySelector(".cost-msg");
+      function submit() {
+        var v = parseFloat(input.value);
+        if (!isFinite(v) || v < 0) {
+          msg.className = "cost-msg bad";
+          msg.textContent = "enter an amount";
+          return;
+        }
+        recordCost(key, v, btn, msg);
+      }
+      btn.addEventListener("click", submit);
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); submit(); }
+      });
+    });
+  }
+
+  /** The ten-second path: type what the vendor charges, press save. */
+  function costForm(serviceKey) {
+    return '<span class="cost-form" data-service="' + esc(serviceKey) + '">' +
+      '<input type="number" step="0.01" min="0" placeholder="0.00" ' +
+      'aria-label="Monthly cost for ' + esc(serviceKey) + '">' +
+      "<button type=\"button\">Save</button>" +
+      '<span class="cost-msg"></span>' +
+      "</span>";
   }
 
   $("svc-filter").addEventListener("input", function () {
