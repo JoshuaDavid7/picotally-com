@@ -191,6 +191,16 @@
   .cost-msg.ok { color: var(--ok); }
   .cost-msg.bad { color: var(--crit); }
 
+
+  /* Cost, grouped by how the figure is obtained */
+  .cost-group { border-bottom: 1px solid var(--line); }
+  .cost-group:last-of-type { border-bottom: none; }
+  .cost-group-head { padding: 13px 16px 9px; background: var(--panel-2); }
+  .cost-group-head strong { font-size: 13px; letter-spacing: .01em; }
+  .cost-group-blurb { display: block; font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+  .cost-amount { min-width: 78px; font-variant-numeric: tabular-nums; font-size: 14px; }
+  .cost-none { color: var(--ink-faint); font-size: 12.5px; font-style: italic; }
+
   @media (max-width: 860px) {
     .strip { grid-template-columns: repeat(2, 1fr); }
     .row { grid-template-columns: 1fr 68px 20px; row-gap: 8px; }
@@ -431,7 +441,7 @@
     renderServices(svcs);
     renderVendors(vend);
     renderInfra(d.infra);
-    renderCost(c, gaps, d.cost_staleness);
+    renderCost(c, d.cost_overview);
   }
 
   function setTile(key, value, note, toneClass) {
@@ -602,55 +612,88 @@
     }).join("");
   }
 
-  function renderCost(c, gaps, staleness) {
-    $("cost-sub").textContent = money(c.total_usd) + " recorded · " +
-      money(c.known_usd) + " from invoices";
+  /**
+   * Every service, grouped by HOW its cost is determined. The previous version
+   * listed only "gaps", which meant a subscription sitting at $0 disappeared —
+   * so the service most likely to start charging had nowhere to change it. It
+   * also put an amount box next to Claude and Gemini, whose cost we compute
+   * hourly from our own usage and which no human should be typing over.
+   */
+  function renderCost(c, overview) {
+    $("cost-sub").textContent = money(c.total_usd) + " this month · " +
+      money(c.known_usd) + " confirmed by invoice";
+
+    var rows = overview || [];
+    var groups = [
+      { model: "subscription", title: "Subscriptions",
+        blurb: "Plans we pay. These only change when you upgrade, so you are the one who knows." },
+      { model: "metered", title: "Measured from our own usage",
+        blurb: "Counted hourly as the app runs. Nothing to enter — we already hold a better number than anyone could type." },
+      { model: "no_cost", title: "No charge to us",
+        blurb: "Free, or paid by somebody else." },
+      { model: "commission", title: "Revenue share",
+        blurb: "A cut of what comes in, not a bill that goes out." }
+    ];
 
     var html = "";
+    groups.forEach(function (g) {
+      var inGroup = rows.filter(function (r) { return r.cost_model === g.model; });
+      if (!inGroup.length) return;
 
-    // Figures that exist but nobody has revisited. Not an alarm — nothing is
-    // broken — but this is where a plan upgrade hides: the number stays
-    // confident while the truth moves on.
-    var stale = (staleness || []).filter(function (s2) { return s2.staleness === "stale"; });
-    if (stale.length) {
-      html += stale.map(function (s2) {
-        return '<div class="gap-row t-warn">' +
-          '<span class="gap-name">' + esc(s2.display_name || s2.service_key) + "</span>" +
-          '<span class="pill">' + s2.days_since_confirmed + " days old</span>" +
-          '<span class="gap-why">Last confirmed at ' + money(s2.last_amount_usd) +
-          ". If the plan changed since, this is wrong.</span>" +
-          costForm(s2.service_key) +
+      // Worst first inside each group: what needs you, then what is merely old.
+      var rank = { missing: 3, stale: 2, current: 1, measured: 0, no_cost: 0, commission: 0 };
+      inGroup.sort(function (a, b) {
+        return (rank[b.state] || 0) - (rank[a.state] || 0) ||
+          (b.amount_usd || 0) - (a.amount_usd || 0);
+      });
+
+      html += '<div class="cost-group"><div class="cost-group-head">' +
+        "<strong>" + esc(g.title) + "</strong>" +
+        '<span class="cost-group-blurb">' + esc(g.blurb) + "</span></div>";
+
+      html += inGroup.map(function (r) {
+        var tone = r.state === "missing" ? "t-warn"
+          : r.state === "stale" ? "t-warn"
+          : r.state === "measured" ? "t-accent" : "t-ok";
+
+        // "not recorded" is only meaningful where a figure is expected. On a
+        // free service or a revenue share it reads as a gap when nothing is
+        // missing, which is the same false-alarm problem as showing a zero
+        // where the truth is unknown.
+        var expectsFigure = r.cost_model === "subscription" || r.cost_model === "metered";
+        var amount = !expectsFigure ? ""
+          : (r.amount_usd === null || r.amount_usd === undefined)
+            ? '<span class="cost-none">not recorded</span>'
+            : "<strong>" + money(r.amount_usd) + "</strong>";
+
+        var meta = r.state === "missing" ? "no figure for this month"
+          : r.state === "stale" ? "last confirmed " + r.days_since_confirmed + " days ago"
+          : r.state === "measured" ? "measured this month"
+          : r.state === "no_cost" ? esc(r.subtitle || "")
+          : r.state === "commission" ? esc(r.subtitle || "")
+          : (r.source === "invoice" ? "from an invoice" : "entered by you");
+
+        return '<div class="gap-row ' + tone + '">' +
+          '<span class="gap-name">' + esc(r.display_name || r.service_key) + "</span>" +
+          '<span class="cost-amount">' + amount + "</span>" +
+          '<span class="gap-why">' + meta + "</span>" +
+          (r.billing_url && r.editable
+            ? '<a class="gap-link" href="' + esc(r.billing_url) +
+              '" target="_blank" rel="noopener">Open billing →</a>' : "") +
+          (r.editable ? costForm(r.service_key, r.amount_usd) : "") +
           "</div>";
       }).join("");
-    }
 
-    if (gaps.length) {
-      html += '<div class="note" style="border-top:none;border-bottom:1px solid var(--line)">' +
-        "These cost money and have no figure this month. The total above excludes them. " +
-        "Type what the vendor charges and it is recorded against this month." +
-        "</div>";
-      html += gaps.map(function (g) {
-        var why = g.billing_access === "automated" ? "pollable, not yet recorded"
-          : g.billing_access === "needs_credential" ? "needs a one-time credential"
-          : "manual entry";
-        return '<div class="gap-row t-warn">' +
-          '<span class="gap-name">' + esc(g.display_name || g.service_key) + "</span>" +
-          '<span class="gap-why">' + esc(why) + "</span>" +
-          (g.billing_url ? '<a class="gap-link" href="' + esc(g.billing_url) +
-            '" target="_blank" rel="noopener">Open billing →</a>' : "") +
-          costForm(g.service_key) +
-          "</div>";
-      }).join("");
-    } else if (!stale.length) {
-      html += '<div class="empty">Every service that costs money has a current figure.</div>';
-    }
+      html += "</div>";
+    });
 
-    html += '<div class="note">A cost is recorded with its source. Invoiced figures ' +
-      "are trusted over typed ones, and where no honest number exists the service " +
-      "is listed above rather than guessed at.</div>";
+    if (!rows.length) html = '<div class="empty">No services are being tracked.</div>';
+
+    html += '<div class="note">A cost is stored with where it came from. An invoice ' +
+      "outranks a typed figure, a measured figure is never overwritten by hand, and " +
+      "where no honest number exists the service says so rather than showing a zero.</div>";
     $("cost-body").innerHTML = html;
 
-    // Wire the inputs after the markup exists.
     Array.prototype.forEach.call($("cost-body").querySelectorAll(".cost-form"), function (f) {
       var key = f.getAttribute("data-service");
       var input = f.querySelector("input");
@@ -672,10 +715,15 @@
     });
   }
 
-  /** The ten-second path: type what the vendor charges, press save. */
-  function costForm(serviceKey) {
+  /**
+   * The ten-second path. Pre-filled with the current figure so updating a plan
+   * is an edit rather than a recall — the moment you upgrade, the old number is
+   * right there to correct.
+   */
+  function costForm(serviceKey, current) {
+    var val = (current === null || current === undefined) ? "" : String(current);
     return '<span class="cost-form" data-service="' + esc(serviceKey) + '">' +
-      '<input type="number" step="0.01" min="0" placeholder="0.00" ' +
+      '<input type="number" step="0.01" min="0" placeholder="0.00" value="' + esc(val) + '" ' +
       'aria-label="Monthly cost for ' + esc(serviceKey) + '">' +
       "<button type=\"button\">Save</button>" +
       '<span class="cost-msg"></span>' +
