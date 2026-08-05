@@ -205,6 +205,39 @@
   .trend-month { font-size: 12.5px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
   .spark { display: block; }
 
+
+  /* ── Executive hierarchy ── */
+  .fin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 18px 16px 8px; }
+  .fin-stat { padding: 4px 6px; }
+  .fin-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-faint); }
+  .fin-value { font-size: 34px; font-weight: 750; letter-spacing: -1px; margin: 4px 0 2px; font-variant-numeric: tabular-nums; }
+  .fin-neg .fin-value { color: var(--crit); }
+  .fin-pos .fin-value { color: var(--ok); }
+  .fin-note-s { font-size: 12px; color: var(--ink-faint); }
+  .fin-trend { padding: 10px 16px 4px; border-top: 1px solid var(--line); margin-top: 10px; }
+  .fin-note { padding: 12px 16px; font-size: 12.5px; color: var(--ink-faint); }
+
+  .sys-summary {
+    list-style: none; cursor: pointer; padding: 15px 16px;
+    font-size: 14.5px; font-weight: 650; user-select: none;
+  }
+  .sys-summary::-webkit-details-marker { display: none; }
+  .sys-summary::after { content: "▸"; float: right; color: var(--ink-faint); transition: transform .15s; }
+  details[open] > .sys-summary::after { transform: rotate(90deg); }
+  .sum-note { font-weight: 400; font-size: 12.5px; color: var(--ink-faint); margin-left: 8px; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 9px; }
+  .dot-ok { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .dot-bad { background: var(--crit); box-shadow: 0 0 6px var(--crit); }
+  .sys-inner { border-top: 1px solid var(--line); }
+  .sub-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 13px 16px 7px; font-size: 12px; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--ink-faint);
+  }
+  .cost-quiet .sys-summary { padding: 12px 16px; font-size: 13px; }
+
+  @media (max-width: 700px) { .fin-grid { grid-template-columns: 1fr 1fr; } .fin-value { font-size: 26px; } }
+
   /* Month bars + timeline */
   .trend-block { padding: 10px 16px; border-top: 1px solid var(--line); }
   .tbar-row { display: flex; align-items: center; gap: 10px; padding: 3px 0; flex-wrap: wrap; }
@@ -287,69 +320,63 @@
     </div>
   </header>
 
-  <div class="strip">
-    <div class="tile" id="tile-overall"><div class="tile-label">Services</div><div class="tile-value" id="v-overall">—</div><div class="tile-note" id="n-overall"></div></div>
-    <div class="tile" id="tile-vendors"><div class="tile-label">Vendor accounts</div><div class="tile-value" id="v-vendors">—</div><div class="tile-note" id="n-vendors"></div></div>
-    <div class="tile" id="tile-monitor"><div class="tile-label">Monitoring</div><div class="tile-value" id="v-monitor">—</div><div class="tile-note" id="n-monitor"></div></div>
-    <div class="tile" id="tile-cost"><div class="tile-label">Cost confidence</div><div class="tile-value" id="v-cost">—</div><div class="tile-note" id="n-cost"></div></div>
-  </div>
-
+  <!-- Critical config contradictions always surface first, no disclosure. -->
   <section class="panel hidden" id="warn-panel">
-    <div class="panel-head"><h2>Configuration warnings</h2><span class="panel-sub">limits that contradict each other</span></div>
+    <div class="panel-head"><h2>Needs a decision</h2><span class="panel-sub">the monitoring disagrees with itself</span></div>
     <div id="warn-body"></div>
   </section>
 
+  <!-- 1 · FINANCIALS — the question the page exists to answer -->
   <section class="panel">
-    <div class="panel-head">
-      <h2>Usage against limits</h2>
-      <span class="panel-sub">counted by us, not read from the vendor</span>
-      <span class="grow"></span>
-      <input class="filter" id="svc-filter" placeholder="Filter services…" aria-label="Filter services">
-    </div>
-    <div id="svc-body"></div>
-    <div class="note">A percentage alone can round a real number to nothing, so each row shows what it counted. Projections apply to counters only — extrapolating a database size is meaningless.</div>
+    <div class="panel-head"><h2>Financials</h2><span class="panel-sub" id="fin-sub"></span></div>
+    <div id="fin-body"></div>
   </section>
 
-  <section class="panel" id="infra-panel">
-    <div class="panel-head">
-      <h2>Running setup</h2>
-      <span class="panel-sub">what is switched on, and the most it can cost</span>
-    </div>
-    <div id="infra-body"></div>
-    <div class="note">
-      Some services bill for time rather than requests, and publish no invoice
-      amount. What they charge is decided by how much is running, so that is
-      what gets watched. Nothing here changes on its own: if it moves, somebody
-      deployed or resized it.
-    </div>
+  <!-- 2 · SYSTEMS — one sentence; the machinery expands on demand and
+       opens itself when something is actually wrong -->
+  <section class="panel">
+    <details id="sys-details">
+      <summary class="sys-summary" id="sys-line">Checking…</summary>
+      <div class="sys-inner">
+        <div class="sub-head">Usage against limits
+          <input class="filter" id="svc-filter" placeholder="Filter…" aria-label="Filter services"></div>
+        <div id="svc-body"></div>
+        <div id="usage-sparks"></div>
+        <div class="sub-head">Running setup</div>
+        <div id="infra-body"></div>
+        <div class="sub-head">Vendor accounts</div>
+        <div id="vendor-body"></div>
+      </div>
+    </details>
   </section>
 
+  <!-- 3 · COSTS -->
   <section class="panel">
-    <div class="panel-head"><h2>Vendor accounts</h2><span class="panel-sub">is the billing relationship still healthy</span></div>
-    <div id="vendor-body"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head"><h2>Cost</h2><span class="panel-sub" id="cost-sub"></span></div>
+    <div class="panel-head"><h2>Costs</h2><span class="panel-sub" id="cost-sub"></span></div>
     <div id="cost-body"></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head"><h2>Trends</h2>
-      <span class="panel-sub" id="trends-sub"></span></div>
     <div id="trends-body"></div>
   </section>
 
+  <!-- 4 · GROWTH -->
   <section class="panel">
-    <div class="panel-head"><h2>What has happened</h2>
-      <span class="panel-sub">alerts the system sent, plans people changed</span></div>
-    <div id="events-body"></div>
+    <div class="panel-head"><h2>Growth</h2><span class="panel-sub" id="growth-sub"></span></div>
+    <div id="growth-body"></div>
   </section>
 
+  <!-- 5 · ACTIVITY -->
   <section class="panel">
-    <div class="panel-head"><h2>Everything we depend on</h2>
-      <span class="panel-sub">the complete map — what breaks if each one fails</span></div>
-    <div id="registry-body"></div>
+    <details>
+      <summary class="sys-summary">What has happened <span class="sum-note" id="events-count"></span></summary>
+      <div id="events-body"></div>
+    </details>
+  </section>
+
+  <!-- 6 · REFERENCE -->
+  <section class="panel">
+    <details>
+      <summary class="sys-summary">Everything we depend on <span class="sum-note">the dependency map, by criticality</span></summary>
+      <div id="registry-body"></div>
+    </details>
   </section>
 </div>
 
@@ -529,47 +556,135 @@
   function render(d) {
     current = d;
     $("stamp").textContent = "checked " + ago(d.generated_at);
-
-    // Services tile
-    var svcs = d.services || [];
-    var bad = svcs.filter(function (s) { return s.status !== "ok"; });
-    setTile("overall", bad.length ? bad.length + " need attention" : "All clear",
-      svcs.length + " meters watched", bad.length ? toneFor(bad[0].status) : "t-ok");
-
-    // Vendors tile
-    var vend = d.billing || [];
-    var vbad = vend.filter(function (b) { return b.severity !== "ok"; });
-    setTile("vendors", vend.length === 0 ? "None tracked" : (vbad.length ? vbad.length + " to check" : "Good standing"),
-      vend.length + " polled", vend.length === 0 ? "t-unknown" : (vbad.length ? toneFor(vbad[0].severity) : "t-ok"));
-
-    // Monitoring tile — the dead-man's switch
-    var m = d.monitor || {};
-    var alive = m.scheduled && m.active && m.last_status === "succeeded";
-    setTile("monitor", alive ? "Alive" : "Check it",
-      m.last_run ? "ran " + ago(m.last_run) : "never run", alive ? "t-ok" : "t-crit");
-
-    // Cost tile
-    var c = d.cost_confidence || {};
-    var gaps = d.cost_gaps || [];
-    setTile("cost", money(c.total_usd),
-      (Number(c.pct_verified || 0)) + "% invoiced · " + gaps.length + " untracked",
-      Number(c.pct_verified || 0) >= 80 ? "t-ok" : (gaps.length ? "t-warn" : "t-unknown"));
-
     renderWarnings(d.config_warnings || []);
-    renderServices(svcs);
-    renderVendors(vend);
-    renderInfra(d.infra);
-    renderCost(c, d.cost_overview, d.plans, d.committed_monthly_usd);
-    renderRegistry(d.registry || []);
+    renderFinancials(d);
+    renderSystems(d);
+    renderCost(d.cost_confidence || {}, d.cost_overview, d.plans, d.committed_monthly_usd);
     renderTrends(d.history || {});
     renderEvents((d.history || {}).events || []);
+    renderRegistry(d.registry || []);
   }
 
-  function setTile(key, value, note, toneClass) {
-    $("v-" + key).textContent = value;
-    $("n-" + key).textContent = note;
-    var tile = $("tile-" + key);
-    tile.className = "tile " + toneClass;
+  /**
+   * The P&L, from the ledgers. Revenue comes from the Apple-fed revenue
+   * ledger — pre-launch it is an HONEST zero with a stated reason, which is a
+   * different thing from untracked. Cash and runway ARE untracked (no bank
+   * connection) and say so instead of pretending. Nothing here is typed;
+   * every figure names its source.
+   */
+  function renderFinancials(d) {
+    var h = d.history || {};
+    var c = d.cost_confidence || {};
+    var rev = h.revenue_monthly || [];
+    var thisMonth = new Date().toISOString().slice(0, 7);
+
+    // Revenue MTD from the ledger; zero months means zero rows, honestly.
+    var revMtd = 0;
+    rev.forEach(function (r) {
+      if (String(r.period_month).slice(0, 7) === thisMonth) revMtd += Number(r.net_usd || 0);
+    });
+
+    // Costs MTD = recorded claims (subscriptions + derived infra) + metered AI.
+    var meteredMtd = 0;
+    (d.cost_overview || []).forEach(function (r) {
+      if (r.cost_model === "metered" && typeof r.amount_usd === "number") meteredMtd += r.amount_usd;
+    });
+    var costsMtd = Number(c.total_usd || 0) + meteredMtd;
+    var netMtd = revMtd - costsMtd;
+
+    // Run-rate: plan commitments + the Fly ceiling. An expectation, with its
+    // parts named, never blended into the measured figures above.
+    var flyCeil = 0;
+    (d.infra || []).forEach(function (i) {
+      if (i.estimate_valid) flyCeil += Number(i.estimated_month_usd_max || 0);
+    });
+    var runRate = Number(d.committed_monthly_usd || 0) + flyCeil;
+
+    var stats =
+      '<div class="fin-grid">' +
+      finStat("Net this month", (netMtd < 0 ? "\u2212" : "") + money(Math.abs(netMtd)),
+        netMtd < 0 ? "burning at the run-rate below" : "profitable", netMtd < 0 ? "neg" : "pos") +
+      finStat("Revenue", money(revMtd), "ledger wired \u00b7 pre-launch", "muted") +
+      finStat("Costs so far", money(costsMtd),
+        money(Number(c.total_usd || 0)) + " recorded + " + money(meteredMtd) + " metered AI", "muted") +
+      finStat("Run-rate", "\u2248 " + money(runRate) + "/mo",
+        "plans " + money(d.committed_monthly_usd || 0) + " + infra up to " + money(flyCeil), "muted") +
+      "</div>";
+
+    // Net by month: revenue minus (recorded claims + metered), the trend a
+    // CFO reads first. Colored by sign; magnitudes to scale.
+    var byMonth = {};
+    (h.billing_monthly || []).forEach(function (r) {
+      var m = String(r.period_month).slice(0, 7);
+      byMonth[m] = (byMonth[m] || 0) - Number(r.amount_usd || 0);
+    });
+    (h.ai_monthly || []).forEach(function (r) {
+      var m = String(r.period_month).slice(0, 7);
+      byMonth[m] = (byMonth[m] || 0) - Number(r.est_cost_usd || 0);
+    });
+    rev.forEach(function (r) {
+      var m = String(r.period_month).slice(0, 7);
+      byMonth[m] = (byMonth[m] || 0) + Number(r.net_usd || 0);
+    });
+    var months = Object.keys(byMonth).sort();
+    var maxAbs = 0;
+    months.forEach(function (m) { maxAbs = Math.max(maxAbs, Math.abs(byMonth[m])); });
+    var trend = months.length < 2 ? "" :
+      '<div class="fin-trend"><div class="trend-label">Net by month</div>' +
+      months.map(function (m) {
+        var v = byMonth[m];
+        var w = maxAbs > 0 ? Math.max(2, (Math.abs(v) / maxAbs) * 100) : 2;
+        return '<div class="tbar-row"><span class="tbar-month">' + esc(m) + "</span>" +
+          '<span class="tbar"><i style="width:' + w.toFixed(1) +
+          '%;background:var(--' + (v < 0 ? "crit" : "ok") + ')"></i></span>' +
+          '<span class="tbar-total">' + (v < 0 ? "\u2212" : "") + money(Math.abs(v)) + "</span></div>";
+      }).join("") + "</div>";
+
+    var honesty = '<div class="fin-note">Cash and runway are not tracked \u2014 no bank ' +
+      "connection. Mercury has an API; connecting it is a one-time credential from you. " +
+      "Until then this page shows earning and spending, not the balance.</div>";
+
+    $("fin-body").innerHTML = stats + trend + honesty;
+    $("fin-sub").textContent = "every figure from a ledger \u00b7 nothing typed";
+  }
+
+  function finStat(label, value, note, tone) {
+    return '<div class="fin-stat fin-' + tone + '">' +
+      '<div class="fin-label">' + esc(label) + "</div>" +
+      '<div class="fin-value">' + value + "</div>" +
+      '<div class="fin-note-s">' + esc(note) + "</div></div>";
+  }
+
+  /**
+   * Systems as ONE sentence. The machinery is a detail view a healthy day
+   * never needs; on a bad day the section opens itself with the problems
+   * already sorted worst-first inside.
+   */
+  function renderSystems(d) {
+    var svcs = d.services || [];
+    var badSvc = svcs.filter(function (s) { return s.status !== "ok"; });
+    var vend = d.billing || [];
+    var badVend = vend.filter(function (b) { return b.severity !== "ok"; });
+    var infra = d.infra || [];
+    var badInfra = infra.filter(function (i) { return i.status !== "match"; });
+    var m = d.monitor || {};
+    var alive = m.scheduled && m.active && m.last_status === "succeeded";
+
+    var issues = badSvc.length + badVend.length + badInfra.length + (alive ? 0 : 1);
+    var line = $("sys-line");
+    if (issues === 0) {
+      line.innerHTML = '<span class="dot dot-ok"></span>All systems normal ' +
+        '<span class="sum-note">' + svcs.length + " meters in range \u00b7 vendor accounts healthy \u00b7 " +
+        "machines as expected \u00b7 monitoring alive \u00b7 details</span>";
+    } else {
+      line.innerHTML = '<span class="dot dot-bad"></span>' + issues +
+        (issues === 1 ? " item needs" : " items need") + " attention " +
+        '<span class="sum-note">opened below, worst first</span>';
+      $("sys-details").setAttribute("open", "");
+    }
+    renderServices(svcs);
+    renderInfra(infra);
+    renderVendors(vend);
   }
 
   function renderWarnings(warnings) {
@@ -778,6 +893,9 @@
    * blank space that could mean anything.
    */
   function renderEvents(events) {
+    $("events-count").textContent = events.length
+      ? events.length + " events \u00b7 alerts sent and plans changed"
+      : "nothing yet";
     if (!events.length) {
       $("events-body").innerHTML =
         '<div class="empty">No alerts have ever fired and no plans have changed. Quiet is a result too.</div>';
@@ -831,46 +949,37 @@
   function renderTrends(h) {
     var usage = h.usage_daily || [];
     var ai = h.ai_monthly || [];
-    var wait = h.waitlist_daily || [];
 
-    var days = {};
-    usage.forEach(function (u) { days[u.day] = true; });
-    var dayCount = Object.keys(days).length;
-    $("trends-sub").textContent = dayCount
-      ? dayCount + " day" + (dayCount === 1 ? "" : "s") + " of history — fills in as days accrue"
-      : "no history yet";
-
-    var html = "";
-
-    // Per-meter sparklines, grouped from the daily usage log.
+    // Per-meter history lives with the meters, inside the systems detail.
     var series = {};
     usage.forEach(function (u) {
       var k = u.service + "|" + u.metric;
       (series[k] = series[k] || []).push({ d: u.day, v: Number(u.units) || 0 });
     });
     var keys = Object.keys(series).sort();
-    if (keys.length) {
-      html += '<div class="trend-grid">' + keys.map(function (k) {
+    var days = {};
+    usage.forEach(function (u) { days[u.day] = true; });
+    var dayCount = Object.keys(days).length;
+    $("usage-sparks").innerHTML = !keys.length ? "" :
+      '<div class="trend-grid">' + keys.map(function (k) {
         var pts = series[k];
         var last = pts[pts.length - 1];
         var parts = k.split("|");
-        var label = parts[0] + " · " + parts[1];
-        // Find the friendlier label from the live meters when one exists.
+        var label = parts[0] + " \u00b7 " + parts[1];
         (current && current.services || []).forEach(function (r) {
           if (r.service === parts[0] && r.metric === parts[1]) {
-            label = (r.display_name || parts[0]) + " · " + (r.metric_label || parts[1]);
+            label = (r.display_name || parts[0]) + " \u00b7 " + (r.metric_label || parts[1]);
           }
         });
-        return '<div class="trend-cell">' +
-          '<div class="trend-label">' + esc(label) + "</div>" +
+        return '<div class="trend-cell"><div class="trend-label">' + esc(label) + "</div>" +
           spark(pts, 150, 36, "accent") +
-          '<div class="trend-last">' + esc(String(last.v)) + " on " + esc(last.d) + "</div>" +
-          "</div>";
-      }).join("") + "</div>";
-    }
+          '<div class="trend-last">' + esc(String(last.v)) + " on " + esc(last.d) + "</div></div>";
+      }).join("") +
+      '</div><div class="fin-note">' + dayCount + " day" + (dayCount === 1 ? "" : "s") +
+      " of history \u2014 fills in as days accrue.</div>";
 
-    // AI spend by month, broken down by service — measured money, the series
-    // that scales with users, and the answer to "which AI costs what".
+    // Cost history bars, inside the Costs section.
+    var html = "";
     if (ai.length) {
       var byMonth = {};
       ai.forEach(function (r) {
@@ -881,15 +990,15 @@
       var months = Object.keys(byMonth).sort();
       var maxTotal = 0;
       months.forEach(function (m) {
-        var t = 0; Object.keys(byMonth[m]).forEach(function (s) { t += byMonth[m][s]; });
+        var t = 0; Object.keys(byMonth[m]).forEach(function (sv) { t += byMonth[m][sv]; });
         byMonth[m].__total = t; if (t > maxTotal) maxTotal = t;
       });
       html += '<div class="trend-block"><div class="trend-label">AI spend by month, by service</div>' +
         months.map(function (m) {
           var t = byMonth[m].__total;
-          var services = Object.keys(byMonth[m]).filter(function (s) { return s !== "__total"; })
+          var services = Object.keys(byMonth[m]).filter(function (sv) { return sv !== "__total"; })
             .sort(function (a, b) { return byMonth[m][b] - byMonth[m][a]; })
-            .map(function (s) { return s + " " + money(byMonth[m][s]); }).join(" · ");
+            .map(function (sv) { return sv + " " + money(byMonth[m][sv]); }).join(" \u00b7 ");
           var w = maxTotal > 0 ? Math.max(2, (t / maxTotal) * 100) : 2;
           return '<div class="tbar-row"><span class="tbar-month">' + esc(m) + "</span>" +
             '<span class="tbar"><i style="width:' + w.toFixed(1) + '%;background:var(--accent)"></i></span>' +
@@ -897,44 +1006,23 @@
             '<span class="tbar-detail">' + esc(services) + "</span></div>";
         }).join("") + "</div>";
     }
+    $("trends-body").innerHTML = html;
 
-    // Total recorded cost by month, from the ledger's best claims — invoices
-    // beating typed figures beating derivations, applied backward in time.
-    var bill = h.billing_monthly || [];
-    if (bill.length) {
-      var costMonth = {};
-      bill.forEach(function (r) {
-        var m = String(r.period_month).slice(0, 7);
-        costMonth[m] = (costMonth[m] || 0) + Number(r.amount_usd || 0);
-      });
-      var cms = Object.keys(costMonth).sort();
-      var maxC = Math.max.apply(null, cms.map(function (m) { return costMonth[m]; }));
-      html += '<div class="trend-block"><div class="trend-label">Recorded cost by month (subscriptions + infra)</div>' +
-        cms.map(function (m) {
-          var w = maxC > 0 ? Math.max(2, (costMonth[m] / maxC) * 100) : 2;
-          return '<div class="tbar-row"><span class="tbar-month">' + esc(m) + "</span>" +
-            '<span class="tbar"><i style="width:' + w.toFixed(1) + '%;background:var(--ok)"></i></span>' +
-            '<span class="tbar-total">' + money(costMonth[m]) + "</span></div>";
-        }).join("") + "</div>";
-    }
-
-    // Waitlist growth — cumulative, the number launch day cares about.
+    // Growth: the one real pre-launch series.
+    var wait = h.waitlist_daily || [];
     if (wait.length) {
       var pts = wait.map(function (w) { return { d: w.day, v: Number(w.cumulative) || 0 }; });
-      html += '<div class="trend-row"><span class="trend-label">Waitlist (cumulative)</span>' +
-        spark(pts, 220, 36, "ok") +
-        '<span class="trend-last">' + esc(String(pts[pts.length - 1].v)) + " signed up</span></div>";
+      $("growth-body").innerHTML =
+        '<div class="trend-row"><span class="trend-label">Waitlist (cumulative)</span>' +
+        spark(pts, 260, 40, "ok") +
+        '<span class="tbar-total">' + esc(String(pts[pts.length - 1].v)) + "</span>" +
+        '<span class="tbar-detail">signed up \u00b7 stored durably since Aug 4</span></div>';
+      $("growth-sub").textContent = "the waitlist is the only growth series that exists pre-launch";
+    } else {
+      $("growth-body").innerHTML = '<div class="empty">No signups yet.</div>';
     }
-
-    $("trends-body").innerHTML = html ||
-      '<div class="empty">Charts appear as the daily counters accumulate history.</div>';
   }
 
-  /**
-   * The complete dependency map. Sorted by criticality because the question
-   * this panel answers is "what should I worry about first", not "what starts
-   * with A". Data recorded service-by-service during the Phase A audit.
-   */
   function renderRegistry(rows) {
     if (!rows.length) {
       $("registry-body").innerHTML = '<div class="empty">No registry data.</div>';
@@ -1039,9 +1127,9 @@
         blurb: "Plans we pay. These only change when you upgrade, so you are the one who knows." },
       { model: "metered", title: "Measured from our own usage",
         blurb: "Counted hourly as the app runs. Nothing to enter — we already hold a better number than anyone could type." },
-      { model: "no_cost", title: "No charge to us",
+      { model: "no_cost", title: "No charge to us", quiet: true,
         blurb: "Free, or paid by somebody else." },
-      { model: "commission", title: "Revenue share",
+      { model: "commission", title: "Revenue share", quiet: true,
         blurb: "A cut of what comes in, not a bill that goes out." }
     ];
 
@@ -1057,9 +1145,14 @@
           (b.amount_usd || 0) - (a.amount_usd || 0);
       });
 
-      html += '<div class="cost-group"><div class="cost-group-head">' +
-        "<strong>" + esc(g.title) + "</strong>" +
-        '<span class="cost-group-blurb">' + esc(g.blurb) + "</span></div>";
+      // The groups that cost nothing collapse to one line each; they answer
+      // "is anything hiding here" and need no permanent screen space.
+      html += g.quiet
+        ? '<details class="cost-quiet"><summary class="sys-summary">' + esc(g.title) +
+          ' <span class="sum-note">' + esc(g.blurb) + "</span></summary>"
+        : '<div class="cost-group"><div class="cost-group-head">' +
+          "<strong>" + esc(g.title) + "</strong>" +
+          '<span class="cost-group-blurb">' + esc(g.blurb) + "</span></div>";
 
       html += inGroup.map(function (r) {
         var tone = r.state === "missing" ? "t-warn"
@@ -1110,7 +1203,7 @@
           "</div>";
       }).join("");
 
-      html += "</div>";
+      html += g.quiet ? "</details>" : "</div>";
     });
 
     if (!rows.length) html = '<div class="empty">No services are being tracked.</div>';
