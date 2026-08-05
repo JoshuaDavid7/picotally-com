@@ -1001,7 +1001,13 @@
           : r.state === "measured" ? "measured this month"
           : r.state === "no_cost" ? esc(r.subtitle || "")
           : r.state === "commission" ? esc(r.subtitle || "")
-          : (r.source === "invoice" ? "from an invoice" : "entered by you");
+          : r.source === "invoice" ? "from an invoice"
+          : r.source === "derived"
+            // Fly publishes no spend API; this figure is reconstructed from
+            // the watched machine shape at a rate calibrated on Fly's own
+            // Cost Explorer. An invoice or a typed figure outranks it.
+            ? "derived from the running machines"
+          : "entered by you";
 
         return '<div class="gap-row ' + tone + '">' +
           '<span class="gap-name">' + esc(r.display_name || r.service_key) + "</span>" +
