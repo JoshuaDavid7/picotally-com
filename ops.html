@@ -971,7 +971,7 @@
       if (!inGroup.length) return;
 
       // Worst first inside each group: what needs you, then what is merely old.
-      var rank = { missing: 3, stale: 2, current: 1, measured: 0, no_cost: 0, commission: 0 };
+      var rank = { missing: 3, stale: 2, unproven: 1.5, current: 1, measured: 0, no_cost: 0, commission: 0 };
       inGroup.sort(function (a, b) {
         return (rank[b.state] || 0) - (rank[a.state] || 0) ||
           (b.amount_usd || 0) - (a.amount_usd || 0);
@@ -992,12 +992,18 @@
         // where the truth is unknown.
         var expectsFigure = r.cost_model === "subscription" || r.cost_model === "metered";
         var amount = !expectsFigure ? ""
+          : r.state === "unproven" ? '<span class="cost-none">—</span>'
           : (r.amount_usd === null || r.amount_usd === undefined)
             ? '<span class="cost-none">not recorded</span>'
             : "<strong>" + money(r.amount_usd) + "</strong>";
 
         var meta = r.state === "missing" ? "no figure for this month"
           : r.state === "stale" ? "last confirmed " + r.days_since_confirmed + " days ago"
+          : r.state === "unproven"
+            // The meter is wired and priced but has never produced a row.
+            // That is not a zero and not a gap; it is untested, and saying so
+            // is the only honest label. One real use flips it to measured.
+            ? "meter armed — no usage has ever been recorded"
           : r.state === "measured" ? "measured this month"
           : r.state === "no_cost" ? esc(r.subtitle || "")
           : r.state === "commission" ? esc(r.subtitle || "")
