@@ -205,6 +205,16 @@
   .trend-month { font-size: 12.5px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
   .spark { display: block; }
 
+  /* Month bars + timeline */
+  .trend-block { padding: 10px 16px; border-top: 1px solid var(--line); }
+  .tbar-row { display: flex; align-items: center; gap: 10px; padding: 3px 0; flex-wrap: wrap; }
+  .tbar-month { font-size: 12px; color: var(--ink-dim); min-width: 58px; font-variant-numeric: tabular-nums; }
+  .tbar { flex: 0 0 180px; height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; }
+  .tbar i { display: block; height: 100%; border-radius: 99px; }
+  .tbar-total { font-size: 12.5px; font-weight: 650; min-width: 52px; font-variant-numeric: tabular-nums; }
+  .tbar-detail { font-size: 11.5px; color: var(--ink-faint); }
+  .event-when { font-size: 11.5px; color: var(--ink-faint); min-width: 92px; font-variant-numeric: tabular-nums; }
+
   /* Plan control + dependency map */
   .plan-wrap { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .plan-pill { font-variant-numeric: tabular-nums; }
@@ -328,6 +338,12 @@
     <div class="panel-head"><h2>Trends</h2>
       <span class="panel-sub" id="trends-sub"></span></div>
     <div id="trends-body"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>What has happened</h2>
+      <span class="panel-sub">alerts the system sent, plans people changed</span></div>
+    <div id="events-body"></div>
   </section>
 
   <section class="panel">
@@ -546,6 +562,7 @@
     renderCost(c, d.cost_overview, d.plans, d.committed_monthly_usd);
     renderRegistry(d.registry || []);
     renderTrends(d.history || {});
+    renderEvents((d.history || {}).events || []);
   }
 
   function setTile(key, value, note, toneClass) {
@@ -755,6 +772,34 @@
   }
 
   /**
+   * The event timeline: alerts the system decided to send and plans people
+   * decided to change, newest first. An EMPTY alert history is displayed as
+   * the statement it is — nothing has crossed a line yet — rather than as a
+   * blank space that could mean anything.
+   */
+  function renderEvents(events) {
+    if (!events.length) {
+      $("events-body").innerHTML =
+        '<div class="empty">No alerts have ever fired and no plans have changed. Quiet is a result too.</div>';
+      return;
+    }
+    $("events-body").innerHTML = events.map(function (e) {
+      var tone = e.kind === "alert" ? "t-warn" : "t-accent";
+      var when = new Date(e.at).toLocaleDateString("en-US",
+        { month: "short", day: "numeric" }) + " " +
+        new Date(e.at).toLocaleTimeString("en-US",
+        { hour: "numeric", minute: "2-digit" });
+      return '<div class="gap-row ' + tone + '">' +
+        '<span class="event-when">' + esc(when) + "</span>" +
+        '<span class="pill">' + esc(e.kind === "alert" ? "alert sent" : "plan change") + "</span>" +
+        '<span class="gap-name">' + esc(e.service) + "</span>" +
+        '<span class="gap-why">' + esc(e.detail) + "</span></div>";
+    }).join("") +
+    '<div class="note">Every alert email and every plan switch, newest first. ' +
+    "This is the memory an invoice four weeks later cannot give you.</div>";
+  }
+
+  /**
    * A polyline sparkline as inline SVG. Hand-rolled on purpose — this page
    * has no supply chain and charts are not a reason to grow one.
    */
@@ -824,17 +869,52 @@
       }).join("") + "</div>";
     }
 
-    // AI spend by month — measured money, the series that scales with users.
+    // AI spend by month, broken down by service — measured money, the series
+    // that scales with users, and the answer to "which AI costs what".
     if (ai.length) {
       var byMonth = {};
       ai.forEach(function (r) {
-        byMonth[r.period_month] = (byMonth[r.period_month] || 0) + Number(r.est_cost_usd || 0);
+        var m = String(r.period_month).slice(0, 7);
+        (byMonth[m] = byMonth[m] || {})[r.service] =
+          (byMonth[m][r.service] || 0) + Number(r.est_cost_usd || 0);
       });
       var months = Object.keys(byMonth).sort();
-      html += '<div class="trend-row"><span class="trend-label">AI spend by month</span>' +
+      var maxTotal = 0;
+      months.forEach(function (m) {
+        var t = 0; Object.keys(byMonth[m]).forEach(function (s) { t += byMonth[m][s]; });
+        byMonth[m].__total = t; if (t > maxTotal) maxTotal = t;
+      });
+      html += '<div class="trend-block"><div class="trend-label">AI spend by month, by service</div>' +
         months.map(function (m) {
-          return '<span class="trend-month">' + esc(m.slice(0, 7)) + " " +
-            money(byMonth[m]) + "</span>";
+          var t = byMonth[m].__total;
+          var services = Object.keys(byMonth[m]).filter(function (s) { return s !== "__total"; })
+            .sort(function (a, b) { return byMonth[m][b] - byMonth[m][a]; })
+            .map(function (s) { return s + " " + money(byMonth[m][s]); }).join(" · ");
+          var w = maxTotal > 0 ? Math.max(2, (t / maxTotal) * 100) : 2;
+          return '<div class="tbar-row"><span class="tbar-month">' + esc(m) + "</span>" +
+            '<span class="tbar"><i style="width:' + w.toFixed(1) + '%;background:var(--accent)"></i></span>' +
+            '<span class="tbar-total">' + money(t) + "</span>" +
+            '<span class="tbar-detail">' + esc(services) + "</span></div>";
+        }).join("") + "</div>";
+    }
+
+    // Total recorded cost by month, from the ledger's best claims — invoices
+    // beating typed figures beating derivations, applied backward in time.
+    var bill = h.billing_monthly || [];
+    if (bill.length) {
+      var costMonth = {};
+      bill.forEach(function (r) {
+        var m = String(r.period_month).slice(0, 7);
+        costMonth[m] = (costMonth[m] || 0) + Number(r.amount_usd || 0);
+      });
+      var cms = Object.keys(costMonth).sort();
+      var maxC = Math.max.apply(null, cms.map(function (m) { return costMonth[m]; }));
+      html += '<div class="trend-block"><div class="trend-label">Recorded cost by month (subscriptions + infra)</div>' +
+        cms.map(function (m) {
+          var w = maxC > 0 ? Math.max(2, (costMonth[m] / maxC) * 100) : 2;
+          return '<div class="tbar-row"><span class="tbar-month">' + esc(m) + "</span>" +
+            '<span class="tbar"><i style="width:' + w.toFixed(1) + '%;background:var(--ok)"></i></span>' +
+            '<span class="tbar-total">' + money(costMonth[m]) + "</span></div>";
         }).join("") + "</div>";
     }
 
