@@ -193,6 +193,18 @@
 
 
 
+
+  /* Trends */
+  .trend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 4px 12px; padding: 12px 16px; }
+  .trend-cell { padding: 8px 6px; }
+  .trend-label { font-size: 12px; color: var(--ink-dim); margin-bottom: 4px; }
+  .trend-last { font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+  .trend-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 16px; border-top: 1px solid var(--line); }
+  .trend-month { font-size: 12.5px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+  .spark { display: block; }
+
   /* Plan control + dependency map */
   .plan-wrap { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .plan-pill { font-variant-numeric: tabular-nums; }
@@ -310,6 +322,12 @@
   <section class="panel">
     <div class="panel-head"><h2>Cost</h2><span class="panel-sub" id="cost-sub"></span></div>
     <div id="cost-body"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Trends</h2>
+      <span class="panel-sub" id="trends-sub"></span></div>
+    <div id="trends-body"></div>
   </section>
 
   <section class="panel">
@@ -527,6 +545,7 @@
     renderInfra(d.infra);
     renderCost(c, d.cost_overview, d.plans, d.committed_monthly_usd);
     renderRegistry(d.registry || []);
+    renderTrends(d.history || {});
   }
 
   function setTile(key, value, note, toneClass) {
@@ -580,9 +599,13 @@
         // The meter's human label leads, with the vendor as context beneath.
         // Two rows both saying "Supabase" told you nothing; "File storage"
         // and "Database size" tell you which one is filling up.
+        // "per day" on a capacity was a label bug the owner caught: storage
+        // is not 1 GB per day, it is 1 GB, currently. Only allowances that
+        // reset (emails, minutes) carry a period.
         '<div><div class="row-name">' + esc(r.metric_label || r.metric) + '</div>' +
-        '<div class="row-meta">' + esc(r.display_name || r.service) + " · per " +
-          esc(r.period) + (r.plan ? " · " + esc(r.plan) : "") + '</div></div>' +
+        '<div class="row-meta">' + esc(r.display_name || r.service) +
+          (r.aggregation === "latest" ? " · current" : " · per " + esc(r.period)) +
+          (r.plan ? " · " + esc(r.plan) : "") + '</div></div>' +
         '<div class="bar-cell"><div class="bar"><i style="width:' + pct + '%"></i></div>' +
         '<div class="bar-text">' + esc(fmtUnits(r.used_units, r.unit_label)) + " of " +
           esc(fmtUnits(r.limit_units, r.unit_label)) + (proj ? " · " + esc(proj) : "") + '</div></div>' +
@@ -729,6 +752,102 @@
       selectEl.disabled = false;
       selectEl.value = "";
     });
+  }
+
+  /**
+   * A polyline sparkline as inline SVG. Hand-rolled on purpose — this page
+   * has no supply chain and charts are not a reason to grow one.
+   */
+  function spark(points, width, height, tone) {
+    if (!points || points.length === 0) return "";
+    var max = Math.max.apply(null, points.map(function (p) { return p.v; }));
+    if (max <= 0) max = 1;
+    var n = points.length;
+    var coords = points.map(function (p, i) {
+      var x = n === 1 ? width / 2 : (i / (n - 1)) * (width - 4) + 2;
+      var y = height - 3 - (p.v / max) * (height - 8);
+      return x.toFixed(1) + "," + y.toFixed(1);
+    });
+    return '<svg class="spark" width="' + width + '" height="' + height +
+      '" viewBox="0 0 ' + width + " " + height + '" aria-hidden="true">' +
+      '<polyline fill="none" stroke="var(--' + tone + ')" stroke-width="1.8" ' +
+      'stroke-linejoin="round" stroke-linecap="round" points="' +
+      coords.join(" ") + '"/>' +
+      '<circle cx="' + coords[n - 1].split(",")[0] + '" cy="' +
+      coords[n - 1].split(",")[1] + '" r="2.4" fill="var(--' + tone + ')"/>' +
+      "</svg>";
+  }
+
+  /**
+   * Honest trends: real series, however short, with the observation window
+   * stated. Three days of data draws three points and says so — charts that
+   * pretend otherwise are decoration.
+   */
+  function renderTrends(h) {
+    var usage = h.usage_daily || [];
+    var ai = h.ai_monthly || [];
+    var wait = h.waitlist_daily || [];
+
+    var days = {};
+    usage.forEach(function (u) { days[u.day] = true; });
+    var dayCount = Object.keys(days).length;
+    $("trends-sub").textContent = dayCount
+      ? dayCount + " day" + (dayCount === 1 ? "" : "s") + " of history — fills in as days accrue"
+      : "no history yet";
+
+    var html = "";
+
+    // Per-meter sparklines, grouped from the daily usage log.
+    var series = {};
+    usage.forEach(function (u) {
+      var k = u.service + "|" + u.metric;
+      (series[k] = series[k] || []).push({ d: u.day, v: Number(u.units) || 0 });
+    });
+    var keys = Object.keys(series).sort();
+    if (keys.length) {
+      html += '<div class="trend-grid">' + keys.map(function (k) {
+        var pts = series[k];
+        var last = pts[pts.length - 1];
+        var parts = k.split("|");
+        var label = parts[0] + " · " + parts[1];
+        // Find the friendlier label from the live meters when one exists.
+        (current && current.services || []).forEach(function (r) {
+          if (r.service === parts[0] && r.metric === parts[1]) {
+            label = (r.display_name || parts[0]) + " · " + (r.metric_label || parts[1]);
+          }
+        });
+        return '<div class="trend-cell">' +
+          '<div class="trend-label">' + esc(label) + "</div>" +
+          spark(pts, 150, 36, "accent") +
+          '<div class="trend-last">' + esc(String(last.v)) + " on " + esc(last.d) + "</div>" +
+          "</div>";
+      }).join("") + "</div>";
+    }
+
+    // AI spend by month — measured money, the series that scales with users.
+    if (ai.length) {
+      var byMonth = {};
+      ai.forEach(function (r) {
+        byMonth[r.period_month] = (byMonth[r.period_month] || 0) + Number(r.est_cost_usd || 0);
+      });
+      var months = Object.keys(byMonth).sort();
+      html += '<div class="trend-row"><span class="trend-label">AI spend by month</span>' +
+        months.map(function (m) {
+          return '<span class="trend-month">' + esc(m.slice(0, 7)) + " " +
+            money(byMonth[m]) + "</span>";
+        }).join("") + "</div>";
+    }
+
+    // Waitlist growth — cumulative, the number launch day cares about.
+    if (wait.length) {
+      var pts = wait.map(function (w) { return { d: w.day, v: Number(w.cumulative) || 0 }; });
+      html += '<div class="trend-row"><span class="trend-label">Waitlist (cumulative)</span>' +
+        spark(pts, 220, 36, "ok") +
+        '<span class="trend-last">' + esc(String(pts[pts.length - 1].v)) + " signed up</span></div>";
+    }
+
+    $("trends-body").innerHTML = html ||
+      '<div class="empty">Charts appear as the daily counters accumulate history.</div>';
   }
 
   /**
@@ -888,11 +1007,14 @@
           '<span class="gap-name">' + esc(r.display_name || r.service_key) + "</span>" +
           '<span class="cost-amount">' + amount + "</span>" +
           '<span class="gap-why">' + meta + "</span>" +
-          (r.billing_url && r.editable
-            ? '<a class="gap-link" href="' + esc(r.billing_url) +
-              '" target="_blank" rel="noopener">Open billing →</a>' : "") +
-          (r.editable ? costForm(r.service_key, r.amount_usd) : "") +
-          (r.editable ? planControl(r.service_key, plansBy[r.service_key]) : "") +
+          (plansBy[r.service_key]
+            // The plan owns the price now. A manual box beside a picker is an
+            // invitation to make the two disagree.
+            ? planControl(r.service_key, plansBy[r.service_key])
+            : (r.billing_url && r.editable
+                ? '<a class="gap-link" href="' + esc(r.billing_url) +
+                  '" target="_blank" rel="noopener">Open billing →</a>' : "") +
+              (r.editable ? costForm(r.service_key, r.amount_usd) : "")) +
           "</div>";
       }).join("");
 
