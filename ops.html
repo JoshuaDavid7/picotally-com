@@ -316,7 +316,7 @@
   var TOKEN_KEY = "pt_ops_token";
 
   var $ = function (id) { return document.getElementById(id); };
-  var token = null;
+  var session = null;
 
   // ── Theme ────────────────────────────────────────────────
   var savedTheme = null;
@@ -329,6 +329,33 @@
   });
 
   // ── Auth (plain REST — no SDK, nothing to go stale) ──────
+  //
+  // The first version kept ONLY the access token, which lasts about an hour.
+  // After that the page still LOOKED signed in — it had rendered from an
+  // earlier load — while every write silently failed with a 401. That is how
+  // the Save button "stopped working": nothing was broken except an expired
+  // credential nobody could see.
+  //
+  // So the session is now kept whole, refreshed before it lapses, and retried
+  // once if a call is unlucky enough to straddle the expiry.
+
+  function saveSession(b) {
+    session = {
+      access: b.access_token,
+      refresh: b.refresh_token,
+      // 60s of slack, so a call that starts just under the wire does not land
+      // just over it.
+      expires: Date.now() + ((Number(b.expires_in) || 3600) - 60) * 1000
+    };
+    try { sessionStorage.setItem(TOKEN_KEY, JSON.stringify(session)); } catch (e) {}
+    return session.access;
+  }
+
+  function clearSession() {
+    session = null;
+    try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
+  }
+
   function signIn(email, password) {
     return fetch(SUPABASE_URL + "/auth/v1/token?grant_type=password", {
       method: "POST",
@@ -337,8 +364,53 @@
     }).then(function (r) {
       return r.json().then(function (b) {
         if (!r.ok) throw new Error(b.error_description || b.msg || b.error || "Sign in failed");
-        return b.access_token;
+        return saveSession(b);
       });
+    });
+  }
+
+  function refreshSession() {
+    if (!session || !session.refresh) return Promise.reject(new Error("no session"));
+    return fetch(SUPABASE_URL + "/auth/v1/token?grant_type=refresh_token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: ANON_KEY },
+      body: JSON.stringify({ refresh_token: session.refresh })
+    }).then(function (r) {
+      return r.json().then(function (b) {
+        if (!r.ok) throw new Error("refresh failed");
+        return saveSession(b);
+      });
+    });
+  }
+
+  /** A valid access token, refreshing first if this one is about to lapse. */
+  function validToken() {
+    if (!session) return Promise.reject(new Error("no session"));
+    if (Date.now() < session.expires) return Promise.resolve(session.access);
+    return refreshSession();
+  }
+
+  /**
+   * Every authenticated call goes through here. Refreshes ahead of expiry, and
+   * retries ONCE on a 401 — because a token can lapse between the check and the
+   * server reading it, and a dashboard that fails on that race is a dashboard
+   * that fails at exactly the wrong moment.
+   */
+  function authedFetch(url, opts, isRetry) {
+    return validToken().then(function (tok) {
+      var o = opts || {};
+      o.headers = Object.assign({}, o.headers, {
+        Authorization: "Bearer " + tok,
+        apikey: ANON_KEY
+      });
+      return fetch(url, o);
+    }).then(function (r) {
+      if (r.status === 401 && !isRetry) {
+        return refreshSession().then(function () {
+          return authedFetch(url, opts, true);
+        });
+      }
+      return r;
     });
   }
 
@@ -348,11 +420,7 @@
     err.classList.add("hidden");
     btn.disabled = true; btn.textContent = "Signing in…";
     signIn($("email").value.trim(), $("password").value)
-      .then(function (t) {
-        token = t;
-        try { sessionStorage.setItem(TOKEN_KEY, t); } catch (e) {}
-        return load();
-      })
+      .then(function () { return load(); })
       .catch(function (e2) {
         err.textContent = e2.message;
         err.classList.remove("hidden");
@@ -361,8 +429,7 @@
   });
 
   $("signout-btn").addEventListener("click", function () {
-    token = null;
-    try { sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    clearSession();
     $("app").classList.add("hidden");
     $("login").classList.remove("hidden");
   });
@@ -566,13 +633,9 @@
     btn.disabled = true;
     msgEl.className = "cost-msg";
     msgEl.textContent = "saving…";
-    return fetch(SUPABASE_URL + "/functions/v1/owner_set_service_cost", {
+    return authedFetch(SUPABASE_URL + "/functions/v1/owner_set_service_cost", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-        apikey: ANON_KEY
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ serviceKey: serviceKey, monthlyUsd: amount })
     }).then(function (r) {
       return r.json().then(function (b) {
@@ -736,10 +799,8 @@
 
   // ── Load ─────────────────────────────────────────────────
   function load() {
-    if (!token) return Promise.resolve();
-    return fetch(HEALTH, {
-      headers: { Authorization: "Bearer " + token, apikey: ANON_KEY }
-    }).then(function (r) {
+    if (!session) return Promise.resolve();
+    return authedFetch(HEALTH, {}).then(function (r) {
       if (r.status === 401 || r.status === 403) {
         throw new Error(r.status === 403
           ? "That account is not on the owner list."
@@ -752,8 +813,7 @@
       $("app").classList.remove("hidden");
       render(d);
     }).catch(function (e) {
-      token = null;
-      try { sessionStorage.removeItem(TOKEN_KEY); } catch (e2) {}
+      clearSession();
       $("app").classList.add("hidden");
       $("login").classList.remove("hidden");
       var err = $("login-err");
@@ -763,8 +823,15 @@
   }
 
   // Resume an existing session rather than asking again on every reload.
-  try { token = sessionStorage.getItem(TOKEN_KEY); } catch (e) {}
-  if (token) load();
+  // Resume. A session stored by the previous build was a bare token string
+  // with no refresh and no expiry — unusable and indistinguishable from a
+  // fresh one, so it is discarded rather than half-trusted.
+  try {
+    var stored = sessionStorage.getItem(TOKEN_KEY);
+    if (stored && stored.charAt(0) === "{") session = JSON.parse(stored);
+    else if (stored) sessionStorage.removeItem(TOKEN_KEY);
+  } catch (e) { session = null; }
+  if (session) load();
 })();
 </script>
 </body>
