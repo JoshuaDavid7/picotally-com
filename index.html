@@ -74,7 +74,13 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
-    img { max-width: 100%; display: block; }
+    /* height:auto is load-bearing. Every screenshot carries width/height
+       attributes (good — they reserve layout space and stop CLS), but with
+       max-width:100% and no height:auto the attribute WINS on height while
+       the width shrinks, so each image renders stretched to its full pixel
+       height. On a 390px phone the dashboard rendered 343x1307 instead of
+       343x232. */
+    img { max-width: 100%; height: auto; display: block; }
     a { color: inherit; }
     h1, h2, h3, h4 { margin: 0 0 0.4em; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
     h1 { font-size: clamp(40px, 6.2vw, 74px); letter-spacing: -0.035em; }
@@ -377,8 +383,8 @@
             <span class="frame-url">app.picotally.com</span>
           </div>
           <picture>
-            <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-dashboard-sm.webp?v=20260815" type="image/webp">
-            <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-dashboard-sm.png?v=20260815">
+            <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-dashboard-sm.webp?v=20260815" type="image/webp" width="1200" height="813">
+            <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-dashboard-sm.png?v=20260815" width="1200" height="813">
             <source srcset="/screenshots/desk/desk-dashboard.webp?v=20260815" type="image/webp">
             <img src="/screenshots/desk/desk-dashboard.png?v=20260815"
                  alt="The PicoTally dashboard: net income, gross income, expenses, money outstanding and open jobs across the top, with cash flow, profit and loss, next actions and recent payments below."
@@ -438,8 +444,8 @@
               <span class="frame-url">app.picotally.com</span>
             </div>
             <picture>
-              <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-invoice-sm.webp?v=20260815" type="image/webp">
-              <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-invoice-sm.png?v=20260815">
+              <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-invoice-sm.webp?v=20260815" type="image/webp" width="1200" height="1144">
+              <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-invoice-sm.png?v=20260815" width="1200" height="1144">
               <source srcset="/screenshots/desk/desk-invoice.webp?v=20260815" type="image/webp">
               <img src="/screenshots/desk/desk-invoice.png?v=20260815"
                    alt="The PicoTally invoice editor: line items and totals being edited on the left, with the finished branded invoice rendering live on the right."
