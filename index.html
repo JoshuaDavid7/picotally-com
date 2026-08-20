@@ -302,6 +302,10 @@
     .when-launched { display: none; }
     body.launched .when-launched { display: inline-flex; }
     body.launched .when-waiting { display: none; }
+    /* Block-level variants for headings/paragraphs (inline-flex breaks those). */
+    .when-launched-block { display: none; }
+    body.launched .when-launched-block { display: block; }
+    body.launched .when-waiting-block { display: none; }
 
     /* ---------- Early-access modal ---------- */
     dialog::backdrop { background: rgba(10,10,10,0.55); backdrop-filter: blur(3px); }
@@ -609,10 +613,15 @@
         </div>
         <div class="card">
           <div class="card-icon">&#128241;</div>
-          <h3>In your pocket, soon</h3>
-          <p>
-            The iPhone app is on its way to the App Store and Android is in the works.
-            Leave your email and I will tell you the day each one lands.
+          <h3 class="when-waiting-block">In your pocket, any day now</h3>
+          <h3 class="when-launched-block">In your pocket, too</h3>
+          <p class="when-waiting-block">
+            The iPhone and Android apps are in review with Apple and Google right now.
+            Leave your email and I will tell you the moment each one goes live.
+          </p>
+          <p class="when-launched-block">
+            On iPhone and Android, from the App Store and Google Play. Snap a receipt at
+            the counter, quote a job in the driveway — it is the same books as your desk.
           </p>
         </div>
         <div class="card">
@@ -856,8 +865,9 @@
       </p>
       <div class="btn-row center">
         <a href="https://app.picotally.com/?signup=1" class="btn btn-on-dark-primary">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
-        <a href="mailto:support@picotally.com" class="btn btn-on-dark-secondary when-waiting">Tell me when the phone app lands</a>
-        <a href="https://apps.apple.com/app/id6791798886" class="btn btn-on-dark-secondary when-launched">Download on the App Store</a>
+        <a href="mailto:support@picotally.com" class="btn btn-on-dark-secondary when-waiting">Tell me when the phone apps land</a>
+        <a href="https://apps.apple.com/us/app/id6791798886" class="btn btn-on-dark-secondary when-launched">Download on the App Store</a>
+        <a href="https://play.google.com/store/apps/details?id=com.picoapps.picotally" class="btn btn-on-dark-secondary when-launched">Get it on Google Play</a>
       </div>
     </div>
   </section>
@@ -995,8 +1005,11 @@
 </script>
 
 <script>
-  // Flip to true the day the iPhone app clears review: every waitlist CTA
-  // becomes an App Store link. The browser CTAs are live regardless.
+  // Flip to true the day the apps clear review: every "notify me" CTA becomes
+  // App Store + Google Play links, and the "in review" copy becomes "on iPhone
+  // and Android". The browser CTAs are live regardless. Both stores are wired,
+  // so flip this once when BOTH are public (or sooner if you prefer per-store —
+  // then split the flag).
   var LAUNCHED = false;
   if (LAUNCHED) { document.body.classList.add('launched'); }
 </script>
