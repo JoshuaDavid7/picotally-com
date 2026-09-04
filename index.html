@@ -4,58 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#FFFFFF">
-  <title>PicoTally: Run your business, not your paperwork</title>
-  <meta name="description" content="The complete back office for electricians, plumbers, handymen and every one-person shop. Invoices, jobs, receipts, payments and your numbers — on your laptop and in your pocket. Start free in your browser.">
+  <title>PicoTally: Say the invoice. It writes itself.</title>
+  <meta name="description" content="Invoices by voice, receipts filed for taxes, and one look at who owes you. Built for electricians, plumbers, HVAC and handymen who run the whole shop from one truck. iPhone, Android and any browser, one account. First month free.">
 
   <link rel="canonical" href="https://picotally.com/">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="PicoTally: Run your business, not your paperwork">
-  <meta property="og:description" content="Invoices, jobs, receipts, payments and your numbers in one place. Works on your laptop and your phone, with one account. Start free in your browser.">
+  <meta property="og:title" content="PicoTally: Say the invoice. It writes itself.">
+  <meta property="og:description" content="Invoices by voice, receipts filed for taxes, one look at who owes you. On your phone in the truck and in your browser at the desk. First month free.">
   <meta property="og:image" content="https://picotally.com/screenshots/desk/desk-dashboard.png">
   <meta property="og:image:width" content="2400">
   <meta property="og:image:height" content="1307">
   <meta property="og:url" content="https://picotally.com">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="PicoTally: Run your business, not your paperwork">
-  <meta name="twitter:description" content="Invoices, jobs, receipts, payments and your numbers in one place. Laptop and phone, one account. Start free in your browser.">
+  <meta name="twitter:title" content="PicoTally: Say the invoice. It writes itself.">
+  <meta name="twitter:description" content="Invoices by voice, receipts filed for taxes, one look at who owes you. Phone and desktop, one account. First month free.">
   <meta name="twitter:image" content="https://picotally.com/screenshots/desk/desk-dashboard.png">
 
-  <link rel="preload" as="image" href="/screenshots/desk/desk-dashboard.webp?v=20260815" type="image/webp" media="(min-width: 721px)" fetchpriority="high">
-  <link rel="preload" as="image" href="/screenshots/desk/desk-dashboard-sm.webp?v=20260815" type="image/webp" media="(max-width: 720px)" fetchpriority="high">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800&family=Inter:wght@400;500;600&display=swap">
+  <link rel="preload" as="image" href="/screenshots/v3/voice.webp?v=20260904" type="image/webp" fetchpriority="high">
   <link rel="icon" type="image/png" href="/picotally-icon.png">
   <link rel="apple-touch-icon" href="/picotally-icon.png">
 
   <style>
-    /* ---------- Design tokens ---------- */
     :root {
       --bg: #FFFFFF;
-      --bg-soft: #F7F8FA;
-      --bg-dark: #0A0A0A;
-      --bg-dark-2: #141416;
-      --text: #0A0A0A;
-      --text-soft: #424246;
-      --text-mute: #71717A;
-      --text-light: #A1A1AA;
-      --on-dark: #FAFAFA;
-      --on-dark-mute: #A1A1AA;
-      --border: #E4E4E7;
-      --border-dark: #27272A;
+      --bg-soft: #F5F7FA;
+      --bg-dark: #0B1A2D;
+      --bg-dark-2: #122A47;
+      --text: #0B1A2D;
+      --text-soft: #3F4A5A;
+      --text-mute: #6B7684;
+      --text-light: #9AA3AF;
+      --on-dark: #FFFFFF;
+      --on-dark-mute: #B7C3D2;
+      --border: #E3E7EC;
+      --border-dark: #24395A;
       --brand: #1565C0;
       --brand-deep: #0D47A1;
       --brand-soft: #E8F0FA;
-      --brand-on-dark: #6CB2F3;
+      --brand-on-dark: #7CC0FF;
+      --green: #34D399;
       --ok: #0E9F6E;
       --ok-soft: #E7F7F0;
-      --warn: #B45309;
-      --warn-soft: #FEF6E7;
       --radius: 14px;
       --radius-lg: 22px;
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
-      --shadow-lg: 0 24px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
-      --shadow-xl: 0 48px 96px rgba(16,24,40,0.18), 0 16px 32px rgba(16,24,40,0.10);
+      --shadow-md: 0 4px 12px rgba(11,26,45,0.06), 0 2px 4px rgba(11,26,45,0.04);
+      --shadow-lg: 0 24px 48px rgba(11,26,45,0.14), 0 8px 16px rgba(11,26,45,0.06);
+      --shadow-xl: 0 48px 96px rgba(11,26,45,0.20), 0 16px 32px rgba(11,26,45,0.10);
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --font-head: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+      --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -65,32 +67,21 @@
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
     body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
-      font-size: 17px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
     }
-    /* height:auto is load-bearing. Every screenshot carries width/height
-       attributes (good — they reserve layout space and stop CLS), but with
-       max-width:100% and no height:auto the attribute WINS on height while
-       the width shrinks, so each image renders stretched to its full pixel
-       height. On a 390px phone the dashboard rendered 343x1307 instead of
-       343x232. */
     img { max-width: 100%; height: auto; display: block; }
     a { color: inherit; }
-    h1, h2, h3, h4 { margin: 0 0 0.4em; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
-    h1 { font-size: clamp(40px, 6.2vw, 74px); letter-spacing: -0.035em; }
-    h2 { font-size: clamp(30px, 4vw, 48px); line-height: 1.14; text-wrap: balance; }
-    h3 { font-size: clamp(19px, 2vw, 23px); }
+    h1, h2, h3, h4 { margin: 0 0 0.4em; font-family: var(--font-head); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; }
+    h1 { font-size: clamp(42px, 6vw, 78px); }
+    h2 { font-size: clamp(32px, 4.2vw, 52px); text-wrap: balance; }
+    h3 { font-size: clamp(24px, 2.6vw, 34px); letter-spacing: -0.025em; }
     p { margin: 0 0 1em; }
 
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-    .container-narrow { max-width: 880px; margin: 0 auto; padding: 0 24px; }
-    .section { padding: clamp(72px, 9vw, 120px) 0; display: flow-root; }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .container-narrow { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+    .section { padding: clamp(64px, 8vw, 110px) 0; display: flow-root; }
     .section-soft { background: var(--bg-soft); }
     .section-dark { background: var(--bg-dark); color: var(--on-dark); }
     .section-dark h1, .section-dark h2, .section-dark h3 { color: var(--on-dark); }
@@ -99,6 +90,7 @@
     .text-mute-on-dark { color: var(--on-dark-mute); }
     .center { text-align: center; }
     .lead { font-size: clamp(17px, 1.7vw, 20px); color: var(--text-soft); }
+    .section-dark .lead { color: var(--on-dark-mute); }
 
     .eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -112,12 +104,12 @@
     /* ---------- Nav ---------- */
     .nav {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(255,255,255,0.86);
+      background: rgba(255,255,255,0.88);
       backdrop-filter: saturate(180%) blur(14px);
       border-bottom: 1px solid var(--border);
     }
     .nav-inner { display: flex; align-items: center; gap: 24px; height: 68px; }
-    .nav-logo { display: flex; align-items: center; gap: 11px; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; text-decoration: none; }
+    .nav-logo { display: flex; align-items: center; gap: 11px; font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; text-decoration: none; }
     .nav-logo img { width: 34px; height: 34px; border-radius: 9px; }
     .nav-links { display: flex; gap: 26px; margin-left: auto; }
     .nav-links a { text-decoration: none; color: var(--text-mute); font-size: 15px; font-weight: 500; transition: color 0.2s; }
@@ -131,197 +123,160 @@
     /* ---------- Buttons ---------- */
     .btn {
       display: inline-flex; align-items: center; gap: 9px;
-      padding: 14px 26px; border-radius: 999px;
-      font-size: 16px; font-weight: 650; text-decoration: none;
+      padding: 15px 28px; border-radius: 999px;
+      font-size: 16px; font-weight: 600; text-decoration: none;
       border: 1.5px solid transparent; cursor: pointer;
       transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s;
     }
     .btn-sm { padding: 9px 18px; font-size: 14.5px; }
     .btn-primary { background: var(--brand); color: #fff; box-shadow: 0 10px 24px rgba(21,101,192,0.28); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(21,101,192,0.34); }
-    .btn-ink { background: var(--text); color: #fff; }
-    .btn-ink:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.18); }
     .btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
     .btn-secondary:hover { background: #fff; border-color: var(--text-light); }
     .btn-on-dark-primary { background: #fff; color: var(--text); }
     .btn-on-dark-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(255,255,255,0.2); }
-    .btn-on-dark-secondary { background: transparent; color: var(--on-dark); border-color: var(--border-dark); }
-    .btn-on-dark-secondary:hover { border-color: var(--on-dark-mute); }
     .btn-arrow { transition: transform 0.2s var(--ease); }
     .btn:hover .btn-arrow { transform: translateX(3px); }
-    .btn-row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
     .btn-row.center { justify-content: center; }
 
+    /* ---------- Store badges ---------- */
+    .stores { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .stores a { display: inline-flex; line-height: 0; transition: transform 0.2s var(--ease); }
+    .stores a:hover { transform: translateY(-2px); }
+    .stores img { height: 46px; width: auto; }
+    .stores img.play { height: 68px; margin: -11px; }
+    .stores-note { font-size: 14px; color: var(--text-mute); }
+
     /* ---------- Hero ---------- */
-    /* Centred hero: the product shot below is the wide element, so centring
-       the copy keeps the eye on one axis instead of stranding half the row. */
-    .hero { padding: clamp(56px, 7vw, 92px) 0 0; overflow: hidden; text-align: center; }
-    .hero-h1 { max-width: 18ch; margin: 0 auto 22px; }
+    .hero { padding: clamp(48px, 6vw, 88px) 0 0; overflow: hidden; }
+    .hero-grid { display: grid; grid-template-columns: 1fr; gap: 44px; align-items: center; }
+    @media (min-width: 900px) { .hero-grid { grid-template-columns: 1.08fr 0.92fr; gap: 40px; } }
+    .hero-h1 { max-width: 12ch; margin-bottom: 20px; }
     .hero-h1 .accent { color: var(--brand); }
-    .hero-sub { font-size: clamp(17px, 1.75vw, 21px); color: var(--text-soft); max-width: 60ch; margin: 0 auto 30px; }
-    .hero-fine { font-size: 14.5px; color: var(--text-mute); margin-top: 18px; }
-    .hero .btn-row { justify-content: center; }
-    .hero .platforms { justify-content: center; }
+    .hero-sub { font-size: clamp(17px, 1.6vw, 20px); color: var(--text-soft); max-width: 52ch; margin: 0 0 28px; }
+    .hero-sub .cmd { font-weight: 600; color: var(--text); }
+    .hero-fine { font-size: 14.5px; color: var(--text-mute); margin-top: 22px; }
+    .hero-visual { position: relative; display: flex; justify-content: center; padding: 32px 0 0; }
+    @media (min-width: 900px) { .hero-visual { justify-content: flex-end; padding: 32px 24px 0 0; } }
 
-    /* ---------- Platform strip ---------- */
-    .platforms { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
-    .plat {
-      display: inline-flex; align-items: center; gap: 9px;
-      padding: 8px 15px 8px 12px; border-radius: 999px;
-      border: 1px solid var(--border); background: #fff;
-      font-size: 14px; font-weight: 600; color: var(--text-soft);
+    /* ---------- Phone ---------- */
+    .phone {
+      width: min(380px, 86vw); aspect-ratio: 1044 / 2140; border-radius: 40px; overflow: hidden;
+      background: #fff; border: 1px solid rgba(11,26,45,0.08); box-shadow: var(--shadow-xl);
+      position: relative;
     }
-    .plat svg { width: 17px; height: 17px; flex: none; color: var(--text-mute); }
-    .plat .tag { font-size: 11.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
-    .plat .tag-now { background: var(--ok-soft); color: var(--ok); }
-    .plat .tag-soon { background: var(--bg-soft); color: var(--text-mute); }
+    .phone img { width: 100%; height: 100%; object-fit: cover; }
+    .phone-sm { width: min(340px, 82vw); }
+    .hero .phone { width: min(400px, 86vw); aspect-ratio: 1044 / 1900; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+    .hero .phone img { object-position: top; }
 
-    /* ---------- Browser frame for desktop shots ---------- */
+    .bubble {
+      position: absolute; z-index: 2;
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--bg-dark); color: #fff; border-radius: 999px;
+      padding: 12px 18px 12px 14px; font-size: 15px; font-weight: 500;
+      box-shadow: var(--shadow-lg); max-width: 300px; line-height: 1.35;
+    }
+    .bubble svg { width: 18px; height: 18px; flex: none; color: var(--green); }
+    .bubble-hero { left: -8px; top: 0; }
+    @media (min-width: 900px) { .bubble-hero { left: -60px; top: 92px; } }
+
+    /* ---------- Problem band ---------- */
+    .problem p { font-size: clamp(19px, 2.1vw, 26px); line-height: 1.5; letter-spacing: -0.015em; color: var(--on-dark-mute); }
+    .problem p strong { color: var(--on-dark); font-weight: 600; }
+
+    /* ---------- Moments ---------- */
+    .moment { display: grid; grid-template-columns: 1fr; gap: 36px; align-items: center; }
+    .moment + .moment { margin-top: clamp(72px, 9vw, 128px); }
+    @media (min-width: 900px) {
+      .moment { grid-template-columns: 1fr 1fr; gap: 64px; }
+      .moment.flip .moment-copy { order: 2; }
+      .moment.flip .moment-shot { order: 1; }
+    }
+    .moment-shot { display: flex; justify-content: center; }
+    .moment-num {
+      font-family: var(--font-head); font-weight: 800; font-size: 15px; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--brand); margin-bottom: 12px; display: block;
+    }
+    .moment-copy p { color: var(--text-soft); font-size: clamp(16px, 1.5vw, 18px); }
+    .moment-note { font-size: 14px; color: var(--text-mute); margin-top: 10px; }
+    .say { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 0; }
+    .say-b {
+      background: #fff; border: 1px solid var(--border); border-radius: 999px;
+      padding: 10px 16px; font-size: 15px; color: var(--text); box-shadow: var(--shadow-md);
+    }
+
+    /* ---------- Browser frame ---------- */
     .frame {
       border-radius: 14px; overflow: hidden; background: #fff;
       border: 1px solid var(--border); box-shadow: var(--shadow-xl);
     }
-    .frame-bar {
-      display: flex; align-items: center; gap: 7px;
-      padding: 11px 14px; background: #F4F5F7; border-bottom: 1px solid var(--border);
-    }
+    .frame-bar { display: flex; align-items: center; gap: 7px; padding: 11px 14px; background: #F4F5F7; border-bottom: 1px solid var(--border); }
     .frame-dot { width: 11px; height: 11px; border-radius: 50%; background: #D8DAE0; flex: none; }
     .frame-url {
       margin-left: 10px; flex: 1; height: 22px; border-radius: 6px; background: #fff;
       border: 1px solid #E6E8EC; display: flex; align-items: center; padding: 0 10px;
-      font-size: 11.5px; color: var(--text-light); letter-spacing: 0.01em;
+      font-size: 11.5px; color: var(--text-light);
     }
     .frame img { display: block; width: 100%; }
-    .frame-dark { border-color: var(--border-dark); }
-    .frame-dark .frame-bar { background: #1B1B1F; border-bottom-color: var(--border-dark); }
-    .frame-dark .frame-dot { background: #3A3A42; }
-    .frame-dark .frame-url { background: #232329; border-color: #33333B; color: #6B6B76; }
 
-    .hero-shot { margin-top: 46px; }
-    .hero-shot .frame { transform: perspective(2200px) rotateX(1.4deg); }
-
-    /* ---------- Tour ---------- */
-    .tour-item { display: grid; grid-template-columns: minmax(0,1fr); gap: 32px; align-items: center; }
-    .tour-item + .tour-item { margin-top: clamp(64px, 8vw, 112px); }
-    @media (min-width: 940px) {
-      .tour-item { grid-template-columns: 0.86fr 1.14fr; gap: 56px; }
-      .tour-item.flip .tour-copy { order: 2; }
-      .tour-item.flip .tour-shot { order: 1; }
-    }
-    .tour-copy h3 { font-size: clamp(24px, 2.6vw, 34px); letter-spacing: -0.025em; margin-bottom: 14px; }
-    .tour-list { list-style: none; padding: 0; margin: 20px 0 0; }
-    .tour-list li { position: relative; padding-left: 27px; margin-bottom: 11px; color: var(--text-soft); font-size: 16px; }
-    .tour-list li::before {
-      content: ""; position: absolute; left: 0; top: 8px;
-      width: 15px; height: 8px; border-left: 2.5px solid var(--ok); border-bottom: 2.5px solid var(--ok);
-      transform: rotate(-45deg);
-    }
-
-    /* ---------- Cards ---------- */
-    .grid { display: grid; gap: 20px; }
-    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(266px, 1fr)); }
-    .card {
-      background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg);
-      padding: 28px; box-shadow: var(--shadow-md);
-    }
-    .section-dark .card { background: var(--bg-dark-2); border-color: var(--border-dark); box-shadow: none; }
-    .card-icon {
-      width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
-      background: var(--brand-soft); margin-bottom: 16px; font-size: 20px;
-    }
-    .section-dark .card-icon { background: rgba(108,178,243,0.14); }
-    .card h3 { margin-bottom: 8px; }
-    .card p { margin: 0; color: var(--text-soft); font-size: 15.5px; }
-    .section-dark .card p { color: var(--on-dark-mute); }
-
-    /* ---------- Quote / problem ---------- */
-    .problem p { font-size: clamp(19px, 2.1vw, 26px); line-height: 1.5; letter-spacing: -0.015em; }
-
-    /* ---------- Voice bubbles ---------- */
-    .say { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-    .say-b {
-      background: var(--bg-dark-2); border: 1px solid var(--border-dark);
-      border-radius: 999px; padding: 11px 20px; font-size: 15.5px; color: var(--on-dark);
-    }
-    .say-b .q { color: var(--brand-on-dark); }
-
-    /* ---------- Phone shots ---------- */
-    .phones { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; margin-top: 12px; }
-    .phone-shot { border-radius: 26px; overflow: hidden; box-shadow: var(--shadow-lg); background: #fff; }
-    .phone-cap { font-size: 14.5px; color: var(--text-mute); margin-top: 12px; text-align: center; }
-    .section-dark .phone-cap { color: var(--on-dark-mute); }
+    /* ---------- Everywhere ---------- */
+    .every-visual { position: relative; margin-top: clamp(36px, 5vw, 56px); padding-bottom: 60px; }
+    .every-visual .frame { width: 92%; }
+    .every-visual .phone { position: absolute; right: 0; bottom: 0; width: min(240px, 34%); border-radius: 28px; }
+    @media (max-width: 720px) { .every-visual { padding-bottom: 40px; } .every-visual .phone { width: 38%; border-radius: 20px; } }
+    .every-points { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 40px; }
+    .every-points h3 { font-size: 19px; margin-bottom: 6px; }
+    .every-points p { margin: 0; color: var(--text-soft); font-size: 15.5px; }
+    .icon { width: 40px; height: 40px; border-radius: 12px; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; margin-bottom: 14px; }
+    .icon svg { width: 20px; height: 20px; }
 
     /* ---------- Pricing ---------- */
-    .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 22px; align-items: start; }
-    .price {
-      background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg);
-      padding: 32px; box-shadow: var(--shadow-md); position: relative;
-    }
+    .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; align-items: start; max-width: 900px; margin: 0 auto; }
+    .price { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-md); position: relative; }
     .price.featured { border-color: var(--brand); box-shadow: 0 20px 44px rgba(21,101,192,0.16); }
-    .price-badge {
-      position: absolute; top: -13px; left: 32px; background: var(--brand); color: #fff;
-      font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-      padding: 5px 13px; border-radius: 999px;
-    }
-    .price-amt { font-size: 52px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+    .price-badge { position: absolute; top: -13px; left: 32px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 5px 13px; border-radius: 999px; }
+    .price-name { font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .price-amt { font-family: var(--font-head); font-size: 54px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
     .price-per { font-size: 15px; color: var(--text-mute); font-weight: 500; }
+    .price-tag { color: var(--text-soft); margin: 12px 0 0; font-size: 15.5px; }
     .price ul { list-style: none; padding: 0; margin: 22px 0 0; }
     .price li { position: relative; padding-left: 27px; margin-bottom: 11px; font-size: 15.5px; color: var(--text-soft); }
-    .price li::before {
-      content: ""; position: absolute; left: 0; top: 7px;
-      width: 14px; height: 7px; border-left: 2.5px solid var(--brand); border-bottom: 2.5px solid var(--brand);
-      transform: rotate(-45deg);
-    }
+    .price li::before { content: ""; position: absolute; left: 0; top: 7px; width: 14px; height: 7px; border-left: 2.5px solid var(--brand); border-bottom: 2.5px solid var(--brand); transform: rotate(-45deg); }
+    .price-fine { text-align: center; color: var(--text-mute); font-size: 14.5px; max-width: 62ch; margin: 28px auto 0; }
+
+    /* ---------- Founder ---------- */
+    .note { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: start; }
+    @media (min-width: 900px) { .note { grid-template-columns: 1.1fr 0.9fr; gap: 72px; } }
+    .note-body p { font-size: clamp(17px, 1.6vw, 19px); color: var(--text-soft); }
+    .note-sig { margin-top: 26px; display: flex; align-items: center; gap: 14px; }
+    .note-sig img { width: 48px; height: 48px; border-radius: 12px; }
+    .note-sig strong { display: block; font-family: var(--font-head); font-size: 18px; }
+    .note-sig span { color: var(--text-mute); font-size: 14.5px; }
+    .trust { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+    .trust li { display: flex; gap: 16px; align-items: flex-start; background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-md); }
+    .trust .icon { margin: 0; flex: none; }
+    .trust strong { display: block; font-family: var(--font-head); font-size: 17px; margin-bottom: 3px; }
+    .trust p { margin: 0; color: var(--text-soft); font-size: 15px; }
 
     /* ---------- FAQ ---------- */
     .faq { border-top: 1px solid var(--border); }
     .faq details { border-bottom: 1px solid var(--border); }
-    .faq summary {
-      list-style: none; cursor: pointer; padding: 22px 40px 22px 0; position: relative;
-      font-size: clamp(17px, 1.8vw, 20px); font-weight: 650; letter-spacing: -0.015em;
-    }
+    .faq summary { list-style: none; cursor: pointer; padding: 20px 40px 20px 0; position: relative; font-family: var(--font-head); font-size: clamp(17px, 1.8vw, 20px); font-weight: 700; letter-spacing: -0.015em; }
     .faq summary::-webkit-details-marker { display: none; }
-    .faq summary::after {
-      content: "+"; position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-      font-size: 24px; font-weight: 400; color: var(--text-light);
-    }
+    .faq summary::after { content: "+"; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 24px; font-weight: 400; color: var(--text-light); }
     .faq details[open] summary::after { content: "\2013"; }
-    .faq-a { padding: 0 40px 24px 0; color: var(--text-soft); }
+    .faq-a { padding: 0 40px 22px 0; color: var(--text-soft); }
     .faq-a p:last-child { margin-bottom: 0; }
 
     /* ---------- Footer ---------- */
-    .footer { background: var(--bg-dark); color: var(--on-dark-mute); padding: 60px 0 44px; font-size: 15px; }
+    .footer { background: var(--bg-dark); color: var(--on-dark-mute); padding: 56px 0 40px; font-size: 15px; border-top: 1px solid var(--border-dark); }
     .footer a { color: var(--on-dark-mute); text-decoration: none; }
     .footer a:hover { color: var(--on-dark); }
     .footer-top { display: flex; flex-wrap: wrap; gap: 30px; justify-content: space-between; align-items: flex-start; }
     .footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
-    .footer-bottom { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border-dark); display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; font-size: 14px; }
-
-    /* ---------- Launch state ---------- */
-    .when-launched { display: none; }
-    body.launched .when-launched { display: inline-flex; }
-    body.launched .when-waiting { display: none; }
-    /* Block-level variants for headings/paragraphs (inline-flex breaks those). */
-    .when-launched-block { display: none; }
-    body.launched .when-launched-block { display: block; }
-    body.launched .when-waiting-block { display: none; }
-
-    /* ---------- Early-access modal ---------- */
-    dialog::backdrop { background: rgba(10,10,10,0.55); backdrop-filter: blur(3px); }
-    .ea-modal { border: none; border-radius: var(--radius-lg); padding: 0; max-width: 460px; width: calc(100% - 40px); box-shadow: var(--shadow-lg); }
-    .ea-inner { padding: 32px; }
-    .ea-close { position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 26px; line-height: 1; color: var(--text-light); cursor: pointer; }
-    .ea-field { margin-bottom: 15px; }
-    .ea-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-    .ea-optional { color: var(--text-light); font-weight: 400; }
-    .ea-input { width: 100%; padding: 12px 14px; font-size: 16px; border: 1px solid var(--border); border-radius: 11px; font-family: inherit; }
-    .ea-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
-    .ea-submit { width: 100%; justify-content: center; margin-top: 6px; }
-    .ea-foot { font-size: 13px; color: var(--text-mute); margin: 16px 0 0; }
-    .ea-error { color: #B42318; font-size: 14px; margin: 0 0 12px; }
-    .ea-success { text-align: center; padding: 12px 0; }
-    .ea-success-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--ok-soft); color: var(--ok); display: grid; place-items: center; font-size: 26px; margin: 0 auto 14px; }
+    .footer-bottom { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--border-dark); display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; font-size: 14px; }
 
     .skip { position: absolute; left: -9999px; }
     .skip:focus { left: 16px; top: 16px; background: #fff; padding: 10px 16px; border-radius: 8px; z-index: 100; }
@@ -334,12 +289,12 @@
   <div class="container nav-inner">
     <a href="/" class="nav-logo"><img src="/picotally-icon.png" alt="" width="34" height="34"> PicoTally</a>
     <div class="nav-links">
-      <a href="#tour">Product</a>
+      <a href="#how">How it works</a>
       <a href="#everywhere">Devices</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">Questions</a>
     </div>
-    <a href="https://app.picotally.com" class="btn btn-primary btn-sm nav-cta">Open PicoTally</a>
+    <a href="https://app.picotally.com/?signup=1" class="btn btn-primary btn-sm nav-cta">Start free</a>
   </div>
 </nav>
 
@@ -347,52 +302,35 @@
 
   <!-- ============ HERO ============ -->
   <header class="hero">
-    <div class="container">
+    <div class="container hero-grid">
       <div>
-          <span class="eyebrow">Invoices · Jobs · Receipts · Payments</span>
-          <h1 class="hero-h1">Run your business.<br>Not your <span class="accent">paperwork.</span></h1>
-          <p class="hero-sub">
-            PicoTally is the whole back office for electricians, plumbers, handymen and
-            every one-person shop. Quote the job, send the invoice, snap the receipt,
-            see what you are owed — in one place, on whatever you are holding.
-          </p>
-          <div class="btn-row">
-            <a href="https://app.picotally.com/?signup=1" class="btn btn-primary">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
-            <a href="#tour" class="btn btn-secondary">See it in action</a>
-          </div>
-          <p class="hero-fine">
-            Free for your first month. Works in any browser — nothing to download, nothing to install.
-          </p>
-
-          <div class="platforms">
-            <span class="plat">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-              Desktop &amp; web <span class="tag tag-now">Available now</span>
-            </span>
-            <span class="plat">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18.5h2"/></svg>
-              iPhone <span class="tag tag-now">Available now</span>
-            </span>
-            <span class="plat">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M10 18.5h4"/></svg>
-              Android <span class="tag tag-now">Available now</span>
-            </span>
-          </div>
+        <span class="eyebrow">For electricians, plumbers, HVAC and handymen</span>
+        <h1 class="hero-h1">Say the invoice. <span class="accent">It writes itself.</span></h1>
+        <p class="hero-sub">
+          <span class="cmd">&ldquo;Hey Pico, invoice Greg four hundred for the water heater.&rdquo;</span>
+          That's the whole job. PicoTally is the office you never hired: invoices by voice,
+          receipts filed for taxes, and one look at who owes you. On your phone in the truck,
+          in your browser at the desk. One account.
+        </p>
+        <div class="btn-row">
+          <a href="https://app.picotally.com/?signup=1" class="btn btn-primary">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
+        </div>
+        <div class="stores" style="margin-top: 18px;">
+          <a href="https://apps.apple.com/us/app/id6791798886" aria-label="Download on the App Store"><img src="/badges/app-store.svg" alt="Download on the App Store" width="138" height="46"></a>
+          <a href="https://play.google.com/store/apps/details?id=com.picoapps.picotally" aria-label="Get it on Google Play"><img class="play" src="/badges/google-play.png" alt="Get it on Google Play" width="176" height="68"></a>
+        </div>
+        <p class="hero-fine">First month free. $9.99 a month after. Cancel anytime.</p>
       </div>
-
-      <div class="hero-shot">
-        <div class="frame">
-          <div class="frame-bar">
-            <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-            <span class="frame-url">app.picotally.com</span>
-          </div>
+      <div class="hero-visual">
+        <div class="bubble bubble-hero" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          Hey Pico, invoice Greg 400 for the water heater
+        </div>
+        <div class="phone">
           <picture>
-            <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-dashboard-sm.webp?v=20260815" type="image/webp" width="1200" height="813">
-            <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-dashboard-sm.png?v=20260815" width="1200" height="813">
-            <source srcset="/screenshots/desk/desk-dashboard.webp?v=20260815" type="image/webp">
-            <img src="/screenshots/desk/desk-dashboard.png?v=20260815"
-                 alt="The PicoTally dashboard: net income, gross income, expenses, money outstanding and open jobs across the top, with cash flow, profit and loss, next actions and recent payments below."
-                 width="2400" height="1307" fetchpriority="high">
+            <source srcset="/screenshots/v3/voice.webp?v=20260904" type="image/webp">
+            <img src="/screenshots/v3/voice.png?v=20260904" width="1044" height="2140" fetchpriority="high"
+                 alt="PicoTally writing a $400 invoice for Greg Watson from a spoken command, with the voice assistant listening at the bottom of the screen.">
           </picture>
         </div>
       </div>
@@ -400,456 +338,283 @@
   </header>
 
   <!-- ============ THE PROBLEM ============ -->
-  <section class="section problem">
+  <section class="section section-dark problem" style="margin-top: clamp(56px, 7vw, 96px);">
     <div class="container-narrow">
       <span class="eyebrow">Sound familiar</span>
-      <h2>You didn&rsquo;t get into the trades to do paperwork.</h2>
-      <p class="text-soft">
-        But there you are at nine at night with a shoebox of receipts, three invoices you
-        meant to send last week, and a customer who swears he already paid you.
+      <h2>You didn't get into the trades to do paperwork.</h2>
+      <p>
+        But it's 9 PM and there you are. <strong>A shoebox of receipts.</strong> Three invoices
+        you meant to send last week. A customer who swears he already paid.
       </p>
-      <p class="text-soft">
-        Every hour at that desk is an hour you are not billing, not quoting the next job,
-        and not home. The big accounting packages want you to become a bookkeeper first.
-        You just want it handled.
+      <p>
+        Every hour at that desk is an hour you're not billing, not quoting the next job,
+        and not home. The big packages want to make you a bookkeeper. <strong>You just want it done.</strong>
       </p>
     </div>
   </section>
 
-  <!-- ============ PRODUCT TOUR ============ -->
-  <section class="section section-soft" id="tour">
+  <!-- ============ HOW IT WORKS ============ -->
+  <section class="section" id="how">
     <div class="container">
-      <div class="center" style="max-width: 760px; margin: 0 auto clamp(48px, 6vw, 78px);">
-        <span class="eyebrow">The product</span>
-        <h2>Everything an office manager would do.<br>Nobody to hire.</h2>
-        <p class="lead">This is the actual app, with a real electrician&rsquo;s books in it.</p>
+      <div class="center" style="max-width: 720px; margin: 0 auto clamp(48px, 6vw, 80px);">
+        <span class="eyebrow">How it works</span>
+        <h2>Three habits. The whole back office.</h2>
+        <p class="lead">This is the real app with a real electrician's books in it. Nothing staged.</p>
       </div>
 
-      <!-- Invoicing -->
-      <div class="tour-item">
-        <div class="tour-copy">
-          <h3>Write the invoice. Watch it become the invoice.</h3>
-          <p class="text-soft">
-            Type on the left, and the document your customer will actually receive builds
-            itself on the right — your logo, your rates, your tax, your payment terms.
-            No exporting to check it. No surprises after you hit send.
-          </p>
-          <ul class="tour-list">
-            <li>Materials priced from what you charged last time</li>
-            <li>Add your markup once; every line follows</li>
-            <li>Quotes become invoices without retyping anything</li>
-            <li>A pay link on the invoice, so the money comes to you</li>
-          </ul>
-        </div>
-        <div class="tour-shot">
-          <div class="frame">
-            <div class="frame-bar">
-              <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-              <span class="frame-url">app.picotally.com</span>
-            </div>
-            <picture>
-              <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-invoice-sm.webp?v=20260815" type="image/webp" width="1200" height="1144">
-              <source media="(max-width: 720px)" srcset="/screenshots/desk/desk-invoice-sm.png?v=20260815" width="1200" height="1144">
-              <source srcset="/screenshots/desk/desk-invoice.webp?v=20260815" type="image/webp">
-              <img src="/screenshots/desk/desk-invoice.png?v=20260815"
-                   alt="The PicoTally invoice editor: line items and totals being edited on the left, with the finished branded invoice rendering live on the right."
-                   width="2400" height="1461" loading="lazy">
-            </picture>
-          </div>
-        </div>
-      </div>
-
-      <!-- Jobs -->
-      <div class="tour-item flip">
-        <div class="tour-copy">
-          <h3>Know who owes you, without opening a spreadsheet.</h3>
-          <p class="text-soft">
-            Every quote and invoice in one list, colour-coded by what it needs from you:
-            still a draft, sent and waiting, paid in full, or overdue and worth a phone
-            call this morning.
-          </p>
-          <ul class="tour-list">
-            <li>Drafts you meant to send, surfaced instead of forgotten</li>
-            <li>Quotes still awaiting a decision</li>
-            <li>Overdue invoices, with how many days late</li>
-            <li>One running total of everything unpaid</li>
-          </ul>
-        </div>
-        <div class="tour-shot">
-          <div class="frame">
-            <div class="frame-bar">
-              <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-              <span class="frame-url">app.picotally.com</span>
-            </div>
-            <picture>
-              <source srcset="/screenshots/desk/desk-jobs.webp?v=20260815" type="image/webp">
-              <img src="/screenshots/desk/desk-jobs.png?v=20260815"
-                   alt="The PicoTally job list showing quotes and invoices with their status: draft, awaiting decision, paid in full, and overdue, with an unpaid total at the bottom."
-                   width="1010" height="1660" loading="lazy">
-            </picture>
-          </div>
-        </div>
-      </div>
-
-      <!-- Expenses -->
-      <div class="tour-item">
-        <div class="tour-copy">
-          <h3>Photograph the receipt. That&rsquo;s the whole job.</h3>
-          <p class="text-soft">
-            Snap it at the counter and PicoTally reads every line, keeps the business
-            items, sets the personal ones aside, and files the rest under a category your
-            accountant will recognise. The shoebox never happens.
-          </p>
-          <ul class="tour-list">
-            <li>Line-by-line, not just a total</li>
-            <li>One receipt split between business and personal</li>
-            <li>Materials attached to the job that used them</li>
-            <li>Every deductible expense adding itself up as you go</li>
-          </ul>
-        </div>
-        <div class="tour-shot">
-          <div class="frame">
-            <div class="frame-bar">
-              <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-              <span class="frame-url">app.picotally.com</span>
-            </div>
-            <picture>
-              <source srcset="/screenshots/desk/desk-expenses.webp?v=20260815" type="image/webp">
-              <img src="/screenshots/desk/desk-expenses.png?v=20260815"
-                   alt="The PicoTally expenses screen: monthly spend, a category breakdown, top merchants, and a table of expenses with categories and tax-deductible flags."
-                   width="2400" height="1384" loading="lazy">
-            </picture>
-          </div>
-        </div>
-      </div>
-
-      <!-- Analytics -->
-      <div class="tour-item flip">
-        <div class="tour-copy">
-          <h3>Made, owed, spent, kept. In one look.</h3>
-          <p class="text-soft">
-            What came in, what went out, what you actually kept, and which customers are
-            worth the drive. The answer takes a glance, not an evening with a spreadsheet
-            you built two years ago.
-          </p>
-          <ul class="tour-list">
-            <li>Cash flow month by month</li>
-            <li>Profit, margin and average invoice</li>
-            <li>Your best customers by what they actually paid</li>
-            <li>Deductible expenses totted up for filing time</li>
-          </ul>
-        </div>
-        <div class="tour-shot">
-          <div class="frame">
-            <div class="frame-bar">
-              <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-              <span class="frame-url">app.picotally.com</span>
-            </div>
-            <picture>
-              <source srcset="/screenshots/desk/desk-analytics.webp?v=20260815" type="image/webp">
-              <img src="/screenshots/desk/desk-analytics.png?v=20260815"
-                   alt="The PicoTally analytics screen: collected, spent, profit, margin and average invoice, with cash flow, an expense breakdown, income over time and top clients."
-                   width="2400" height="1384" loading="lazy">
-            </picture>
-          </div>
-        </div>
-      </div>
-
-      <!-- Clients -->
-      <div class="tour-item">
-        <div class="tour-copy">
-          <h3>Every customer, and exactly where they stand.</h3>
-          <p class="text-soft">
-            Billed, paid, outstanding — per customer, without digging. Their jobs, their
-            expenses and their history in one place, so you know who to chase and who to
-            look after before you pick up the phone.
-          </p>
-          <ul class="tour-list">
-            <li>What each customer has been billed and has paid</li>
-            <li>Everything you have ever done for them</li>
-            <li>Call, text or email them from the same screen</li>
-            <li>Start their next quote without retyping the details</li>
-          </ul>
-        </div>
-        <div class="tour-shot">
-          <div class="frame">
-            <div class="frame-bar">
-              <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
-              <span class="frame-url">app.picotally.com</span>
-            </div>
-            <picture>
-              <source srcset="/screenshots/desk/desk-clients.webp?v=20260815" type="image/webp">
-              <img src="/screenshots/desk/desk-clients.png?v=20260815"
-                   alt="The PicoTally clients screen: a list of customers with what each has been billed and what is still due, beside one customer's billed, paid and outstanding totals."
-                   width="2400" height="815" loading="lazy">
-            </picture>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ONE ACCOUNT, EVERYWHERE ============ -->
-  <section class="section" id="everywhere">
-    <div class="container">
-      <div class="center" style="max-width: 780px; margin: 0 auto 56px;">
-        <span class="eyebrow">One account, one subscription</span>
-        <h2>Quote it in the truck.<br>Chase it from the kitchen table.</h2>
-        <p class="lead">
-          The same business, the same books, wherever you happen to be standing. Start a
-          quote on your phone at the customer&rsquo;s house and finish it on a real keyboard
-          that evening — it is the same account, and you pay for it once.
-        </p>
-      </div>
-
-      <div class="grid grid-3">
-        <div class="card">
-          <div class="card-icon">&#128187;</div>
-          <h3>Desktop, today</h3>
+      <div class="moment">
+        <div class="moment-copy">
+          <span class="moment-num">01</span>
+          <h3>Say it.</h3>
           <p>
-            A proper desktop application in your browser, not a phone screen stretched
-            wide. Nothing to install, nothing to update. Open it and your books are there.
-          </p>
-        </div>
-        <div class="card">
-          <div class="card-icon">&#128241;</div>
-          <h3 class="when-waiting-block">In your pocket, any day now</h3>
-          <h3 class="when-launched-block">In your pocket, too</h3>
-          <p class="when-waiting-block">
-            The iPhone and Android apps are in review with Apple and Google right now.
-            Leave your email and I will tell you the moment each one goes live.
-          </p>
-          <p class="when-launched-block">
-            On iPhone and Android, from the App Store and Google Play. Snap a receipt at
-            the counter, quote a job in the driveway — it is the same books as your desk.
-          </p>
-        </div>
-        <div class="card">
-          <div class="card-icon">&#128260;</div>
-          <h3>Always in step</h3>
-          <p>
-            Write an invoice with no signal in a basement and it saves anyway, then syncs
-            itself the moment you have bars again. One set of books, never two.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ HEY PICO ============ -->
-  <section class="section section-dark">
-    <div class="container">
-      <div class="tour-item">
-        <div class="tour-copy">
-          <span class="eyebrow">Hey Pico</span>
-          <h2>Say it. It does it.</h2>
-          <p class="text-mute-on-dark">
-            When your hands are full, talk instead. Say the invoice out loud and it writes
-            itself — your rates, your materials, your logo on it, ready to send before the
-            tools are packed. Ask it a question about your business and it answers from
-            your actual books.
+            When your hands are full, talk. Say who the job was for and what it cost.
+            PicoTally writes the invoice with your rates, prices the materials from your
+            past jobs, puts your logo on it, and has it ready to send before the tools are
+            packed. Change your mind out loud and watch it happen on the screen.
           </p>
           <div class="say">
-            <span class="say-b"><span class="q">&ldquo;</span>Hey Pico, invoice John four hundred for the water heater.<span class="q">&rdquo;</span></span>
-            <span class="say-b"><span class="q">&ldquo;</span>Who still owes me money?<span class="q">&rdquo;</span></span>
-            <span class="say-b"><span class="q">&ldquo;</span>Make it no tax, and add a twenty five percent markup.<span class="q">&rdquo;</span></span>
+            <span class="say-b">&ldquo;Make it no tax.&rdquo;</span>
+            <span class="say-b">&ldquo;Add a 25 percent markup.&rdquo;</span>
+            <span class="say-b">&ldquo;Send it to Greg.&rdquo;</span>
           </div>
-          <p class="text-mute-on-dark" style="margin-top:24px; font-size:15.5px;">
-            It works with your gloves on. And when it changes something, you watch it
-            happen on the screen — nothing moves without you seeing it.
+          <p class="moment-note">Hey Pico is part of Pro Max. Everything also works by tap.</p>
+        </div>
+        <div class="moment-shot">
+          <div class="phone phone-sm">
+            <picture>
+              <source srcset="/screenshots/v3/invoice.webp?v=20260904" type="image/webp">
+              <img src="/screenshots/v3/invoice.png?v=20260904" width="1044" height="2140" loading="lazy"
+                   alt="A finished PicoTally invoice for Rivera Electric with the logo, line items, total and a tap-to-pay QR code.">
+            </picture>
+          </div>
+        </div>
+      </div>
+
+      <div class="moment flip">
+        <div class="moment-copy">
+          <span class="moment-num">02</span>
+          <h3>Snap it.</h3>
+          <p>
+            Photograph the receipt at the counter. PicoTally reads every line, keeps the
+            business items, sets the personal ones aside, and files each one under a
+            category your accountant will recognize. The shoebox never happens, and at
+            filing time it's one clean report instead of a bag of paper.
           </p>
         </div>
-        <div class="tour-shot">
-          <div class="phones" style="grid-template-columns: repeat(2, 1fr); max-width: 520px; margin-left: auto;">
-            <div>
-              <div class="phone-shot">
-                <picture>
-                  <source srcset="/screenshots/03-voice-quote-draft.webp?v=20260803" type="image/webp">
-                  <img src="/screenshots/03-voice-quote-draft.png?v=20260803" alt="A finished quote written by voice, showing the client, labour hours, materials and the total." width="416" height="905" loading="lazy">
-                </picture>
-              </div>
-              <p class="phone-cap">A quote, spoken</p>
-            </div>
-            <div>
-              <div class="phone-shot">
-                <picture>
-                  <source srcset="/screenshots/02-chat-overdue.webp?v=20260803" type="image/webp">
-                  <img src="/screenshots/02-chat-overdue.png?v=20260803" alt="Asking PicoTally who owes the most money and getting an exact answer broken down by customer." width="416" height="905" loading="lazy">
-                </picture>
-              </div>
-              <p class="phone-cap">An answer, from your books</p>
-            </div>
+        <div class="moment-shot">
+          <div class="phone phone-sm">
+            <picture>
+              <source srcset="/screenshots/v3/receipt.webp?v=20260904" type="image/webp">
+              <img src="/screenshots/v3/receipt.png?v=20260904" width="1044" height="2140" loading="lazy"
+                   alt="A scanned City Electric Supply receipt in PicoTally, every line item extracted and tagged as materials or office supplies.">
+            </picture>
+          </div>
+        </div>
+      </div>
+
+      <div class="moment">
+        <div class="moment-copy">
+          <span class="moment-num">03</span>
+          <h3>Ask it.</h3>
+          <p>
+            Who owes me money? How much did I spend on materials this month? Ask in plain
+            English and get names and dollar amounts from your actual books, not a guess.
+            Drafts you forgot, quotes still waiting, invoices overdue and by how many days.
+          </p>
+          <div class="say">
+            <span class="say-b">&ldquo;Who owes me the most?&rdquo;</span>
+            <span class="say-b">&ldquo;What did I make this month?&rdquo;</span>
+          </div>
+        </div>
+        <div class="moment-shot">
+          <div class="phone phone-sm">
+            <picture>
+              <source srcset="/screenshots/v3/chat.webp?v=20260904" type="image/webp">
+              <img src="/screenshots/v3/chat.png?v=20260904" width="1044" height="2140" loading="lazy"
+                   alt="The PicoTally assistant answering who owes the most, listing three customers with amounts and due dates from the books.">
+            </picture>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ TAX TIME ============ -->
-  <section class="section section-soft">
+  <!-- ============ EVERYWHERE ============ -->
+  <section class="section section-soft" id="everywhere">
     <div class="container">
-      <div class="tour-item flip">
-        <div class="tour-copy">
-          <span class="eyebrow">Tax time</span>
-          <h2>The worst week of your year, gone.</h2>
-          <p class="text-soft">
-            Every receipt you photographed during the year already has a category on it. So
-            when filing comes around there is no shoebox and no lost Saturday — it is one
-            report, totalled, with every expense itemised down to the vendor and the date.
-          </p>
-          <ul class="tour-list">
-            <li>Sorted into the categories your accountant expects</li>
-            <li>Every expense itemised by date, vendor and what you bought</li>
-            <li>Export the lot whenever you want it</li>
-          </ul>
-          <p class="text-mute" style="font-size:14.5px; margin-top:20px;">
-            PicoTally gets the paperwork ready. It does not file for you and it will not
-            pretend to give you tax advice, because that is a job for someone qualified.
-          </p>
-        </div>
-        <div class="tour-shot">
-          <div style="max-width: 380px; margin: 0 auto;">
-            <div class="phone-shot">
-              <picture>
-                <source srcset="/screenshots/06-tax-report.webp?v=20260803" type="image/webp">
-                <img src="/screenshots/06-tax-report.png?v=20260803" alt="A tax report totalling deductible expenses by category, ready to hand to an accountant." width="416" height="905" loading="lazy">
-              </picture>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ TRUST ============ -->
-  <section class="section">
-    <div class="container">
-      <div class="center" style="max-width: 740px; margin: 0 auto 52px;">
-        <span class="eyebrow">Why you can trust it</span>
-        <h2>Built by one guy who was tired of the paperwork too.</h2>
+      <div class="center" style="max-width: 760px; margin: 0 auto;">
+        <span class="eyebrow">iPhone, Android and any browser</span>
+        <h2>In the truck. At the desk. Same books.</h2>
         <p class="lead">
-          PicoTally is made and run by a small shop, for small shops. Your books are yours:
-          nobody else can see them, and we could not sell them if we wanted to, because
-          that is not the business we are in.
+          Start the quote on your phone at the customer's house. Finish it that evening on
+          a real keyboard. It's one account, and you pay for it once.
         </p>
       </div>
-      <div class="grid grid-3">
-        <div class="card">
-          <div class="card-icon">&#128274;</div>
-          <h3>Encrypted, end to end</h3>
-          <p>
-            Your data is encrypted in transit and at rest. On the iPhone, the local
-            database is encrypted too, with a key that never leaves the device Keychain.
-          </p>
+
+      <div class="every-visual">
+        <div class="frame">
+          <div class="frame-bar">
+            <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
+            <span class="frame-url">app.picotally.com</span>
+          </div>
+          <picture>
+            <source srcset="/screenshots/desk/desk-dashboard.webp?v=20260815" type="image/webp">
+            <img src="/screenshots/desk/desk-dashboard.png?v=20260815" width="2400" height="1307" loading="lazy"
+                 alt="The PicoTally desktop dashboard in a browser: net income, gross income, expenses, money outstanding and open jobs, with cash flow and next actions below.">
+          </picture>
         </div>
-        <div class="card">
-          <div class="card-icon">&#128203;</div>
-          <h3>Invoices stay true</h3>
-          <p>
-            Change your logo, address or rates tomorrow and the invoice you sent last
-            spring still reads exactly as your customer received it. That is how
-            bookkeeping is supposed to work, and it is the part most apps get wrong.
-          </p>
+        <div class="phone">
+          <picture>
+            <source srcset="/screenshots/v3/dashboard.webp?v=20260904" type="image/webp">
+            <img src="/screenshots/v3/dashboard.png?v=20260904" width="1044" height="2140" loading="lazy"
+                 alt="The same books on the phone: awaiting payment, this month's income and expenses, and the urgent list.">
+          </picture>
         </div>
-        <div class="card">
-          <div class="card-icon">&#128100;</div>
-          <h3>Yours to take</h3>
-          <p>
-            Export every job, expense, client and payment whenever you like. No ad
-            networks, no data brokers, no selling your customer list. Cancel and keep
-            the lot.
-          </p>
+      </div>
+
+      <div class="every-points">
+        <div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>
+          <h3>In your pocket</h3>
+          <p>On iPhone from the App Store and on Android from Google Play. Snap the receipt at the counter, quote the job in the driveway.</p>
         </div>
+        <div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <h3>On your desk</h3>
+          <p>A proper desktop app in any browser, not a phone screen stretched wide. Nothing to install. Open it and your books are there.</p>
+        </div>
+        <div>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2"/><path d="M21 4v5h-5M3 20v-5h5"/></svg></div>
+          <h3>Always in step</h3>
+          <p>Write an invoice in a basement with no signal and it saves anyway, then syncs the moment you have bars. One set of books, never two.</p>
+        </div>
+      </div>
+
+      <div class="stores" style="justify-content: center; margin-top: 40px;">
+        <a href="https://apps.apple.com/us/app/id6791798886" aria-label="Download on the App Store"><img src="/badges/app-store.svg" alt="Download on the App Store" width="138" height="46"></a>
+        <a href="https://play.google.com/store/apps/details?id=com.picoapps.picotally" aria-label="Get it on Google Play"><img class="play" src="/badges/google-play.png" alt="Get it on Google Play" width="176" height="68"></a>
+        <a href="https://app.picotally.com/?signup=1" class="btn btn-secondary">Open in your browser</a>
       </div>
     </div>
   </section>
 
   <!-- ============ PRICING ============ -->
-  <section class="section section-soft" id="pricing">
+  <section class="section" id="pricing">
     <div class="container">
-      <div class="center" style="max-width: 720px; margin: 0 auto 52px;">
+      <div class="center" style="max-width: 720px; margin: 0 auto clamp(40px, 5vw, 60px);">
         <span class="eyebrow">Pricing</span>
         <h2>Less than one billable hour a month.</h2>
-        <p class="lead">
-          Your first month is free with everything switched on. If it does not save you an
-          evening, cancel and you owe nothing.
-        </p>
+        <p class="lead">Your first month is free with everything switched on. If it doesn't save you an evening, cancel and you owe nothing.</p>
       </div>
-
       <div class="price-grid">
         <div class="price featured">
           <span class="price-badge">Most popular</span>
-          <h3>Pro</h3>
+          <div class="price-name">Pro</div>
           <div><span class="price-amt">$9.99</span> <span class="price-per">per month</span></div>
-          <p class="text-mute" style="margin-top:10px; font-size:15px;">The whole back office, done for you.</p>
+          <p class="price-tag">The whole back office, done for you.</p>
           <ul>
-            <li>Unlimited invoices and quotes</li>
+            <li>Unlimited invoices and quotes, with your logo and a pay link</li>
             <li>Receipt scanning that splits business from personal</li>
-            <li>Every expense categorised as it happens</li>
-            <li>Tax report ready at filing time</li>
-            <li>Card payments and pay links</li>
-            <li>Desktop, and your phone when it lands</li>
+            <li>Ask Pico by chat: who owes you, what you spent</li>
+            <li>Every expense categorized as it happens</li>
+            <li>Tax-time report, ready when you are</li>
+            <li>Phone and desktop, one account</li>
           </ul>
           <a href="https://app.picotally.com/?signup=1" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:26px;">Start free</a>
         </div>
-
         <div class="price">
-          <h3>Pro Max</h3>
+          <div class="price-name">Pro Max</div>
           <div><span class="price-amt">$19.99</span> <span class="price-per">per month</span></div>
-          <p class="text-mute" style="margin-top:10px; font-size:15px;">Everything in Pro, and you never have to touch it.</p>
+          <p class="price-tag">Everything in Pro, and you never have to touch it.</p>
           <ul>
             <li>Everything in Pro</li>
-            <li>&ldquo;Hey Pico&rdquo; wake word, hands free from the truck</li>
-            <li>Real-time voice conversation with your business</li>
+            <li>&ldquo;Hey Pico&rdquo; wake word, hands-free from the truck</li>
+            <li>It listens and talks back, in real time</li>
             <li>Voice edits on any invoice, any field</li>
           </ul>
           <a href="https://app.picotally.com/?signup=1" class="btn btn-secondary" style="width:100%; justify-content:center; margin-top:26px;">Start free</a>
         </div>
       </div>
-
-      <p class="center text-mute" style="margin-top:28px; font-size:14.5px;">
-        One subscription covers every device you sign in on. Sign up in your browser and
-        you are billed by card; subscribe on an iPhone and Apple handles it — cancel from
-        wherever you started, any time.
+      <p class="price-fine">
+        One subscription covers every device you sign in on. Sign up in your browser and pay
+        by card, or subscribe on your phone and the store handles it. Cancel from wherever
+        you started, any time.
       </p>
+    </div>
+  </section>
+
+  <!-- ============ FOUNDER ============ -->
+  <section class="section section-soft">
+    <div class="container note">
+      <div class="note-body">
+        <span class="eyebrow">From the builder</span>
+        <h2>A note from Josh.</h2>
+        <p>
+          I built PicoTally for the one-person shop: the electrician or plumber who does
+          the work all day and still has to chase the money at night. Everything on the
+          market was built for a crew with an office. This is built for one truck.
+        </p>
+        <p>
+          Your books are yours. They're encrypted, you can export every job, expense,
+          client and payment whenever you like, and nobody is selling your customer list
+          or running ads against it. If something doesn't work, email me. You'll get me,
+          not a ticket queue.
+        </p>
+        <div class="note-sig">
+          <img src="/picotally-icon.png" alt="" width="48" height="48">
+          <div><strong>Josh</strong><span>Pico Apps LLC &middot; Texas &middot; <a href="mailto:support@picotally.com">support@picotally.com</a></span></div>
+        </div>
+      </div>
+      <ul class="trust">
+        <li>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+          <div><strong>Encrypted in transit and at rest</strong><p>On the iPhone, the local database is encrypted too, with a key that never leaves the device.</p></div>
+        </li>
+        <li>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></div>
+          <div><strong>Invoices stay true</strong><p>Change your logo or rates next year and the invoice you sent last spring still reads exactly as your customer received it.</p></div>
+        </li>
+        <li>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></div>
+          <div><strong>Yours to take</strong><p>Export everything, any time. Cancel and keep the lot. No data brokers, no ad networks.</p></div>
+        </li>
+      </ul>
     </div>
   </section>
 
   <!-- ============ FAQ ============ -->
   <section class="section" id="faq">
     <div class="container-narrow">
-      <div style="margin-bottom: 40px;">
-        <span class="eyebrow">Straight answers</span>
-        <h2>What people ask me before they sign up.</h2>
-      </div>
-      <div class="faq">
-        <details open>
-          <summary>Can I actually use it today?</summary>
-          <div class="faq-a"><p>Yes — open it in any browser on a laptop or desktop and you are working in a couple of minutes. The iPhone app is on the App Store and the Android app is on Google Play. Everything you do on one shows up on the others.</p></div>
-        </details>
+      <span class="eyebrow">Straight answers</span>
+      <h2>What people ask before they sign up.</h2>
+      <div class="faq" style="margin-top: 28px;">
         <details>
           <summary>Is this built for my trade?</summary>
-          <div class="faq-a"><p>If you send invoices and buy materials, yes. Electricians, plumbers, HVAC, handymen, landscapers, painters, remodelers, and every one-person shop in between. It is built for the person who runs the whole business and does their own books.</p></div>
+          <div class="faq-a"><p>If you send invoices and buy materials, yes. Electricians, plumbers, HVAC, handymen, landscapers, painters, and every one-person shop in between. If you run a crew with an office manager, you'll outgrow it, and that's fine.</p></div>
         </details>
         <details>
           <summary>Do I have to talk to it?</summary>
-          <div class="faq-a"><p>No. Everything works by clicking and typing, the same as any other app. The voice is there for when your hands are full or you are covered in something, which for most of us is most of the day.</p></div>
+          <div class="faq-a"><p>No. Everything works by tap, on the phone and on the desktop. Pro includes the chat assistant. The hands-free "Hey Pico" voice is the Pro Max plan, for when your hands are full or you're driving.</p></div>
+        </details>
+        <details>
+          <summary>Which plan do I need?</summary>
+          <div class="faq-a"><p>Pro if you want the paperwork done: invoices, receipts, expenses, the tax-time report, and the chat assistant. Pro Max if you want to do it by voice from the truck. Both start with a free month, and you can switch.</p></div>
         </details>
         <details>
           <summary>Does it work without signal?</summary>
-          <div class="faq-a"><p>Yes. Write invoices, snap receipts and log expenses in a basement with no bars. Everything saves on the device and syncs itself the moment you are back in coverage.</p></div>
+          <div class="faq-a"><p>Yes. Write invoices, snap receipts and log expenses in a basement with no bars. Everything saves on the device and syncs the moment you're back in coverage.</p></div>
         </details>
         <details>
           <summary>What happens to my stuff if I quit?</summary>
-          <div class="faq-a"><p>You export everything and you keep it — jobs, expenses, clients and payments. Your books are yours. Cancel whenever you like, with nobody trying to talk you out of it.</p></div>
+          <div class="faq-a"><p>You export everything and you keep it: jobs, expenses, clients and payments. Cancel whenever you like, with nobody trying to talk you out of it.</p></div>
         </details>
         <details>
           <summary>Will it do my taxes?</summary>
-          <div class="faq-a"><p>It gets you ready for them. Every deductible expense is tracked and categorised as you go, and at filing time you hand yourself or your accountant one clean report. It does not file for you, and it will not pretend to give you tax advice.</p></div>
+          <div class="faq-a"><p>It gets you ready for them. Every deductible expense is tracked and categorized as you go, and at filing time you hand yourself or your accountant one clean report. It does not file for you, and it will not pretend to give you tax advice.</p></div>
         </details>
         <details>
           <summary>Is my customer list safe?</summary>
-          <div class="faq-a"><p>Your data is encrypted in transit and at rest, and on the iPhone the local database is encrypted with a key held in the device Keychain. We do not sell data, we do not run ads against it, and we have no business reason to look at your books.</p></div>
+          <div class="faq-a"><p>Your data is encrypted in transit and at rest, and on the iPhone the local database is encrypted with a key held in the device Keychain. We don't sell data, we don't run ads against it, and we have no business reason to look at your books.</p></div>
         </details>
       </div>
     </div>
@@ -859,15 +624,16 @@
   <section class="section section-dark">
     <div class="container-narrow center">
       <h2>Get your evenings back.</h2>
-      <p class="lead text-mute-on-dark" style="max-width: 54ch; margin: 0 auto 30px;">
-        Open PicoTally in your browser, put in your first job, and see how long it takes to
-        send an invoice that looks like it came from a real company. First month free.
+      <p class="lead text-mute-on-dark" style="max-width: 52ch; margin: 0 auto 30px;">
+        Put in your first job and see how long it takes to send an invoice that looks like
+        it came from a real company. First month free.
       </p>
       <div class="btn-row center">
         <a href="https://app.picotally.com/?signup=1" class="btn btn-on-dark-primary">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
-        <a href="mailto:support@picotally.com" class="btn btn-on-dark-secondary when-waiting">Tell me when the phone apps land</a>
-        <a href="https://apps.apple.com/us/app/id6791798886" class="btn btn-on-dark-secondary when-launched">Download on the App Store</a>
-        <a href="https://play.google.com/store/apps/details?id=com.picoapps.picotally" class="btn btn-on-dark-secondary when-launched">Get it on Google Play</a>
+      </div>
+      <div class="stores" style="justify-content: center; margin-top: 22px;">
+        <a href="https://apps.apple.com/us/app/id6791798886" aria-label="Download on the App Store"><img src="/badges/app-store.svg" alt="Download on the App Store" width="138" height="46"></a>
+        <a href="https://play.google.com/store/apps/details?id=com.picoapps.picotally" aria-label="Get it on Google Play"><img class="play" src="/badges/google-play.png" alt="Get it on Google Play" width="176" height="68"></a>
       </div>
     </div>
   </section>
@@ -880,10 +646,10 @@
         <a href="/" class="nav-logo" style="color: var(--on-dark); text-decoration: none;">
           <img src="/picotally-icon.png" alt="" width="34" height="34"> PicoTally
         </a>
-        <p style="margin-top:12px; max-width: 34ch;">The back office for the one-person shop.</p>
+        <p style="margin-top:12px; max-width: 34ch;">The office you never hired. Built for one truck.</p>
       </div>
       <div class="footer-links">
-        <a href="#tour">Product</a>
+        <a href="#how">How it works</a>
         <a href="#pricing">Pricing</a>
         <a href="#faq">Questions</a>
         <a href="https://app.picotally.com">Open PicoTally</a>
@@ -893,126 +659,11 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <span>&copy; 2026 Pico Apps LLC. All rights reserved.</span>
+      <span>&copy; 2026 Pico Apps LLC, Texas. All rights reserved.</span>
       <span><a href="mailto:support@picotally.com">support@picotally.com</a></span>
     </div>
   </div>
 </footer>
-
-<dialog class="ea-modal" id="ea-modal" aria-labelledby="ea-title">
-  <div class="ea-inner">
-    <button class="ea-close" data-ea-close aria-label="Close">&times;</button>
-    <h2 id="ea-title" style="font-size:26px; margin-bottom:8px;">Tell me when the phone app lands</h2>
-    <p class="text-mute" style="font-size:15px; margin-bottom:20px;">
-      The desktop app is ready now at
-      <a href="https://app.picotally.com">app.picotally.com</a>. Leave your email and I
-      will let you know the day the iPhone and Android apps go live.
-    </p>
-    <p class="ea-error" id="ea-error" hidden></p>
-    <form class="ea-form" id="ea-form" novalidate>
-      <div class="ea-field">
-        <label class="ea-label" for="ea-name">Name</label>
-        <input class="ea-input" type="text" id="ea-name" name="name" autocomplete="name" required>
-      </div>
-      <div class="ea-field">
-        <label class="ea-label" for="ea-email">Email</label>
-        <input class="ea-input" type="email" id="ea-email" name="email" autocomplete="email" required>
-      </div>
-      <div class="ea-field">
-        <label class="ea-label" for="ea-trade">Your trade <span class="ea-optional">(optional)</span></label>
-        <input class="ea-input" type="text" id="ea-trade" name="trade" placeholder="Plumber, electrician, HVAC&hellip;" autocomplete="off">
-      </div>
-      <button type="submit" class="btn btn-primary ea-submit" id="ea-submit">Put me on the list</button>
-    </form>
-    <div class="ea-success" id="ea-success" hidden>
-      <div class="ea-success-icon" aria-hidden="true">&#x2713;</div>
-      <h3>You are on the list.</h3>
-      <p class="text-mute">I will email you the day it goes live. In the meantime, the desktop app is ready when you are.</p>
-    </div>
-    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a> and nowhere else. Here is the <a href="/privacy">privacy policy</a>.</p>
-  </div>
-</dialog>
-
-<script>
-(function() {
-  var modal = document.getElementById('ea-modal');
-  // Ancient browser with no <dialog>: leave the mailto links doing their job.
-  if (!modal || typeof HTMLDialogElement === 'undefined' || !modal.showModal) return;
-
-  var form = document.getElementById('ea-form');
-  var submitBtn = document.getElementById('ea-submit');
-  var successEl = document.getElementById('ea-success');
-  var errorEl = document.getElementById('ea-error');
-
-  function openModal(e) {
-    if (e) e.preventDefault();
-    form.reset();
-    form.hidden = false;
-    successEl.hidden = true;
-    errorEl.hidden = true;
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Put me on the list';
-    modal.showModal();
-    setTimeout(function() { document.getElementById('ea-name').focus(); }, 50);
-  }
-
-  // Every phone-app CTA. After the App Store launch these are hidden and the
-  // store buttons take over, so there is nothing to unbind.
-  document.querySelectorAll('a.when-waiting').forEach(function(a) {
-    a.addEventListener('click', openModal);
-  });
-
-  modal.querySelectorAll('[data-ea-close]').forEach(function(el) {
-    el.addEventListener('click', function() { modal.close(); });
-  });
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) modal.close();
-  });
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (!form.reportValidity()) return;
-
-    errorEl.hidden = true;
-    submitBtn.disabled = true;
-    // textContent, not innerHTML — so '&hellip;' would print as those literal
-    // eight characters, which is exactly what it did once. The real character
-    // goes in directly.
-    submitBtn.textContent = 'Sending…';
-
-    fetch('/api/early-access', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        name: form.name.value.trim(),
-        email: form.email.value.trim(),
-        trade: form.trade.value.trim()
-      })
-    }).then(function(r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).then(function() {
-      form.hidden = true;
-      successEl.hidden = false;
-    }).catch(function() {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Try again';
-      errorEl.textContent = 'That did not go through. Email support@picotally.com and I will add you by hand.';
-      errorEl.hidden = false;
-    });
-  });
-})();
-</script>
-
-<script>
-  // Flip to true the day the apps clear review: every "notify me" CTA becomes
-  // App Store + Google Play links, and the "in review" copy becomes "on iPhone
-  // and Android". The browser CTAs are live regardless. Both stores are wired,
-  // so flip this once when BOTH are public (or sooner if you prefer per-store —
-  // then split the flag).
-  var LAUNCHED = true;
-  if (LAUNCHED) { document.body.classList.add('launched'); }
-</script>
 
 <script type="application/ld+json">
 {
@@ -1020,8 +671,8 @@
   "@type": "SoftwareApplication",
   "name": "PicoTally",
   "applicationCategory": "BusinessApplication",
-  "operatingSystem": "Web, iOS",
-  "description": "Invoicing, job tracking, receipt scanning, expenses, payments and business analytics for one-person trade businesses. Works in the browser and on the phone with one account.",
+  "operatingSystem": "Web, iOS, Android",
+  "description": "Invoicing by voice, receipt scanning, expenses, payments and a tax-time report for one-person trade businesses. Works in the browser and on iPhone and Android with one account.",
   "url": "https://picotally.com",
   "offers": [
     { "@type": "Offer", "name": "Pro", "price": "9.99", "priceCurrency": "USD" },
