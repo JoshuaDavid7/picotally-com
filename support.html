@@ -222,31 +222,52 @@
     html, body { overflow-x: clip; max-width: 100vw; }
 
 </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@700;800&family=Inter:wght@400;500;600&display=swap">
+  <style>
+    /* Shared site chrome: identical to the homepage nav and footer. Rules are
+       prefixed with .nav / .footer so they win over this page's older element
+       selectors without touching the page body styles. */
+    :root { --on-dark: #FFFFFF; --on-dark-mute: #B7C3D2; --nav-dark: #0B1A2D; --nav-border-dark: #24395A;
+            --font-head: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+            --font-body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { font-family: var(--font-body); }
+    h1, h2, h3 { font-family: var(--font-head); letter-spacing: -0.03em; }
+    .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.88); backdrop-filter: saturate(180%) blur(14px); -webkit-backdrop-filter: saturate(180%) blur(14px); border-bottom: 1px solid #E3E7EC; }
+    .nav .nav-inner { display: flex; align-items: center; gap: 24px; height: 68px; max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .nav .nav-logo, .footer .nav-logo { display: flex; align-items: center; gap: 11px; font-family: var(--font-head); font-weight: 800; font-size: 20px; letter-spacing: -0.02em; text-decoration: none; color: #0B1A2D; }
+    .nav .nav-logo:hover, .footer .nav-logo:hover { text-decoration: none; }
+    .nav .nav-logo img, .footer .nav-logo img { width: 34px; height: 34px; border-radius: 9px; }
+    .nav .nav-links { display: flex; gap: 26px; margin-left: auto; }
+    .nav .nav-links a { text-decoration: none; color: #6B7684; font-size: 15px; font-weight: 500; transition: color 0.2s; }
+    .nav .nav-links a:hover { color: #0B1A2D; text-decoration: none; }
+    .nav .btn { display: inline-flex; align-items: center; gap: 9px; padding: 9px 18px; border-radius: 999px; font-size: 14.5px; font-weight: 600; text-decoration: none; border: 1.5px solid transparent; background: #1565C0; color: #fff; box-shadow: 0 10px 24px rgba(21,101,192,0.28); transition: transform 0.2s, box-shadow 0.2s; margin-left: 22px; }
+    .nav .btn:hover { transform: translateY(-2px); text-decoration: none; box-shadow: 0 16px 34px rgba(21,101,192,0.34); }
+    @media (max-width: 860px) { .nav .nav-links { display: none; } .nav .btn { margin-left: auto; } }
+    .footer { background: var(--nav-dark); color: var(--on-dark-mute); padding: 56px 0 40px; font-size: 15px; border-top: 1px solid var(--nav-border-dark); margin-top: 0; }
+    .footer .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .footer a { color: var(--on-dark-mute); text-decoration: none; }
+    .footer a:hover { color: var(--on-dark); text-decoration: underline; }
+    .footer p { color: var(--on-dark-mute); font-size: 15px; margin: 0; }
+    .footer .footer-top { display: flex; flex-wrap: wrap; gap: 30px; justify-content: space-between; align-items: flex-start; }
+    .footer .footer-links { display: flex; flex-wrap: wrap; gap: 22px; font-size: 15px; }
+    .footer .footer-bottom { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--nav-border-dark); display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; font-size: 14px; line-height: 1.6; }
+  </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">
-      <picture>
-        <source srcset="/picotally-icon.webp" type="image/webp">
-        <img src="/picotally-icon.png" alt="" width="72" height="72">
-      </picture>
-      <span>PicoTally</span>
-    </a>
-    <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-    </button>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo"><img src="/picotally-icon.png" alt="" width="34" height="34"> PicoTally</a>
     <div class="nav-links">
-      <a href="/#vs">vs Generic AI</a>
-      <a href="/#features">Features</a>
-      <a href="/#trust">Trust</a>
-      <a href="/#faq">FAQ</a>
-      <a href="/#about">About</a>
+      <a href="/#how">How it works</a>
+      <a href="/#everywhere">Devices</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/#faq">Questions</a>
     </div>
-    <a href="mailto:support@picotally.com?subject=Early%20access" class="btn btn-primary btn-sm">Get early access</a>
+    <a href="https://app.picotally.com/?signup=1" class="btn btn-primary btn-sm nav-cta">Start free</a>
   </div>
 </nav>
 
@@ -287,140 +308,32 @@
   </div>
 </main>
 
-<footer>
+<footer class="footer">
   <div class="container">
-    <div class="footer-row">
+    <div class="footer-top">
       <div>
-        <div class="footer-brand">
-          <picture>
-            <source srcset="/picotally-icon.webp" type="image/webp">
-            <img src="/picotally-icon.png" alt="" width="24" height="24" loading="lazy">
-          </picture>
-          <span class="footer-brand-name">PicoTally</span>
-        </div>
-        <p class="footer-tag">The personal AI for your trade business.</p>
+        <a href="/" class="nav-logo" style="color: var(--on-dark); text-decoration: none;">
+          <img src="/picotally-icon.png" alt="" width="34" height="34"> PicoTally
+        </a>
+        <p style="margin-top:12px; max-width: 34ch;">The office you never hired. Built for one truck.</p>
       </div>
       <div class="footer-links">
-        <a href="/">Home</a>
+        <a href="/#how">How it works</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/#faq">Questions</a>
+        <a href="https://app.picotally.com">Open PicoTally</a>
+        <a href="/support">Support</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
-        <a href="/support">Support</a>
-      </div>
-      <div>
-        <a href="mailto:support@picotally.com" style="color: var(--brand);">support@picotally.com</a>
       </div>
     </div>
-    <div class="footer-legal">
-      &copy; 2026 Pico Apps LLC. All rights reserved.<br>
-      &ldquo;PicoTally&rdquo; is an assumed name of Pico Apps LLC, registered with the Texas Secretary of State (Document #&nbsp;1581268360003).
+    <div class="footer-bottom">
+      <span>&copy; 2026 Pico Apps LLC, Texas. All rights reserved. &ldquo;PicoTally&rdquo; is an assumed name of Pico Apps LLC, registered with the Texas Secretary of State (Document #&nbsp;1581268360003).</span>
+      <span><a href="mailto:support@picotally.com">support@picotally.com</a></span>
     </div>
   </div>
 </footer>
 
-<dialog id="ea-modal" class="ea-modal" aria-labelledby="ea-title">
-  <div class="ea-body">
-    <button type="button" class="ea-close" data-ea-close aria-label="Close">&times;</button>
-    <div class="ea-eyebrow">Join the waitlist</div>
-    <h2 id="ea-title" class="ea-title">Get early access to PicoTally</h2>
-    <p class="ea-lede">Be among the first tradespeople to try the personal AI for your business. We&rsquo;ll email you the moment we open enrollment.</p>
-    <p class="ea-error" id="ea-error" hidden></p>
-    <form class="ea-form" id="ea-form" novalidate>
-      <div class="ea-field">
-        <label class="ea-label" for="ea-name">Name</label>
-        <input class="ea-input" type="text" id="ea-name" name="name" autocomplete="name" required>
-      </div>
-      <div class="ea-field">
-        <label class="ea-label" for="ea-email">Email</label>
-        <input class="ea-input" type="email" id="ea-email" name="email" autocomplete="email" required>
-      </div>
-      <div class="ea-field">
-        <label class="ea-label" for="ea-trade">Your trade <span class="ea-optional">(optional)</span></label>
-        <input class="ea-input" type="text" id="ea-trade" name="trade" placeholder="Plumber, electrician, HVAC&hellip;" autocomplete="off">
-      </div>
-      <button type="submit" class="btn btn-primary ea-submit" id="ea-submit">Request access</button>
-    </form>
-    <div class="ea-success" id="ea-success" hidden>
-      <div class="ea-success-icon" aria-hidden="true">&#x2713;</div>
-      <h3>You&rsquo;re on the list.</h3>
-      <p>We&rsquo;ll be in touch the moment we open enrollment. Welcome aboard.</p>
-    </div>
-    <p class="ea-foot">Your details go to <a href="mailto:support@picotally.com">support@picotally.com</a>, nothing else. See our <a href="/privacy">privacy policy</a>.</p>
-  </div>
-</dialog>
-
-<script>
-(function() {
-  var modal = document.getElementById('ea-modal');
-  if (!modal || typeof HTMLDialogElement === 'undefined') return;
-  var form = document.getElementById('ea-form');
-  var submitBtn = document.getElementById('ea-submit');
-  var successEl = document.getElementById('ea-success');
-  var errorEl = document.getElementById('ea-error');
-  function openModal(e) {
-    if (e) e.preventDefault();
-    form.reset();
-    form.hidden = false; successEl.hidden = true; errorEl.hidden = true;
-    submitBtn.disabled = false; submitBtn.textContent = 'Request access';
-    modal.showModal();
-    setTimeout(function() { document.getElementById('ea-name').focus(); }, 50);
-  }
-  document.querySelectorAll('a[href^="mailto:support@picotally.com?subject=Early"]').forEach(function(a) {
-    a.addEventListener('click', openModal);
-  });
-  modal.querySelectorAll('[data-ea-close]').forEach(function(el) { el.addEventListener('click', function() { modal.close(); }); });
-  modal.addEventListener('click', function(e) { if (e.target === modal) modal.close(); });
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (!form.reportValidity()) return;
-    errorEl.hidden = true; submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
-    var payload = { name: form.name.value.trim(), email: form.email.value.trim(), trade: form.trade.value.trim() || '(not specified)', _subject: 'PicoTally early access request', _template: 'table' };
-    fetch('/api/early-access', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(payload) })
-      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function() { form.hidden = true; successEl.hidden = false; })
-      .catch(function() {
-        submitBtn.disabled = false; submitBtn.textContent = 'Try again';
-        errorEl.textContent = 'Hmm, that didn’t go through. You can email support@picotally.com directly and we’ll add you manually.';
-        errorEl.hidden = false;
-      });
-  });
-})();
-</script>
-
-
-<script>
-(function() {
-  var toggle = document.querySelector('.nav-toggle');
-  var links = document.querySelector('.nav-links');
-  if (!toggle || !links) return;
-  if (!links.id) links.id = 'nav-links';
-  toggle.addEventListener('click', function(e) {
-    e.stopPropagation();
-    var open = links.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-  // Close when tapping a link
-  links.querySelectorAll('a').forEach(function(a) {
-    a.addEventListener('click', function() {
-      links.classList.remove('is-open');
-      toggle.setAttribute('aria-expanded', 'false');
-    });
-  });
-  // Close on Esc
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && links.classList.contains('is-open')) {
-      links.classList.remove('is-open');
-      toggle.setAttribute('aria-expanded', 'false');
-    }
-  });
-  // Close when tapping outside the nav
-  document.addEventListener('click', function(e) {
-    if (!links.classList.contains('is-open')) return;
-    if (toggle.contains(e.target) || links.contains(e.target)) return;
-    links.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
-  });
-})();
-</script>
 
 </body>
 </html>
