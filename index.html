@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#FFFFFF">
   <title>PicoTally: Say the invoice. It writes itself.</title>
-  <meta name="description" content="Invoices by voice, receipts filed for taxes, and one look at who owes you. Built for electricians, plumbers, HVAC and handymen who run the whole shop from one truck. iPhone, Android and any browser, one account. First month free.">
+  <meta name="description" content="Invoices by voice, receipts sorted for tax time, and one look at who owes you. Built for electricians, plumbers, HVAC and handymen who run the whole shop from one truck. iPhone, Android and any browser, one account. First month free.">
 
   <link rel="canonical" href="https://picotally.com/">
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="PicoTally: Say the invoice. It writes itself.">
-  <meta property="og:description" content="Invoices by voice, receipts filed for taxes, one look at who owes you. On your phone in the truck and in your browser at the desk. First month free.">
+  <meta property="og:description" content="Invoices by voice, receipts sorted for tax time, one look at who owes you. On your phone in the truck and in your browser at the desk. First month free.">
   <meta property="og:image" content="https://picotally.com/screenshots/desk/desk-dashboard.png">
   <meta property="og:image:width" content="2400">
   <meta property="og:image:height" content="1307">
@@ -19,7 +19,7 @@
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="PicoTally: Say the invoice. It writes itself.">
-  <meta name="twitter:description" content="Invoices by voice, receipts filed for taxes, one look at who owes you. Phone and desktop, one account. First month free.">
+  <meta name="twitter:description" content="Invoices by voice, receipts sorted for tax time, one look at who owes you. Phone and desktop, one account. First month free.">
   <meta name="twitter:image" content="https://picotally.com/screenshots/desk/desk-dashboard.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -157,8 +157,8 @@
     .hero-sub { font-size: clamp(17px, 1.6vw, 20px); color: var(--text-soft); max-width: 52ch; margin: 0 0 28px; }
     .hero-sub .cmd { font-weight: 600; color: var(--text); }
     .hero-fine { font-size: 14.5px; color: var(--text-mute); margin-top: 22px; }
-    .hero-visual { position: relative; display: flex; justify-content: center; padding: 32px 0 0; }
-    @media (min-width: 900px) { .hero-visual { justify-content: flex-end; padding: 32px 24px 0 0; } }
+    .hero-visual { position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 8px 0 0; }
+    @media (min-width: 900px) { .hero-visual { align-items: flex-end; padding: 8px 24px 0 0; } }
 
     /* ---------- Phone ---------- */
     .phone {
@@ -172,15 +172,19 @@
     .hero .phone img { object-position: top; }
 
     .bubble {
-      position: absolute; z-index: 2;
+      position: relative; z-index: 2;
       display: inline-flex; align-items: center; gap: 10px;
       background: var(--bg-dark); color: #fff; border-radius: 999px;
       padding: 12px 18px 12px 14px; font-size: 15px; font-weight: 500;
       box-shadow: var(--shadow-lg); max-width: 300px; line-height: 1.35;
     }
     .bubble svg { width: 18px; height: 18px; flex: none; color: var(--green); }
-    .bubble-hero { left: -8px; top: 0; }
-    @media (min-width: 900px) { .bubble-hero { left: -60px; top: 92px; } }
+    .bubble::after {
+      content: ""; position: absolute; left: 34px; bottom: -9px;
+      width: 18px; height: 18px; background: var(--bg-dark); transform: rotate(45deg); border-radius: 3px;
+    }
+    .bubble-hero { margin-right: auto; }
+    @media (min-width: 900px) { .bubble-hero { margin-right: 44px; } }
 
     /* ---------- Problem band ---------- */
     .problem p { font-size: clamp(19px, 2.1vw, 26px); line-height: 1.5; letter-spacing: -0.015em; color: var(--on-dark-mute); }
@@ -224,7 +228,8 @@
     /* ---------- Everywhere ---------- */
     .every-visual { position: relative; margin-top: clamp(36px, 5vw, 56px); padding-bottom: 60px; }
     .every-visual .frame { width: 92%; }
-    .every-visual .phone { position: absolute; right: 0; bottom: 0; width: min(240px, 34%); border-radius: 28px; }
+    .every-visual .phone { position: absolute; right: 0; bottom: 0; width: min(240px, 34%); border-radius: 28px; aspect-ratio: auto; height: auto; }
+    .every-visual .phone img { height: auto; }
     @media (max-width: 720px) { .every-visual { padding-bottom: 40px; } .every-visual .phone { width: 38%; border-radius: 20px; } }
     .every-points { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 40px; }
     .every-points h3 { font-size: 19px; margin-bottom: 6px; }
@@ -309,7 +314,7 @@
         <p class="hero-sub">
           <span class="cmd">&ldquo;Hey Pico, invoice Greg four hundred for the water heater.&rdquo;</span>
           That's the whole job. PicoTally is the office you never hired: invoices by voice,
-          receipts filed for taxes, and one look at who owes you. On your phone in the truck,
+          receipts sorted for tax time, and one look at who owes you. On your phone in the truck,
           in your browser at the desk. One account.
         </p>
         <div class="btn-row">
@@ -349,6 +354,9 @@
       <p>
         Every hour at that desk is an hour you're not billing, not quoting the next job,
         and not home. The big packages want to make you a bookkeeper. <strong>You just want it done.</strong>
+      </p>
+      <p>
+        Big companies have had software that does this for years. <strong>Now you do too.</strong>
       </p>
     </div>
   </section>
@@ -396,9 +404,10 @@
           <h3>Snap it.</h3>
           <p>
             Photograph the receipt at the counter. PicoTally reads every line, keeps the
-            business items, sets the personal ones aside, and files each one under a
+            business items, sets the personal ones aside, and sorts each one into a
             category your accountant will recognize. The shoebox never happens, and at
-            filing time it's one clean report instead of a bag of paper.
+            tax time you hand over one clean report instead of a bag of paper. You still
+            file the way you do now. This just gets you ready.
           </p>
         </div>
         <div class="moment-shot">
@@ -550,9 +559,16 @@
         <span class="eyebrow">From the builder</span>
         <h2>A note from Josh.</h2>
         <p>
-          I built PicoTally for the one-person shop: the electrician or plumber who does
-          the work all day and still has to chase the money at night. Everything on the
-          market was built for a crew with an office. This is built for one truck.
+          I started PicoTally with one goal: put the technology big businesses run on
+          into the hands of small business owners, at a price a one-person shop can pay.
+          The voice assistant, the receipt reader, the books that answer questions. Big
+          companies have had all of it for years. You shouldn't need an office manager
+          and an IT budget to get it.
+        </p>
+        <p>
+          So this is built for the electrician or plumber who does the work all day and
+          still has to chase the money at night. Not for a crew with an office. For one
+          truck.
         </p>
         <p>
           Your books are yours. They're encrypted, you can export every job, expense,
