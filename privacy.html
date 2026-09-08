@@ -394,24 +394,30 @@
 <main class="page-body">
   <div class="container-narrow">
 
-<p>PicoTally (&ldquo;the App&rdquo;) is published by Pico Apps LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;). This policy explains what data we collect, why, and how we protect it.</p>
+<p>PicoTally (&ldquo;the App&rdquo;) is published by Pico Apps LLC (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;). This policy explains what data we collect, why, and how we protect it. It applies wherever you use PicoTally: the iPhone and iPad app, the Android app, and the web app at <a href="https://app.picotally.com">app.picotally.com</a>.</p>
 
 <h2>1. Data we collect</h2>
 
 <table>
   <tr><th>Category</th><th>Examples</th><th>Purpose</th></tr>
-  <tr><td>Account</td><td>Email address, name (if provided via Google/Apple sign-in)</td><td>Authentication and account management</td></tr>
-  <tr><td>Business profile</td><td>Business name, address, phone, tax ID, hourly rate</td><td>Populating your invoices and quotes</td></tr>
+  <tr><td>Account</td><td>Email address; your name if your Google or Apple account provides one; which sign-in method you use</td><td>Authentication and account management</td></tr>
+  <tr><td>Business profile</td><td>Business name, address, phone, business email, logo, hourly rate, invoice numbering and payment terms, PayPal and Venmo handles if you enter them, and a reference to your Stripe account if you enable payment collection</td><td>Populating your invoices and quotes, and paying you</td></tr>
   <tr><td>Customer records</td><td>Client name, email, phone, address, notes</td><td>Invoice delivery and CRM</td></tr>
-  <tr><td>Financial records</td><td>Invoices, quotes, expenses, payments, receipt images</td><td>Core app functionality</td></tr>
-  <tr><td>Media</td><td>Photos (receipts, project sites), voice memos</td><td>Receipt scanning, voice-to-invoice</td></tr>
+  <tr><td>Financial records</td><td>Invoices, quotes, expenses, payments, payment receipts, receipt images, job folders and notes</td><td>Core app functionality</td></tr>
+  <tr><td>Media</td><td>Photos (receipts, note attachments), voice notes</td><td>Receipt scanning, voice-to-invoice, notes</td></tr>
+  <tr><td>Subscription</td><td>Your plan, its status and renewal date, and which store or processor bills you. Never your card number.</td><td>Unlocking paid features</td></tr>
+  <tr><td>Voice usage</td><td>Minutes of real-time voice conversation used this month</td><td>Applying the Pro&nbsp;Max monthly limit</td></tr>
   <tr><td>Crash reports</td><td>Error stack traces, device model, OS version (no personal identifiers)</td><td>Fixing bugs and improving stability</td></tr>
-  <tr><td>Usage analytics</td><td>Anonymous product events (app opened, onboarding finished, invoice sent, receipt scanned, paywall viewed, subscription started), app version, platform, plan tier, a random session ID, and a one-way hash of your account ID</td><td>Seeing which features are used and where new users get stuck</td></tr>
+  <tr><td>Usage analytics</td><td>A fixed set of product events (app opened, onboarding finished, invoice sent, receipt scanned, voice started, paywall viewed, free month started, subscription started), app version, platform, plan tier, a random session ID, and a one-way hash of your account ID</td><td>Seeing which features are used and where new users get stuck</td></tr>
 </table>
 
-<p>We do <strong>not</strong> collect location data, contacts, health data, browsing history, or advertising identifiers, and we do not use any of your data for advertising.</p>
+<p>We do not collect location data, contacts, health data, browsing history, or advertising identifiers, and we do not use any of your data for advertising.</p>
 
-<p>To be precise about the one identifier in that table: usage analytics carry a <strong>SHA&#8209;256 hash of your account ID</strong>. Hashing is one-way, so our analytics provider cannot work backwards from it to your identity &mdash; but it is stable across your sessions and devices, which is what lets us count one returning person rather than five strangers. We describe it as pseudonymous rather than anonymous, because that is what it is.</p>
+<p>We no longer ask for a tax registration number. Older versions of the app had an optional field for an EIN or tax ID; the field was removed in September 2026 and any value previously stored has been cleared from our database.</p>
+
+<p>If you turn on Face&nbsp;ID, Touch&nbsp;ID or fingerprint sign-in, your device performs the check and only tells the app whether it succeeded. Biometric data never reaches us.</p>
+
+<p>To be precise about the one identifier in that table: usage analytics carry a SHA&#8209;256 hash of your account ID. Hashing is one-way, so our analytics provider cannot work backwards from it to your identity &mdash; but it is stable across your sessions and devices, which is what lets us count one returning person rather than five strangers. We describe it as pseudonymous rather than anonymous, because that is what it is.</p>
 
 <h2>2. How we use your data</h2>
 <ul>
@@ -421,6 +427,7 @@
       <li>Your message text;</li>
       <li>A snapshot of your business data, your customer list with outstanding balances, your recent invoices, recent expenses, recent payments, current-screen context, and current-month summary statistics, so the assistant can answer your question in the context of your business;</li>
       <li>If the assistant needs an exact total or a longer list to answer accurately, it may run a query against your own records and the result of that query is returned to Claude in the same conversation.</li>
+      <li>Separately, when the app suggests a title for a new document, it sends the short job description to Claude for that purpose only.</li>
     </ul>
     There are two voice paths, and they send your audio to different places.
     <br><br>
@@ -430,50 +437,60 @@
     <br><br>
     Receipt scanning is a separate flow again: the text read off the receipt is sent to <strong>Google Gemini</strong> for itemisation (the receipt image itself is never sent to Gemini). All AI calls are processed server-side via secure edge functions; no AI provider keys are embedded in the app.</li>
   <li><strong>On-device OCR</strong>. Google ML Kit extracts text from receipt images entirely on your device, so no image is sent to any AI provider to be read. The receipt photo itself is still uploaded to your own Supabase storage, so it syncs across your devices and stays attached to the expense as evidence.</li>
-  <li><strong>Payments</strong>, when you use online payment links, Stripe processes the transaction. We store the payment status and session ID but never your card details.</li>
+  <li><strong>Payments</strong>, when your customer pays an invoice through its pay link or QR code, Stripe processes the transaction. We store the payment status and a reference to the Stripe session, never anyone&rsquo;s card details.</li>
+<li><strong>Email</strong>, sign-in, password and account emails to you, and the invoices, quotes and receipts you choose to email to a customer, are delivered through Resend.</li>
+<li><strong>&ldquo;Hey&nbsp;Pico&rdquo; wake word</strong> (phone apps, Pro&nbsp;Max), when you turn it on, the phone listens for the phrase using a small model that runs entirely on the device. Nothing is recorded or transmitted until the phrase is detected and a voice session begins, which the app shows on screen.</li>
   <li><strong>Crash reporting</strong>, if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
-  <li><strong>Usage analytics</strong>, we record a small, fixed set of product events through <strong>TelemetryDeck</strong> &mdash; the app was opened, onboarding finished, an invoice was sent, a receipt was scanned, the paywall was viewed, a subscription started &mdash; so we can see which features earn their keep and where new users get stuck. Each signal carries your app version, platform, plan tier, a random session ID, and the hashed account ID described above. It never carries your name, email, customer records, invoice or quote contents, notes, or any dollar amount. We use this only to improve the product; it is not sold, shared, or used for advertising.</li>
+  <li><strong>Usage analytics</strong>, we record a small, fixed set of product events through <strong>TelemetryDeck</strong> &mdash; the app was opened, onboarding finished, an invoice was sent, a receipt was scanned, voice was started, the paywall was viewed, a free month started, a subscription started &mdash; so we can see which features earn their keep and where new users get stuck. Each signal carries your app version, platform, plan tier, a random session ID, and the hashed account ID described above. It never carries your name, email, customer records, invoice or quote contents, notes, or any dollar amount. We use this only to improve the product; it is not sold, shared, or used for advertising.</li>
 </ul>
 
 <h2>3. Third-party services</h2>
 
 <table>
   <tr><th>Service</th><th>Data received</th><th>Purpose</th></tr>
-  <tr><td>Supabase</td><td>All synced business data</td><td>Cloud database, authentication, file storage</td></tr>
+  <tr><td>Supabase</td><td>All synced business data, your account, and the files you upload</td><td>Cloud database, authentication and file storage, on servers in the United States</td></tr>
+  <tr><td>Google Sign-In / Sign in with Apple</td><td>Your name and email address from that account, only if you choose that sign-in method</td><td>Authentication</td></tr>
   <tr><td>Google Gemini</td><td>Text read off your receipts (not the images), and transcripts of job voice notes</td><td>Itemising receipts and extracting job details</td></tr>
   <tr><td>Google Gemini Live</td><td><strong>Your microphone audio, live</strong>, plus the business context the assistant needs to answer you</td><td>The real-time "Hey Pico" voice assistant (Pro&nbsp;Max)</td></tr>
   <tr><td>LiveKit</td><td><strong>Your microphone audio, live</strong></td><td>Carrying the real-time voice conversation between your phone and the assistant (Pro&nbsp;Max)</td></tr>
   <tr><td>Fly.io</td><td><strong>Your microphone audio, live</strong>, and the business records the assistant looks up to answer you</td><td>Running the voice assistant service itself, on servers in the United States (Pro&nbsp;Max)</td></tr>
   <tr><td>Deepgram</td><td>Recorded voice notes (audio), and the assistant's reply text when it speaks back</td><td>Voice-to-text transcription, and text-to-speech</td></tr>
-  <tr><td>Anthropic Claude</td><td>Your assistant message (voice transcript or typed text) plus a snapshot of your business data, customer names with balances, recent invoices, recent expenses, recent payments, and current-month statistics. May also receive additional rows from your own records when the assistant runs a query mid-conversation.</td><td>Powering the in-app AI assistant: answering questions about your business and drafting invoices, expenses, and payments on command</td></tr>
-  <tr><td>Stripe (Connect)</td><td>Payment amount, currency, client email</td><td>Payment processing for invoices you send to your customers</td></tr>
+  <tr><td>Anthropic Claude</td><td>Your assistant message (voice transcript or typed text) plus a snapshot of your business data, customer names with balances, recent invoices, recent expenses, recent payments, and current-month statistics. May also receive additional rows from your own records when the assistant runs a query mid-conversation, and short job descriptions when suggesting a document title.</td><td>Powering the in-app AI assistant: answering questions about your business and drafting invoices, expenses, and payments on command</td></tr>
+  <tr><td>Stripe (Connect)</td><td>Invoice amount and currency, and the customer name and description shown on the invoice. Your customer enters their own email and card on Stripe&rsquo;s payment page, not in PicoTally.</td><td>Payment processing for invoices you send to your customers</td></tr>
   <tr><td>Apple App Store (StoreKit)</td><td>Purchase receipt (signed by Apple)</td><td>Processing your Pro subscription if you subscribed on iPhone or iPad. Apple, not us, sees your payment method.</td></tr>
   <tr><td>Google Play Billing</td><td>Purchase token and subscription status (signed by Google)</td><td>Processing your Pro subscription if you subscribed on Android. Google, not us, sees your payment method.</td></tr>
-  <tr><td>Stripe (Billing)</td><td>Your email address and subscription status</td><td>Processing your Pro subscription if you subscribed on the web. Stripe, not us, sees your card details.</td></tr>
+  <tr><td>Stripe (Billing)</td><td>Your email address and subscription status; the card you enter is stored by Stripe</td><td>Processing your Pro or Pro&nbsp;Max subscription if you subscribed on the web. Stripe, not us, sees your card details.</td></tr>
   <tr><td>Sentry</td><td>Crash logs (scrubbed of PII)</td><td>Error monitoring</td></tr>
   <tr><td>TelemetryDeck</td><td>Product event names (e.g.&nbsp;&ldquo;invoice sent&rdquo;), app version, platform, plan tier, a random session ID, and a SHA&#8209;256 hash of your account ID. No names, emails, customer records, document contents, or dollar amounts.</td><td>Product usage analytics &mdash; which features are used, and where new users drop off</td></tr>
   <tr><td>Resend</td><td>The recipient's email address and the invoice, quote or receipt PDF you chose to send, plus your account email for sign-in and password emails</td><td>Delivering the documents you send to your customers, and account emails to you</td></tr>
   <tr><td>Google ML Kit</td><td>None (on-device only)</td><td>Text recognition from images</td></tr>
+  <tr><td>Cloudflare</td><td>Standard web-server logs (IP address, browser type, pages requested) when you visit picotally.com or app.picotally.com, kept briefly by Cloudflare for security</td><td>Hosting the website and the web app</td></tr>
 </table>
 
 <p>Waitlist signups submitted through the early-access form that ran on picotally.com before launch were received by a Cloudflare Pages Function that runs on the same infrastructure as the website itself. The submission (name, email, optional trade) stays on our Cloudflare account, the same provider that hosts the marketing site, and is not shared with any third-party form processor.</p>
 
 <p><strong>Development and support tooling.</strong> When we diagnose a problem or check how the service is running, we use development tools on our own computers, including AI coding tools from Anthropic (Claude Code). These tools work from counts, dates and system records by default, through a database account that cannot read customer names, contact details, receipt images or invoice contents. Individual account data may pass through them only when a specific account needs fixing. We have opted out of model training for these tools, and we do not use them to browse customer records.</p>
 
+<p><strong>Cookies and tracking.</strong> picotally.com sets no cookies and loads no analytics or advertising scripts. app.picotally.com keeps your sign-in session in your browser&rsquo;s local storage, which is required for the app to work; it uses no advertising cookies or trackers.</p>
+
 <p>We do not sell, rent, or share your data with advertisers, data brokers, or any party not listed above.</p>
 
 <h2>4. Device permissions</h2>
 <ul>
-  <li><strong>Microphone</strong>, voice recording for the voice-to-invoice feature. Only active when you tap the record button.</li>
-  <li><strong>Camera</strong>, taking photos of receipts and project work.</li>
-  <li><strong>Photo library</strong>, selecting existing photos for receipt scanning or project documentation.</li>
+  <li><strong>Microphone</strong>, voice-to-invoice, voice notes, the chat microphone, and the real-time voice assistant. Only active when you tap to talk, or, if you turn on the &ldquo;Hey&nbsp;Pico&rdquo; wake word in the phone apps, while the on-device listener is waiting for the phrase.</li>
+  <li><strong>Camera</strong>, taking photos of receipts and note attachments.</li>
+  <li><strong>Photo library</strong>, choosing an existing photo for receipt scanning or a note. On Android the system photo picker is used, so the app needs no library permission.</li>
+  <li><strong>Face&nbsp;ID / Touch&nbsp;ID / fingerprint</strong>, optional quick sign-in on the phone apps.</li>
+  <li><strong>In the browser</strong>, your browser asks for microphone and camera access separately and you can revoke it in the browser&rsquo;s site settings.</li>
 </ul>
 <p>Each permission is requested only when needed and can be revoked at any time in your device settings.</p>
 
 <h2>5. Data storage and security</h2>
 <ul>
   <li>Cloud data is stored in Supabase (PostgreSQL) with row-level security. Each user can only access their own records, enforced at the database level, not just in app code.</li>
-  <li>A local copy is cached on your device in a SQLite database for offline use. The file is encrypted with SQLCipher (AES-256); the encryption key is generated on your device and stored in the iOS Keychain / Android Keystore, and never leaves the device.</li>
+  <li>On iPhone and Android, a local copy is cached on your device in a SQLite database for offline use. The file is encrypted with SQLCipher (AES-256); the encryption key is generated on your device and stored in the iOS Keychain / Android Keystore, and never leaves the device.</li>
+  <li>In the browser, a working copy of your data is kept in your browser&rsquo;s own storage so the web app is fast and survives brief connection drops. Browser storage is not separately encrypted; it is protected by your device login and the browser&rsquo;s isolation of each site. Sign out when you finish on a shared computer.</li>
+  <li>Our servers are in the United States.</li>
   <li>All network communication uses HTTPS/TLS encryption.</li>
   <li>API keys for Google Gemini, Deepgram, Anthropic Claude, LiveKit, Resend, and Stripe live only as server-side secrets. They are never bundled into the mobile app and cannot be extracted from an installed binary.</li>
   <li>Crash reports sent to Sentry are passed through a PII scrubber that redacts emails, phone numbers, tokens, and truncates long free-form text before the report leaves your device.</li>
@@ -483,10 +500,11 @@
 <ul>
   <li>Your data is retained for as long as your account is active.</li>
   <li>You can delete individual records (invoices, expenses, customers) at any time from within the app.</li>
-  <li>You can permanently delete your entire account from <em>Settings &rarr; Account &rarr; Delete Account</em>. This removes all rows tied to your user ID across our database, invoices, quotes, expenses, receipts, customers, project notes, voice memos, uploaded logos and photos, plus your authentication record. The deletion is irreversible and typically completes within seconds. Full instructions, including how to request deletion if you no longer have the app installed, are on our <a href="/delete-account">Delete your account</a> page.</li>
+  <li>You can permanently delete your entire account from <em>Settings &rarr; Account &rarr; Delete Account</em>. This removes all rows tied to your user ID across our database, invoices, quotes, expenses, receipts, customers, project notes, voice memos, uploaded logos and photos, plus your authentication record. The deletion is irreversible and completes within seconds. The same option is available in the web app under Settings &rarr; Account. If you no longer have access to the app, email us from the account&rsquo;s address and we will delete it for you within 30 days, usually within a few business days. Full instructions, including how to request deletion if you no longer have the app installed, are on our <a href="/delete-account">Delete your account</a> page.</li>
   <li>The same in-app deletion also wipes the encrypted local database on your device, removes the SQLCipher key from the iOS Keychain / Android Keystore, and clears any saved sign-in credentials. <strong>Use the in-app Delete Account flow rather than just uninstalling</strong>, uninstalling removes the app&rsquo;s documents folder but, by default, the iOS Keychain entries survive uninstall and would persist until the device is wiped or you delete the PicoTally entries via iOS Settings.</li>
   <li>Audit logs of payment webhook events received from Stripe are retained for fraud-detection purposes; these contain transaction metadata (amount, currency, status) but no card numbers and no personal account information.</li>
   <li>Database backups taken before your deletion request may continue to hold a copy of your data for up to 7 days, after which they are rotated out and unrecoverable. We do not access these backups except to recover from infrastructure failure.</li>
+  <li>Apple, Google and Stripe keep their own records of your subscription payments under their own policies; deleting your PicoTally account does not delete those, and does not cancel a subscription (see the Delete your account page).</li>
 </ul>
 
 <h2>7. Your rights</h2>
@@ -495,9 +513,9 @@
   <li>Access all data we hold about you (available directly in the app).</li>
   <li>Correct inaccurate data (editable in the app).</li>
   <li>Delete your data and account.</li>
-  <li>Export your data (invoices can be exported as PDF).</li>
+  <li>Export your data: jobs, expenses, clients and payments as CSV from Settings &rarr; Data &amp; privacy; the tax-time report as Excel or PDF; any invoice or quote as PDF.</li>
 </ul>
-<p>If you are in the EU/EEA, you also have rights under GDPR including data portability and the right to lodge a complaint with a supervisory authority.</p>
+<p>If you are a resident of California, Texas or another U.S. state with a consumer privacy law, or of the EU/EEA or the United Kingdom, you may have further rights, including data portability and the right to complain to a regulator. Email us and we will honor them. We do not sell personal data, and we will never treat you differently for exercising a privacy right.</p>
 
 <h2>8. Children&rsquo;s privacy</h2>
 <p>PicoTally is a business tool designed for adults. Our <a href="/terms">Terms of Service</a> require you to be at least 18 years old to use the App, and we do not knowingly collect data from anyone under 18. If we learn that we have collected data from a minor, we will delete it promptly. If you believe a minor has provided us with data, contact <a href="mailto:support@picotally.com">support@picotally.com</a> and we will remove it.</p>
