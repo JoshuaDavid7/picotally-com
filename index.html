@@ -230,6 +230,13 @@
 
     /* ---------- Everywhere ---------- */
     .every-visual { position: relative; margin-top: clamp(36px, 5vw, 56px); padding-bottom: 60px; }
+    /* One folder per job: a 3200px desk view is unreadable at phone width, so
+       narrow screens get the phone's own folder screen instead. */
+    .folders-phone { display: none; }
+    @media (max-width: 720px) {
+      .folders-desk { display: none; }
+      .folders-phone { display: flex; justify-content: center; margin: 0 0 40px; }
+    }
     .every-visual .frame { width: 92%; }
     .every-visual .phone { position: absolute; right: 0; bottom: 0; width: min(240px, 34%); border-radius: 28px; aspect-ratio: auto; height: auto; }
     .every-visual .phone img { height: auto; }
@@ -462,7 +469,7 @@
           what it cost you, and what you made. Per job, not per year.
         </p>
       </div>
-      <div class="every-visual" style="margin-top: 0;">
+      <div class="every-visual folders-desk" style="margin-top: 0;">
         <div class="frame">
           <div class="frame-bar">
             <span class="frame-dot"></span><span class="frame-dot"></span><span class="frame-dot"></span>
@@ -472,6 +479,15 @@
             <source srcset="/screenshots/desk/desk-folder.webp?v=20260915" type="image/webp">
             <img src="/screenshots/desk/desk-folder.png?v=20260915" width="3200" height="2000" loading="lazy"
                  alt="A PicoTally job folder open on the desk: billed, paid, costs and profit for one job across the top, then its three paid invoices, its three expenses, and a notes area.">
+          </picture>
+        </div>
+      </div>
+      <div class="folders-phone">
+        <div class="phone phone-sm">
+          <picture>
+            <source srcset="/screenshots/v3/folder.webp?v=20260915" type="image/webp">
+            <img src="/screenshots/v3/folder.png?v=20260915" width="1044" height="2140" loading="lazy"
+                 alt="A PicoTally job folder on the phone: billed, paid, costs and profit for one job, then its invoices, expenses and notes.">
           </picture>
         </div>
       </div>
