@@ -157,6 +157,9 @@
     .hero-sub { font-size: clamp(17px, 1.6vw, 20px); color: var(--text-soft); max-width: 52ch; margin: 0 0 28px; }
     .hero-sub .cmd { font-weight: 600; color: var(--text); }
     .hero-fine { font-size: 14.5px; color: var(--text-mute); margin-top: 22px; }
+    .hero-alt { font-size: 14.5px; color: var(--text-mute); margin-top: 14px; }
+    .hero-alt a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+    [hidden] { display: none !important; }
     .hero-visual { position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 8px 0 0; }
     @media (min-width: 900px) { .hero-visual { align-items: flex-end; padding: 8px 24px 0 0; } }
 
@@ -299,7 +302,7 @@
       <a href="#pricing">Pricing</a>
       <a href="#faq">Questions</a>
     </div>
-    <a href="https://app.picotally.com/?signup=1" class="btn btn-primary btn-sm nav-cta">Start free</a>
+    <a href="https://app.picotally.com/?signup=1" class="btn btn-primary btn-sm nav-cta" data-cta="start" data-store-label="short">Start free</a>
   </div>
 </nav>
 
@@ -318,9 +321,10 @@
           in your browser at the desk. One account.
         </p>
         <div class="btn-row">
-          <a href="https://app.picotally.com/?signup=1" class="btn btn-primary">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
+          <a href="https://app.picotally.com/?signup=1" class="btn btn-primary" data-cta="start">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
         </div>
-        <div class="stores" style="margin-top: 18px;">
+        <p class="hero-alt" id="hero-alt" hidden>Prefer the desk? <a href="https://app.picotally.com/?signup=1">Start free in your browser</a>.</p>
+        <div class="stores" id="hero-stores" style="margin-top: 18px;">
           <a href="https://apps.apple.com/us/app/id6791798886" aria-label="Download on the App Store"><img src="/badges/app-store.svg" alt="Download on the App Store" width="138" height="46"></a>
           <a href="https://play.google.com/store/apps/details?id=com.picoapps.picotally" aria-label="Get it on Google Play"><img class="play" src="/badges/google-play.png" alt="Get it on Google Play" width="176" height="68"></a>
         </div>
@@ -529,7 +533,7 @@
             <li>Tax-time report, ready when you are</li>
             <li>Phone and desktop, one account</li>
           </ul>
-          <a href="https://app.picotally.com/?signup=1" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:26px;">Start free</a>
+          <a href="https://app.picotally.com/?signup=1" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:26px;" data-cta="start" data-store-label="short">Start free</a>
         </div>
         <div class="price">
           <div class="price-name">Pro Max</div>
@@ -647,7 +651,7 @@
         it came from a real company. First month free.
       </p>
       <div class="btn-row center">
-        <a href="https://app.picotally.com/?signup=1" class="btn btn-on-dark-primary">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
+        <a href="https://app.picotally.com/?signup=1" class="btn btn-on-dark-primary" data-cta="start">Start free in your browser <span class="btn-arrow">&rarr;</span></a>
       </div>
       <div class="stores" style="justify-content: center; margin-top: 22px;">
         <a href="https://apps.apple.com/us/app/id6791798886" aria-label="Download on the App Store"><img src="/badges/app-store.svg" alt="Download on the App Store" width="138" height="46"></a>
@@ -700,6 +704,86 @@
   ],
   "publisher": { "@type": "Organization", "name": "Pico Apps LLC" }
 }
+</script>
+
+<script>
+(function () {
+  // ── Phone visitors get the store, not the desk ──────────────────────────
+  // Sep 2026 ad test: ~200 phone visits, one signup. The big button opened
+  // the desk web app (card form) on a phone; the store badges sat below,
+  // small. On iOS/Android the "Start free" buttons now go to that phone's
+  // store; the browser stays one tap away in a quiet line under the hero.
+  // ── First-party attribution ───────────────────────────────────────────
+  // utm_* on the landing URL (we set them on our own ad links; a Facebook
+  // click without them still carries fbclid) is kept for 30 days in this
+  // browser and appended to every link into the app and to Google Play's
+  // install referrer. Nothing is sent to any ad network. The app records it
+  // once, at account creation — see privacy.html, "Arrival source".
+  var UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+  var KEY = 'pt_attr';
+  var APP = 'https://app.picotally.com';
+  var IOS_URL = 'https://apps.apple.com/us/app/id6791798886';
+  var PLAY_URL = 'https://play.google.com/store/apps/details?id=com.picoapps.picotally';
+  // App Store Connect → App Analytics → Campaign links → provider token.
+  // Empty until set: Apple ignores ct= without pt=, so we add nothing.
+  var APPLE_PT = '';
+
+  function readAttr() {
+    var q = new URLSearchParams(location.search), a = {}, any = false;
+    UTM.forEach(function (k) { var v = q.get(k); if (v) { a[k] = v.slice(0, 64); any = true; } });
+    if (!any && q.get('fbclid')) { a.utm_source = 'facebook'; a.utm_medium = 'social'; any = true; }
+    if (any) {
+      a.ts = Date.now();
+      try { localStorage.setItem(KEY, JSON.stringify(a)); } catch (e) {}
+      return a;
+    }
+    try {
+      var s = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (s && s.ts && Date.now() - s.ts < 30 * 864e5) return s;
+    } catch (e) {}
+    return null;
+  }
+
+  function withParams(href, params) {
+    var u = new URL(href);
+    Object.keys(params).forEach(function (k) { u.searchParams.set(k, params[k]); });
+    return u.toString();
+  }
+
+  var ua = navigator.userAgent || '';
+  var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var android = !ios && /Android/.test(ua);
+  if (ios || android) {
+    var store = ios ? IOS_URL : PLAY_URL;
+    var name = ios ? 'Get it on the App Store' : 'Get it on Google Play';
+    Array.prototype.forEach.call(document.querySelectorAll('a[data-cta="start"]'), function (a) {
+      var label = a.getAttribute('data-store-label') === 'short' ? 'Get the app' : name;
+      var arrow = a.querySelector('.btn-arrow');
+      a.href = store;
+      a.textContent = label + (arrow ? ' ' : '');
+      if (arrow) a.appendChild(arrow);
+    });
+    var alt = document.getElementById('hero-alt'); if (alt) alt.hidden = false;
+    var badges = document.getElementById('hero-stores'); if (badges) badges.hidden = true;
+  }
+
+  var attr = readAttr();
+  if (attr) {
+    var utm = {};
+    UTM.forEach(function (k) { if (attr[k]) utm[k] = attr[k]; });
+    var referrer = Object.keys(utm).map(function (k) { return k + '=' + encodeURIComponent(utm[k]); }).join('&');
+    Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+      var h = a.getAttribute('href') || '';
+      if (h.indexOf(APP) === 0) {
+        a.href = withParams(h, utm);
+      } else if (h.indexOf(PLAY_URL) === 0) {
+        a.href = withParams(h, { referrer: referrer });
+      } else if (h.indexOf(IOS_URL) === 0 && APPLE_PT && utm.utm_campaign) {
+        a.href = withParams(h, { pt: APPLE_PT, ct: utm.utm_campaign, mt: '8' });
+      }
+    });
+  }
+})();
 </script>
 </body>
 </html>
