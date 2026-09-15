@@ -751,8 +751,12 @@
   }
 
   var ua = navigator.userAgent || '';
-  var ios = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  var android = !ios && /Android/.test(ua);
+  // Android first: it names itself. The iPad heuristic (a "Mac" that has
+  // touch) must never be consulted for an Android UA — device emulators
+  // report a Mac platform with touch points and would land on the wrong
+  // store (caught on the live check, 2026-09-15).
+  var android = /Android/.test(ua);
+  var ios = !android && (/iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
   if (ios || android) {
     var store = ios ? IOS_URL : PLAY_URL;
     var name = ios ? 'Get it on the App Store' : 'Get it on Google Play';
