@@ -49,7 +49,13 @@
     .page-body h2:first-child { margin-top: 0; }
     .page-body ul { padding-left: 22px; margin-bottom: 20px; }
     .page-body li { font-size: 17px; line-height: 1.7; color: var(--text-soft); margin-bottom: 14px; }
-    .page-body li strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 4px; }
+    /* A bullet that OPENS with a bold term gets that term on its own line.
+       Bold used mid-sentence must stay inline — as a blanket `display:block`
+       it shattered any sentence with emphasis in it (caught 2026-09-18 on
+       /partners and in the agreement's sub-clauses, which are generated).
+       privacy/terms/delete-account already use the inline base rule. */
+    .page-body li strong { color: var(--text); font-weight: 600; }
+    .page-body li > strong:first-child { display: block; margin-bottom: 4px; }
 
     .contact-card {
       background: var(--bg-soft);
