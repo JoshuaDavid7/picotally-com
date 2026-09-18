@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your PicoTally referrals</title>
-  <meta name="description" content="A PicoTally referral partner's own numbers: sign-ups through their link, paying customers, and their share.">
+  <title>Referral Partner Agreement &mdash; PicoTally</title>
+  <meta name="description" content="The agreement between Pico Apps LLC (PicoTally) and its referral partners: what is paid, how referrals are counted, and the rules.">
   <link rel="icon" type="image/png" href="/picotally-icon.png">
   <link rel="apple-touch-icon" href="/picotally-icon.png">
   <style>
@@ -274,145 +273,86 @@
 
 <header class="page-hero">
   <div class="container-narrow">
-    <span class="eyebrow">Referral partner</span>
-    <h1 id="pd-title">Your PicoTally referrals</h1>
-    <p class="effective" id="pd-sub">Loading your numbers&hellip;</p>
+    <span class="eyebrow">Referral partners</span>
+    <h1>Referral Partner Agreement</h1>
+    <p class="effective">Version 1.0 &middot; September 18, 2026</p>
   </div>
 </header>
 
 <main class="page-body">
   <div class="container-narrow">
-    <style>
-      .pd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 8px 0 28px; }
-      .pd-stat { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
-      .pd-stat .n { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); line-height: 1.1; }
-      .pd-stat .l { font-size: 13.5px; color: var(--text-mute); margin-top: 6px; }
-      .pd-link { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: var(--bg-soft); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; margin: 12px 0 28px; }
-      .pd-link code { font-size: 16px; font-weight: 600; color: var(--text); }
-      .pd-table { width: 100%; border-collapse: collapse; margin: 6px 0 28px; font-size: 15px; }
-      .pd-table th, .pd-table td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
-      .pd-table th { color: var(--text-mute); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
-      .pd-table td.num, .pd-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
-      .pd-note { color: var(--text-mute); font-size: 14.5px; }
-      #pd-error { display: none; }
-      .pd-accept label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; margin: 10px 0; }
-      .pd-accept-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-      .pd-accept-row input { flex: 1 1 260px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font: inherit; }
-    </style>
-
-    <div id="pd-error">
-      <h2>We couldn't find that link</h2>
-      <p>This page only opens from the private link PicoTally sent you. If yours stopped working, email <a href="mailto:support@picotally.com">support@picotally.com</a> and we'll send a fresh one.</p>
-    </div>
-
-    <div id="pd-body" hidden>
-      <div id="pd-agree-block">
-        <h2>Your agreement</h2>
-        <div id="pd-agree-ok" hidden><p class="pd-note">You accepted the <a href="/partner-agreement" target="_blank" rel="noopener">Referral Partner Agreement</a> version <span id="pd-agree-ver"></span> on <span id="pd-agree-date"></span>.</p></div>
-        <div id="pd-agree-form" hidden>
-          <p class="pd-note"><strong>Before we can pay you, please read and accept the <a href="/partner-agreement" target="_blank" rel="noopener">Referral Partner Agreement</a></strong> (version <span id="pd-agree-req"></span>). It covers what we pay, how referrals are counted, the rules for promoting PicoTally, and taxes. Your referrals are being counted in the meantime.</p>
-          <form id="pd-accept" class="pd-accept">
-            <label><input type="checkbox" id="pd-accept-check" required> I have read the Referral Partner Agreement and I agree to it.</label>
-            <div class="pd-accept-row"><input type="text" id="pd-accept-name" placeholder="Type your full legal name" required minlength="2" maxlength="120" autocomplete="name"><button class="btn btn-primary btn-sm" type="submit" id="pd-accept-btn">Accept</button></div>
-            <span class="pd-note" id="pd-accept-msg"></span>
-          </form>
-        </div>
-        <p class="pd-note" id="pd-w9"></p>
-      </div>
-
-      <h2>Your link</h2>
-      <div class="pd-link"><code id="pd-link"></code><button class="btn btn-secondary btn-sm" id="pd-copy" type="button">Copy</button><span class="pd-note" id="pd-copied"></span></div>
-
-      <h2>Where things stand</h2>
-      <div class="pd-grid">
-        <div class="pd-stat"><div class="n" id="s-signups">0</div><div class="l">signed up through your link</div></div>
-        <div class="pd-stat"><div class="n" id="s-paying">0</div><div class="l">paying customers</div></div>
-        <div class="pd-stat"><div class="n" id="s-earned">$0.00</div><div class="l">your share, earned to date</div></div>
-        <div class="pd-stat"><div class="n" id="s-paid">$0.00</div><div class="l">paid out to you</div></div>
-        <div class="pd-stat"><div class="n" id="s-owed">$0.00</div><div class="l">ready for your next payout</div></div>
-        <div class="pd-stat"><div class="n" id="s-pending">$0.00</div><div class="l">in the 30-day hold</div></div>
-      </div>
-      <p class="pd-note">Your share is <strong id="s-rate">30%</strong> of <span id="s-basis">every payment</span> from a customer who signed up through your link, for as long as they pay<span id="s-costs-wrap" hidden>. Net means the payment minus card processing minus PicoTally's published service cost for that plan: <span id="s-costs"></span></span>. On today's prices that is <strong id="s-example">$2.99 per Pro customer and $5.99 per Pro&nbsp;Max customer, every month</strong>. Each payment sits in a 30-day hold (the refund window) and then becomes ready to pay; payouts go out monthly. Customers still in their free month appear in the first number and start counting once their first real payment lands. Last payout: <span id="s-lastpayout">none yet</span>.</p>
-
-      <h2>By month</h2>
-      <table class="pd-table" id="pd-months"><thead><tr><th>Month</th><th class="num">Your share</th></tr></thead><tbody></tbody></table>
-
-      <p class="pd-note">The program terms are at <a href="/partners">picotally.com/partners</a>. Questions or a payout detail to change: <a href="mailto:support@picotally.com">support@picotally.com</a>.</p>
-    </div>
+<p><em>This is the agreement a referral partner accepts on their partner page. The plain-language program summary is at <a href="/partners">picotally.com/partners</a>.</em></p>
+<h2>1. What this is</h2>
+<p>1.1 PicoTally runs a referral program. You share a link we give you. When a new customer creates a PicoTally account through your link and pays for the PicoTally web plan, we pay you a share of what that customer pays us, as set out in Section 4.</p>
+<p>1.2 <em>This is a referral arrangement, not a job.</em> You are an independent business. Nothing in this agreement makes you our employee, agent, joint venturer or representative. You have no authority to make promises, sign anything, or incur any obligation on PicoTally's behalf, and you must not suggest otherwise.</p>
+<p>1.3 You decide whether, when, where and how much to promote PicoTally. We set no hours, quotas or scripts, provide no equipment, and require no exclusivity. You are free to promote other products and services.</p>
+<h2>2. Who can be a Partner</h2>
+<p>2.1 You must be at least 18 years old, a resident of the United States for tax purposes, and able to enter into contracts. A business may be a Partner; the person accepting on its behalf confirms they have authority to do so.</p>
+<p>2.2 One agreement per person or business. We may decline or remove any Partner at our discretion, including before any referral is made.</p>
+<p>2.3 Employees of PicoTally, and businesses they control, may not be Partners.</p>
+<h2>3. Your link, and how referrals are counted</h2>
+<p>3.1 We give you a unique link in the form <code>picotally.com/r/&lt;code&gt;</code> and a private dashboard link. The dashboard link is yours to protect; anyone with it can see your numbers.</p>
+<p>3.2 A "Referred Customer" is a PicoTally account that meets all of the following:</p>
+<ul>
+<li>(a) it was created (its first setup completed) <strong>after</strong> the visitor arrived through your link;</li>
+<li>(b) your link was the <strong>last</strong> partner link that visitor's browser recorded in the <strong>90 days</strong> before the account was created;</li>
+<li>(c) it did not exist before, under any email address, and is not a re-registration of an existing or former customer;</li>
+<li>(d) it is not you, your business, or any person or business you own, control, are employed by, or share a household with.</li>
+</ul>
+<p>3.3 <em>How the counting actually works.</em> Your link places a small record in the visitor's browser for 90 days. When an account is created in that browser, the account is labelled with your code, once, at its first setup. That label is what earns you a share. Our records of that label are the record of this agreement; your dashboard shows the same numbers we see.</p>
+<p>3.4 <strong>App Store and Google Play subscriptions do not count.</strong> Apple and Google do not tell us which link an app install came from, so a customer who subscribes inside the iPhone or Android app cannot be credited to anyone, even if they used your link first. Your link sends phone visitors to the browser sign-up for exactly this reason.</p>
+<p>3.5 <strong>No manual credit.</strong> We do not credit referrals that our system did not record. <em>If a friend forgot to use your link, we cannot add them afterwards.</em></p>
+<h2>4. What we pay</h2>
+<p>4.1 <strong>The share.</strong> For each Referred Customer, we pay you <strong>30% of every subscription payment PicoTally actually receives</strong> from that customer for the PicoTally web plan, for as long as that customer keeps paying, subject to this agreement.</p>
+<p>4.2 <strong>On money received only.</strong> Your share is computed on amounts we actually receive, <strong>net of refunds, failed payments, chargebacks and reversals.</strong> A free month, a trial, a $0 invoice, or a payment later refunded earns nothing.</p>
+<p>4.3 <strong>Hold, then payable.</strong> Each payment becomes payable to you 30 days after we receive it (the refund window). <em>So a payment received on March 1 becomes payable on March 31.</em></p>
+<p>4.4 <strong>Monthly payout, minimum $25.</strong> Once a month we pay everything that has become payable, provided the total is at least <strong>$25</strong>. Smaller balances roll over. Payment is in US dollars by <strong>Zelle or bank transfer (ACH)</strong> to the account you give us. You are responsible for keeping your payment details current; we are not responsible for payments sent to details you gave us.</p>
+<p>4.5 <strong>Refunds after a payout.</strong> If a payment we already paid you a share of is later refunded, charged back or reversed, we deduct the corresponding share from your next payout(s). We will not ask you to send money back except in cases of fraud (Section 8).</p>
+<p>4.6 <strong>Conditions of payment.</strong> We pay only if, at the time of payout, you (a) have accepted the current version of this agreement, (b) have given us a completed IRS Form W-9 (Section 5), and (c) are not suspended or terminated for cause. Amounts held under (a) or (b) are paid once the condition is met.</p>
+<p>4.7 <strong>If our prices change,</strong> your 30% applies to the new price automatically.</p>
+<p>4.8 <strong>No other compensation.</strong> The share in this Section is the only payment for anything you do under this agreement. There is no payment for time, effort, clicks, sign-ups that do not pay, or expenses.</p>
+<h2>5. Taxes</h2>
+<p>5.1 You are responsible for all taxes on amounts we pay you. We do not withhold taxes unless the law requires it.</p>
+<p>5.2 Before your first payout you must provide a completed IRS Form W-9 (or the form we ask for). If you do not, we may withhold as the law requires or hold payment until we receive it.</p>
+<p>5.3 We will issue any information return (such as Form 1099-NEC) that the law requires for what we pay you, to the name and taxpayer number on your form.</p>
+<h2>6. How you may promote PicoTally</h2>
+<p>6.1 <strong>Say that you are paid.</strong> Wherever you recommend PicoTally — a post, a video, a message, a conversation that leads to a sign-up — make it clear that you receive a share of what customers who use your link pay. One sentence is enough, for example: <em>"I get a share of what PicoTally customers pay if you sign up through my link."</em> This is required by the Federal Trade Commission's endorsement rules, and by us.</p>
+<p>6.2 <strong>Only true things, only our things.</strong> You may describe PicoTally using what is published on picotally.com and in our app-store listings. You may not invent features, prices, guarantees, results, or timelines, and you may not say or imply anything about tax outcomes, tax filing, or accounting advice beyond what our site says.</p>
+<p>6.3 <strong>No app-store reviews.</strong> You must not ask for, reward, or arrange App Store or Google Play ratings or reviews, for yourself or through others. Both stores forbid rewarded reviews and would penalize the app.</p>
+<p>6.4 <strong>No bulk messaging.</strong> You must not send bulk or automated email, text messages, or calls promoting PicoTally, and you must not use purchased lists. <em>Personal, one-to-one messages to people you know are fine.</em></p>
+<p>6.5 <strong>No brand bidding or impersonation.</strong> You must not run paid ads on the names "PicoTally", "Pico Apps", or misspellings of them; register domains or social accounts that could be confused with ours; or present yourself as PicoTally.</p>
+<p>6.6 <strong>No incentives to sign up.</strong> You must not offer customers cash, rebates, or anything of value to use your link.</p>
+<p>6.7 <strong>No spam, no fraud, no deception,</strong> including cookie stuffing, forced clicks, hidden frames, fake accounts, or anything that creates referrals a real person did not choose to make.</p>
+<p>6.8 <strong>Our name and logo.</strong> We give you a limited, non-exclusive, revocable permission to use the PicoTally name and the assets we provide, only to promote PicoTally under this agreement and only as we publish them. We may withdraw it at any time. You gain no rights in our marks.</p>
+<h2>7. Privacy and confidentiality</h2>
+<p>7.1 <strong>You receive no customer data.</strong> Your dashboard shows totals about your referrals and nothing about any individual customer. You must not attempt to identify Referred Customers from your numbers, or ask us to.</p>
+<p>7.2 <strong>Customers' data is theirs.</strong> Nothing in this agreement gives you any access to, or right in, any PicoTally customer's information.</p>
+<p>7.3 Keep your dashboard link and any non-public information we share with you confidential.</p>
+<h2>8. Ending this agreement</h2>
+<p>8.1 <strong>Either of us may end it</strong> for any reason with 30 days' written notice (email counts).</p>
+<p>8.2 <strong>We may end it immediately</strong> if you breach Section 6 or 7, act fraudulently, harm PicoTally's reputation, or if the law requires. In that case <strong>unpaid amounts are forfeited</strong> and, in cases of fraud, we may recover amounts already paid on fraudulent referrals.</p>
+<p>8.3 <strong>After a no-cause termination,</strong> Referred Customers recorded before the termination date keep earning you the share in Section 4 for as long as they pay, on the same terms. No new referrals are credited after that date.</p>
+<p>8.4 <strong>If we end the program</strong> for everyone, we will give 30 days' notice, and Section 8.3 applies to every Partner.</p>
+<h2>9. Changes</h2>
+<p>9.1 We may change this agreement or the share with 30 days' notice by email and on <a href="/partners">picotally.com/partners</a>. <strong>Changes apply to Referred Customers recorded after the change takes effect.</strong> Referred Customers recorded before it keep the share in effect when they were recorded.</p>
+<p>9.2 If you do not accept a change, you may end this agreement under Section 8.1; Section 8.3 applies.</p>
+<h2>10. Disclaimers and limits</h2>
+<p>10.1 <strong>No promises about earnings.</strong> Any example on our site is arithmetic, not a promise. Whether anyone signs up or pays is not within our control or yours.</p>
+<p>10.2 PicoTally may change, suspend or stop any product, price, plan or feature at any time.</p>
+<p>10.3 To the fullest extent the law allows, PicoTally is not liable to you for any indirect, consequential, special or lost-profit damages, and our total liability under this agreement is limited to the amounts payable to you under Section 4 in the 12 months before the claim.</p>
+<p>10.4 You will indemnify PicoTally against claims, losses and costs (including reasonable attorneys' fees) arising from your promotion of PicoTally in breach of this agreement or of the law.</p>
+<h2>11. General</h2>
+<p>11.1 <strong>Governing law and venue.</strong> Texas law governs this agreement. Any dispute will be brought in the state or federal courts located in <strong>Harris County, Texas</strong>, and both of us consent to that venue. Before suing, each of us agrees to try in good faith to resolve the matter by email or a call within 30 days.</p>
+<p>11.2 <strong>Entire agreement.</strong> This document (with the program page at <a href="/partners">picotally.com/partners</a> as it reads on the Effective Date) is the whole agreement about the referral program and replaces any earlier discussion.</p>
+<p>11.3 <strong>Assignment.</strong> You may not assign this agreement. We may assign it to a successor of the PicoTally business.</p>
+<p>11.4 <strong>Notices.</strong> To you: the email you gave us. To us: support@picotally.com.</p>
+<p>11.5 <strong>Severability; waiver.</strong> If a term is unenforceable, the rest stands. Not enforcing a term once is not a waiver.</p>
+<p>11.6 <strong>Independent contractor, restated.</strong> You are responsible for your own taxes, insurance, licenses and business expenses. You are not entitled to employee benefits of any kind.</p>
+<h2>Acceptance</h2>
+<p>By accepting this agreement on the acceptance page, you confirm that you have read it, that you meet Section 2, and that you agree to it. We record your name, the date and time, the version accepted, and the network address used.</p>
+<p><em>Version history: 1.0 — first draft, 2026-09-18.</em></p>
   </div>
 </main>
-
-<script>
-(function () {
-  var SUPABASE_URL = "https://txtgzycaopcmnfamwuam.supabase.co";
-  var ANON_KEY = "sb_publishable_Z4hE3v7xUGIjti_T_ph5iQ_C42UA0_5";
-  function $(id) { return document.getElementById(id); }
-  function money(c) { return "$" + (Number(c || 0) / 100).toFixed(2); }
-  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (ch) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]; }); }
-  function fail() { $("pd-sub").textContent = "This link isn't valid."; $("pd-error").style.display = "block"; }
-  var key = (new URLSearchParams(location.search).get("key") || "").trim().toLowerCase();
-  if (!/^[0-9a-f]{32}$/.test(key)) { fail(); return; }
-  fetch(SUPABASE_URL + "/functions/v1/partner_stats?key=" + encodeURIComponent(key), { headers: { apikey: ANON_KEY } })
-    .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
-    .then(function (d) {
-      $("pd-title").textContent = "Hi " + d.name.split(" ")[0] + ", here are your referrals";
-      $("pd-sub").textContent = "Partner since " + d.since + (d.active ? "" : " · paused");
-      $("pd-link").textContent = d.link.replace(/^https?:\/\//, "");
-      $("pd-copy").addEventListener("click", function () {
-        (navigator.clipboard ? navigator.clipboard.writeText(d.link) : Promise.reject()).then(function () { $("pd-copied").textContent = "Copied."; }, function () { $("pd-copied").textContent = d.link; });
-      });
-      $("s-signups").textContent = d.referred_signups;
-      $("s-paying").textContent = d.paying_customers;
-      $("s-earned").textContent = money(d.earned_cents);
-      $("s-paid").textContent = money(d.paid_cents);
-      $("s-owed").textContent = money(d.owed_cents);
-      $("s-pending").textContent = money(d.pending_cents);
-      $("s-rate").textContent = (Number(d.rate_bps) / 100) + "%";
-      var pc = d.plan_costs || {};
-      var rate = Number(d.rate_bps) / 10000;
-      if (d.basis === "net" && pc.pro && pc.pro_max) {
-        var bps = Number(pc.pro.processing_bps || 0), fixed = Number(pc.pro.processing_fixed_cents || 0);
-        var fee = function (a) { return Math.round(a * bps / 10000) + fixed; };
-        var ex = function (price, cost) { return money(Math.floor(Math.max(0, price - fee(price) - cost) * rate)); };
-        $("s-basis").textContent = "the net of every payment";
-        $("s-costs-wrap").hidden = false;
-        $("s-costs").textContent = money(pc.pro.service_cost_cents) + " a month on Pro, " + money(pc.pro_max.service_cost_cents) + " on Pro Max";
-        $("s-example").textContent = ex(999, Number(pc.pro.service_cost_cents)) + " per Pro customer and " + ex(1999, Number(pc.pro_max.service_cost_cents)) + " per Pro Max customer, every month";
-      } else {
-        $("s-basis").textContent = "every payment";
-        $("s-costs-wrap").hidden = true;
-        $("s-example").textContent = money(Math.floor(999 * rate)) + " per Pro customer and " + money(Math.floor(1999 * rate)) + " per Pro Max customer, every month";
-      }
-      $("s-lastpayout").textContent = d.last_payout_on || "none yet";
-      // Agreement + W-9 + payout conditions
-      var accepted = d.agreement_accepted_version && d.agreement_accepted_version === d.agreement_required_version;
-      $("pd-agree-ok").hidden = !accepted;
-      $("pd-agree-form").hidden = !!accepted;
-      if (accepted) { $("pd-agree-ver").textContent = d.agreement_accepted_version; $("pd-agree-date").textContent = d.agreement_accepted_at || ""; }
-      else { $("pd-agree-req").textContent = d.agreement_required_version || ""; }
-      var minTxt = "Payouts go out monthly once your balance is at least " + money(d.payout_min_cents || 2500) + "; smaller balances roll over.";
-      var dedTxt = Number(d.deductions_pending_cents || 0) > 0 ? " A refund or chargeback on a payment we already paid you for means " + money(d.deductions_pending_cents) + " will come off your next payout." : "";
-      $("pd-w9").innerHTML = (d.w9_received ? "Your W-9 is on file. " : "<strong>We also need a completed IRS Form W-9 before your first payout.</strong> Email it to <a href=\"mailto:support@picotally.com\">support@picotally.com</a> and we'll confirm here. ") + esc(minTxt) + esc(dedTxt);
-      $("pd-accept").addEventListener("submit", function (ev) {
-        ev.preventDefault();
-        if (!$("pd-accept-check").checked) return;
-        var name = $("pd-accept-name").value.trim();
-        $("pd-accept-btn").disabled = true; $("pd-accept-msg").textContent = "Recording\u2026";
-        fetch(SUPABASE_URL + "/functions/v1/partner_accept", { method: "POST", headers: { apikey: ANON_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ key: key, version: d.agreement_required_version, name: name }) })
-          .then(function (r) { return r.json(); })
-          .then(function (j) {
-            if (j && j.accepted) { $("pd-accept-msg").textContent = "Thank you. Recorded."; setTimeout(function () { location.reload(); }, 800); }
-            else { $("pd-accept-msg").textContent = j && j.reason === "name_required" ? "Please type your full name." : "Could not record the acceptance. Please reload and try again."; $("pd-accept-btn").disabled = false; }
-          })
-          .catch(function () { $("pd-accept-msg").textContent = "Could not reach the server. Please try again."; $("pd-accept-btn").disabled = false; });
-      });
-      var mb = $("pd-months").querySelector("tbody");
-      mb.innerHTML = (d.months && d.months.length) ? d.months.map(function (m) { return "<tr><td>" + esc(m.month) + "</td><td class=\"num\">" + money(m.earned_cents) + "</td></tr>"; }).join("") : "<tr><td colspan=\"2\" class=\"pd-note\">Nothing yet. Your first share appears the month your first customer makes a real payment.</td></tr>";
-      $("pd-body").hidden = false;
-    })
-    .catch(fail);
-})();
-</script>
 
 <footer class="footer">
   <div class="container">
