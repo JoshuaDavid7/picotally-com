@@ -345,7 +345,7 @@
 
   <!-- 1b · PARTNERS — the referral program: who is owed what -->
   <section class="panel" id="ref-panel">
-    <div class="panel-head"><h2>Partners</h2><span class="panel-sub" id="ref-sub">Referral program · 35% of net, for life · 30-day hold</span></div>
+    <div class="panel-head"><h2>Partners</h2><span class="panel-sub" id="ref-sub">Referral program · 30% of every payment, for life · 30-day hold</span></div>
     <div class="ref-wrap" id="ref-body">Loading…</div>
     <details>
       <summary class="sys-summary">Add a partner</summary>
@@ -622,7 +622,7 @@
     rows.forEach(function (p) {
       var owed = Number(p.owed_cents || 0);
       h += '<tr>' +
-        '<td>' + esc(p.name) + (p.active ? '' : ' <span class="muted">(inactive)</span>') + '<br><span class="muted">' + esc(p.code) + ' · ' + (Number(p.rate_bps) / 100) + '% of net · ' + esc(p.payout_method || '—') + '</span></td>' +
+        '<td>' + esc(p.name) + (p.active ? '' : ' <span class="muted">(inactive)</span>') + '<br><span class="muted">' + esc(p.code) + ' · ' + (Number(p.rate_bps) / 100) + '% · ' + esc(p.payout_method || '—') + '</span></td>' +
         '<td><span class="muted">picotally.com/r/' + esc(p.code) + '</span><br><a class="muted" href="' + esc(p.dashboard_link || '#') + '" target="_blank" rel="noopener">their dashboard ↗</a></td>' +
         '<td class="num">' + Number(p.referred_signups || 0) + '</td>' +
         '<td class="num">' + Number(p.paying_customers || 0) + '</td>' +
