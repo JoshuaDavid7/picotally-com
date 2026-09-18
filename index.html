@@ -735,6 +735,7 @@
         <a href="#faq">Questions</a>
         <a href="https://app.picotally.com">Open PicoTally</a>
         <a href="/support">Support</a>
+        <a href="/partners">Partners</a>
         <a href="/privacy">Privacy</a>
         <a href="/terms">Terms</a>
         <a href="https://www.instagram.com/picotally/" rel="me noopener">Instagram</a>
@@ -778,8 +779,16 @@
   // browser and appended to every link into the app and to Google Play's
   // install referrer. Nothing is sent to any ad network. The app records it
   // once, at account creation — see privacy.html, "Arrival source".
+  // ── Referral partners ────────────────────────────────────────────────
+  // picotally.com/r/<code> (rewritten to ?ref=<code> by _redirects) names a
+  // partner who earns a share of what that customer pays. Kept 90 days and
+  // carried into the app like the utm tags. Because the stores cannot
+  // attribute a purchase to a link, a visitor carrying a partner code keeps
+  // the browser signup on the phone too; the store badges stay visible.
   var UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
   var KEY = 'pt_attr';
+  var REF_KEY = 'pt_ref';
+  var REF_RE = /^[a-z0-9][a-z0-9_-]{1,31}$/;
   var APP = 'https://app.picotally.com';
   var IOS_URL = 'https://apps.apple.com/us/app/id6791798886';
   var PLAY_URL = 'https://play.google.com/store/apps/details?id=com.picoapps.picotally';
@@ -803,12 +812,27 @@
     return null;
   }
 
+  function readRef() {
+    var q = new URLSearchParams(location.search);
+    var r = (q.get('ref') || '').trim().toLowerCase();
+    if (REF_RE.test(r)) {
+      try { localStorage.setItem(REF_KEY, JSON.stringify({ code: r, ts: Date.now() })); } catch (e) {}
+      return r;
+    }
+    try {
+      var s = JSON.parse(localStorage.getItem(REF_KEY) || 'null');
+      if (s && s.code && REF_RE.test(s.code) && s.ts && Date.now() - s.ts < 90 * 864e5) return s.code;
+    } catch (e) {}
+    return null;
+  }
+
   function withParams(href, params) {
     var u = new URL(href);
     Object.keys(params).forEach(function (k) { u.searchParams.set(k, params[k]); });
     return u.toString();
   }
 
+  var ref = readRef();
   var ua = navigator.userAgent || '';
   // Android first: it names itself. The iPad heuristic (a "Mac" that has
   // touch) must never be consulted for an Android UA — device emulators
@@ -816,7 +840,7 @@
   // store (caught on the live check, 2026-09-15).
   var android = /Android/.test(ua);
   var ios = !android && (/iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
-  if (ios || android) {
+  if ((ios || android) && !ref) {
     var store = ios ? IOS_URL : PLAY_URL;
     var name = ios ? 'Get it on the App Store' : 'Get it on Google Play';
     Array.prototype.forEach.call(document.querySelectorAll('a[data-cta="start"]'), function (a) {
@@ -831,18 +855,19 @@
   }
 
   var attr = readAttr();
-  if (attr) {
-    var utm = {};
-    UTM.forEach(function (k) { if (attr[k]) utm[k] = attr[k]; });
-    var referrer = Object.keys(utm).map(function (k) { return k + '=' + encodeURIComponent(utm[k]); }).join('&');
+  if (attr || ref) {
+    var params = {};
+    if (attr) UTM.forEach(function (k) { if (attr[k]) params[k] = attr[k]; });
+    if (ref) params.ref = ref;
+    var referrer = Object.keys(params).map(function (k) { return k + '=' + encodeURIComponent(params[k]); }).join('&');
     Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
       var h = a.getAttribute('href') || '';
       if (h.indexOf(APP) === 0) {
-        a.href = withParams(h, utm);
+        a.href = withParams(h, params);
       } else if (h.indexOf(PLAY_URL) === 0) {
         a.href = withParams(h, { referrer: referrer });
-      } else if (h.indexOf(IOS_URL) === 0 && APPLE_PT && utm.utm_campaign) {
-        a.href = withParams(h, { pt: APPLE_PT, ct: utm.utm_campaign, mt: '8' });
+      } else if (h.indexOf(IOS_URL) === 0 && APPLE_PT && params.utm_campaign) {
+        a.href = withParams(h, { pt: APPLE_PT, ct: params.utm_campaign, mt: '8' });
       }
     });
   }

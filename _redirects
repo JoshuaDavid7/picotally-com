@@ -12,3 +12,7 @@
 
 /stripe/return    /stripe-return.html    200
 /stripe/refresh   /stripe-refresh.html   200
+
+# Referral partner links (2026-09-17): picotally.com/r/<code> → the homepage
+# with ?ref=<code>, which the page keeps for 90 days and carries into the app.
+/r/*              /?ref=:splat           302

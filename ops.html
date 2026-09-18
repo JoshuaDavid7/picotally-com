@@ -288,6 +288,17 @@
     .gap-why { min-width: 0; }
     a.gap-link { white-space: normal; }
   }
+
+    /* Partners (referral program) */
+    .ref-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .ref-table th, .ref-table td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+    .ref-table th { color: var(--ink-dim); font-weight: 600; }
+    .ref-table td.num { font-family: var(--mono); text-align: right; }
+    .ref-table .muted { color: var(--ink-faint); }
+    .ref-add-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+    .ref-add-form input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); color: var(--ink); font: inherit; font-size: 13px; }
+    .ref-msg { font-size: 13px; color: var(--ink-dim); }
+    .ref-wrap { overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -330,6 +341,23 @@
   <section class="panel">
     <div class="panel-head"><h2>Financials</h2><span class="panel-sub" id="fin-sub"></span></div>
     <div id="fin-body"></div>
+  </section>
+
+  <!-- 1b · PARTNERS — the referral program: who is owed what -->
+  <section class="panel" id="ref-panel">
+    <div class="panel-head"><h2>Partners</h2><span class="panel-sub" id="ref-sub">Referral program · 30% for life · 30-day hold</span></div>
+    <div class="ref-wrap" id="ref-body">Loading…</div>
+    <details>
+      <summary class="sys-summary">Add a partner</summary>
+      <form class="ref-add-form" id="ref-add-form">
+        <input id="ref-code" placeholder="code, e.g. ricky" required pattern="[a-z0-9][a-z0-9_-]{1,31}" title="lowercase letters, digits, _ or -; 2–32 chars">
+        <input id="ref-name" placeholder="name" required>
+        <input id="ref-contact" placeholder="contact (email / phone)">
+        <input id="ref-method" placeholder="payout: paypal / zelle / venmo">
+        <button class="btn btn-primary" type="submit" id="ref-add-btn">Add</button>
+        <span class="ref-msg" id="ref-add-msg"></span>
+      </form>
+    </details>
   </section>
 
   <!-- 2 · SYSTEMS — one sentence; the machinery expands on demand and
@@ -558,6 +586,7 @@
     $("stamp").textContent = "checked " + ago(d.generated_at);
     renderWarnings(d.config_warnings || []);
     renderFinancials(d);
+    loadReferrals();
     renderSystems(d);
     renderCost(d.cost_confidence || {}, d.cost_overview, d.plans, d.committed_monthly_usd);
     renderTrends(d.history || {});
@@ -572,6 +601,70 @@
    * connection) and say so instead of pretending. Nothing here is typed;
    * every figure names its source.
    */
+  // ── Partners (referral program) ───────────────────────────
+  var REFERRALS = SUPABASE_URL + "/functions/v1/ops_referrals";
+  function refCall(body) {
+    return authedFetch(REFERRALS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+  }
+  function cents(n) { return money(Number(n || 0) / 100); }
+  function loadReferrals() {
+    $("ref-body").textContent = "Loading…";
+    return refCall({ action: "report" }).then(function (j) { renderReferrals(j.partners || []); })
+      .catch(function (e) { $("ref-body").innerHTML = '<span class="ref-msg">Could not load partners: ' + esc(String(e.message || e)) + '</span>'; });
+  }
+  function renderReferrals(rows) {
+    if (!rows.length) { $("ref-body").innerHTML = '<span class="ref-msg">No partners yet. Add one below; their link is picotally.com/r/&lt;code&gt;.</span>'; return; }
+    var h = '<table class="ref-table"><thead><tr><th>Partner</th><th>Link</th><th>Signups</th><th>Paying</th><th>Owed</th><th>Pending (hold)</th><th>Paid YTD</th><th>Paid total</th><th>Last payout</th><th></th></tr></thead><tbody>';
+    rows.forEach(function (p) {
+      var owed = Number(p.owed_cents || 0);
+      h += '<tr>' +
+        '<td>' + esc(p.name) + (p.active ? '' : ' <span class="muted">(inactive)</span>') + '<br><span class="muted">' + esc(p.code) + ' · ' + (Number(p.rate_bps) / 100) + '% · ' + esc(p.payout_method || '—') + '</span></td>' +
+        '<td><span class="muted">picotally.com/r/' + esc(p.code) + '</span></td>' +
+        '<td class="num">' + Number(p.referred_signups || 0) + '</td>' +
+        '<td class="num">' + Number(p.paying_customers || 0) + '</td>' +
+        '<td class="num">' + cents(owed) + '</td>' +
+        '<td class="num">' + cents(p.pending_cents) + '</td>' +
+        '<td class="num">' + cents(p.paid_ytd_cents) + (Number(p.paid_ytd_cents || 0) >= 60000 ? ' <span class="muted" title="1099-NEC needed in January">1099</span>' : '') + '</td>' +
+        '<td class="num">' + cents(p.paid_total_cents) + (Number(p.refund_after_payout_cents || 0) > 0 ? ' <span class="muted" title="refunded after payout">↺' + cents(p.refund_after_payout_cents) + '</span>' : '') + '</td>' +
+        '<td>' + esc(p.last_payout_on || '—') + '</td>' +
+        '<td><button class="btn" data-ref-pay="' + esc(p.code) + '"' + (owed > 0 ? '' : ' disabled') + '>Mark paid</button> ' +
+        '<button class="btn" data-ref-active="' + esc(p.code) + '" data-active="' + (p.active ? '1' : '0') + '">' + (p.active ? 'Pause' : 'Resume') + '</button></td>' +
+        '</tr>';
+    });
+    h += '</tbody></table>';
+    $("ref-body").innerHTML = h;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref-pay]'), function (b) {
+      b.addEventListener("click", function () {
+        var code = b.getAttribute("data-ref-pay");
+        var row = rows.filter(function (p) { return p.code === code; })[0];
+        if (!window.confirm("Record a payout of " + cents(row.owed_cents) + " to " + row.name + " (" + (row.payout_method || "method not set") + ")? Only click after the money has actually been sent.")) return;
+        b.disabled = true;
+        refCall({ action: "mark_paid", code: code, method: row.payout_method || null }).then(loadReferrals)
+          .catch(function (e) { window.alert("Could not mark paid: " + (e.message || e)); b.disabled = false; });
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref-active]'), function (b) {
+      b.addEventListener("click", function () {
+        var code = b.getAttribute("data-ref-active"), active = b.getAttribute("data-active") !== "1";
+        refCall({ action: "set_active", code: code, active: active }).then(loadReferrals)
+          .catch(function (e) { window.alert("Could not update: " + (e.message || e)); });
+      });
+    });
+  }
+  $("ref-add-form").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var code = $("ref-code").value.trim().toLowerCase();
+    $("ref-add-btn").disabled = true; $("ref-add-msg").textContent = "Adding…";
+    refCall({ action: "add_partner", code: code, name: $("ref-name").value.trim(), contact: $("ref-contact").value.trim(), payout_method: $("ref-method").value.trim() })
+      .then(function (j) { $("ref-add-msg").textContent = "Added. Link: " + j.link; $("ref-add-form").reset(); return loadReferrals(); })
+      .catch(function (e) { $("ref-add-msg").textContent = "Could not add: " + (e.message || e); })
+      .then(function () { $("ref-add-btn").disabled = false; });
+  });
+
   function renderFinancials(d) {
     var h = d.history || {};
     var c = d.cost_confidence || {};

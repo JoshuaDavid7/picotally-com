@@ -3,188 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delete Your Data or Account &mdash; PicoTally</title>
-  <meta name="description" content="How to delete individual records or your whole PicoTally account, what is removed, and what is kept.">
+  <title>Referral partners &mdash; PicoTally</title>
+  <meta name="description" content="Send PicoTally a customer and get 30% of every payment they make, for as long as they pay. Program terms.">
   <link rel="icon" type="image/png" href="/picotally-icon.png">
   <link rel="apple-touch-icon" href="/picotally-icon.png">
   <style>
-    /* ---------- Design tokens (match index.html) ---------- */
     :root {
-      --bg: #FFFFFF;
-      --bg-soft: #F7F7F8;
-      --bg-dark: #0F0F11;
-      --text: #0A0A0A;
-      --text-soft: #424246;
-      --text-mute: #71717A;
-      --text-light: #A1A1AA;
-      --border: #E4E4E7;
-      --border-dark: #27272A;
-      --brand: #1565C0;
-      --brand-deep: #0D47A1;
-      --brand-soft: #E8F0FA;
+      --bg: #FFFFFF; --bg-soft: #F7F7F8; --bg-dark: #0F0F11;
+      --text: #0A0A0A; --text-soft: #424246; --text-mute: #71717A; --text-light: #A1A1AA;
+      --border: #E4E4E7; --border-dark: #27272A;
+      --brand: #1565C0; --brand-deep: #0D47A1; --brand-soft: #E8F0FA;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; -webkit-font-smoothing: antialiased; }
     a { color: var(--brand); text-decoration: none; }
     a:hover { text-decoration: underline; }
-
     .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
     .container-narrow { max-width: 740px; margin: 0 auto; padding: 0 24px; }
 
-    /* ---------- Nav ---------- */
-    nav {
-      position: sticky; top: 0; z-index: 50;
-      background: rgba(255,255,255,0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      display: flex; align-items: center; gap: 32px;
-      max-width: 1180px; margin: 0 auto;
-      padding: 12px 24px;
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 16px;
-      font-weight: 700; font-size: 32px; letter-spacing: -0.02em;
-      color: var(--text);
-    }
+    nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; gap: 32px; max-width: 1180px; margin: 0 auto; padding: 12px 24px; }
+    .nav-logo { display: flex; align-items: center; gap: 16px; font-weight: 700; font-size: 32px; letter-spacing: -0.02em; color: var(--text); }
     .nav-logo:hover { text-decoration: none; }
     .nav-logo img { width: 72px; height: 72px; border-radius: 18px; }
-    .nav-links {
-      display: flex; align-items: center; gap: 28px;
-      margin-left: auto;
-    }
-    .nav-links a {
-      color: var(--text-soft); font-size: 15px; font-weight: 500;
-      transition: color 120ms;
-    }
+    .nav-links { display: flex; align-items: center; gap: 28px; margin-left: auto; }
+    .nav-links a { color: var(--text-soft); font-size: 15px; font-weight: 500; transition: color 120ms; }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
 
-    /* ---------- Button ---------- */
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 22px;
-      border-radius: 14px;
-      font-size: 15px; font-weight: 600;
-      text-decoration: none;
-      transition: transform 160ms ease, box-shadow 160ms ease;
-      cursor: pointer; border: none; font-family: inherit;
-      white-space: nowrap;
-    }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 14px; font-size: 15px; font-weight: 600; text-decoration: none; transition: transform 160ms ease, box-shadow 160ms ease; cursor: pointer; border: none; font-family: inherit; white-space: nowrap; }
     .btn-primary { background: var(--text); color: var(--bg); }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,0.18); text-decoration: none; }
     .btn-sm { padding: 10px 18px; font-size: 14px; }
 
-    /* ---------- Page hero ---------- */
-    .page-hero {
-      padding: 72px 0 56px;
-      background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%);
-      border-bottom: 1px solid var(--border);
-    }
-    .page-hero .eyebrow {
-      display: inline-flex; align-items: center;
-      font-size: 13px; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--brand);
-      margin-bottom: 14px;
-    }
-    .page-hero .eyebrow::before {
-      content: ''; display: inline-block;
-      width: 24px; height: 2px;
-      background: var(--brand);
-      margin-right: 10px; border-radius: 2px;
-    }
-    .page-hero h1 {
-      font-size: 44px; font-weight: 700;
-      letter-spacing: -0.025em; line-height: 1.1;
-      color: var(--text);
-      margin-bottom: 12px;
-    }
-    .page-hero .effective {
-      color: var(--text-mute);
-      font-size: 15px;
-    }
+    .page-hero { padding: 72px 0 56px; background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%); border-bottom: 1px solid var(--border); }
+    .page-hero .eyebrow { display: inline-flex; align-items: center; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); margin-bottom: 14px; }
+    .page-hero .eyebrow::before { content: ''; display: inline-block; width: 24px; height: 2px; background: var(--brand); margin-right: 10px; border-radius: 2px; }
+    .page-hero h1 { font-size: 44px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; color: var(--text); margin-bottom: 12px; }
+    .page-hero .effective { color: var(--text-mute); font-size: 17px; }
 
-    /* ---------- Page body ---------- */
     .page-body { padding: 56px 0 80px; }
-    .page-body p {
-      font-size: 17px; line-height: 1.65;
-      color: var(--text-soft);
-      margin-bottom: 18px;
-    }
-    .page-body h2 {
-      font-size: 24px; font-weight: 700;
-      letter-spacing: -0.015em;
-      color: var(--text);
-      margin: 48px 0 16px;
-    }
+    .page-body p { font-size: 17px; line-height: 1.65; color: var(--text-soft); margin-bottom: 18px; }
+    .page-body h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.015em; color: var(--text); margin: 48px 0 16px; }
     .page-body h2:first-child { margin-top: 0; }
-    .page-body h3 {
-      font-size: 18px; font-weight: 600;
-      color: var(--text);
-      margin: 28px 0 12px;
-    }
-    .page-body ul, .page-body ol { padding-left: 22px; margin-bottom: 20px; }
-    .page-body li {
-      font-size: 17px; line-height: 1.65;
-      color: var(--text-soft);
-      margin-bottom: 10px;
-    }
-    .page-body li strong { color: var(--text); font-weight: 600; }
-    .page-body p strong { color: var(--text); font-weight: 600; }
-    .page-body ul ul, .page-body ol ol, .page-body ul ol, .page-body ol ul {
-      margin-top: 8px; margin-bottom: 8px;
-    }
+    .page-body ul { padding-left: 22px; margin-bottom: 20px; }
+    .page-body li { font-size: 17px; line-height: 1.7; color: var(--text-soft); margin-bottom: 14px; }
+    .page-body li strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 4px; }
 
-    /* ---------- Table ---------- */
-    .page-body table {
-      width: 100%;
-      border-collapse: separate; border-spacing: 0;
-      margin: 24px 0 32px;
-      font-size: 15px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-    .page-body th, .page-body td {
-      text-align: left;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-soft);
-      vertical-align: top; line-height: 1.5;
-    }
-    .page-body tr:last-child td { border-bottom: none; }
-    .page-body th {
+    .contact-card {
       background: var(--bg-soft);
-      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin: 28px 0 36px;
+      display: flex; align-items: center; gap: 24px;
+    }
+    .contact-card-icon {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      background: var(--brand);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .contact-card-text { min-width: 0; }
+    .contact-card-label { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-mute); margin-bottom: 4px; }
+    .contact-card a.email {
+      display: inline-block;
+      font-size: 24px; font-weight: 700; letter-spacing: -0.015em;
       color: var(--text);
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      word-break: break-all;
     }
+    .contact-card a.email:hover { color: var(--brand); text-decoration: none; }
+    .contact-card .sla { color: var(--text-mute); font-size: 14px; margin-top: 6px; }
 
-    /* ---------- Footer (match index.html) ---------- */
-    footer {
-      background: var(--bg-dark);
-      color: rgba(255,255,255,0.7);
-      padding: 56px 0 32px;
-      margin-top: 40px;
-    }
-    .footer-row {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr 1fr;
-      gap: 40px;
-      padding-bottom: 32px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
+    footer { background: var(--bg-dark); color: rgba(255,255,255,0.7); padding: 56px 0 32px; margin-top: 40px; }
+    .footer-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .footer-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
     .footer-brand img { width: 24px; height: 24px; border-radius: 6px; }
     .footer-brand-name { font-weight: 700; color: #fff; font-size: 16px; letter-spacing: -0.01em; }
@@ -192,14 +87,8 @@
     .footer-links { display: flex; flex-direction: row; gap: 24px; flex-wrap: wrap; }
     .footer-links a { color: rgba(255,255,255,0.7); font-size: 14px; }
     .footer-links a:hover { color: #fff; text-decoration: none; }
-    .footer-legal {
-      padding-top: 24px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.4);
-      line-height: 1.6;
-    }
+    .footer-legal { padding-top: 24px; font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
 
-    /* ---------- Responsive ---------- */
     @media (max-width: 720px) {
       .nav-logo span { display: inline; }
       .nav-logo img { width: 52px; height: 52px; border-radius: 13px; }
@@ -211,12 +100,11 @@
       .page-body { padding: 36px 0 56px; }
       .page-body p, .page-body li { font-size: 16px; }
       .page-body h2 { font-size: 21px; margin-top: 36px; }
-      .page-body table { font-size: 14px; }
-      .page-body th, .page-body td { padding: 10px 12px; }
+      .contact-card { flex-direction: column; align-items: flex-start; gap: 16px; padding: 24px; }
+      .contact-card a.email { font-size: 19px; }
       .footer-row { grid-template-columns: 1fr; gap: 24px; }
     }
 
-    /* ---------- Early-access modal ---------- */
     .ea-modal { position: fixed; top: 50%; left: 50%; margin: 0; transform: translate(-50%, -50%); border: none; padding: 0; max-width: 480px; width: min(480px, calc(100vw - 32px)); border-radius: 24px; box-shadow: 0 30px 80px -10px rgba(0,0,0,0.35), 0 8px 32px -8px rgba(0,0,0,0.18); background: var(--bg); color: var(--text); }
     .ea-modal::backdrop { background: rgba(10, 10, 10, 0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .ea-modal[open] { animation: ea-pop 200ms cubic-bezier(0.2, 0.9, 0.3, 1.2); }
@@ -385,132 +273,44 @@
 
 <header class="page-hero">
   <div class="container-narrow">
-    <div class="eyebrow">Legal</div>
-    <h1>Delete your data or account</h1>
-    <p class="effective">Last updated September 7, 2026</p>
+    <span class="eyebrow">Referral partners</span>
+    <h1>Send us a customer. Get paid for as long as they do.</h1>
+    <p class="effective">Program terms, effective September 17, 2026</p>
   </div>
 </header>
 
 <main class="page-body">
   <div class="container-narrow">
 
-<p><strong>PicoTally</strong> is published by <strong>Pico Apps LLC</strong>. This page
-explains how to delete individual records, how to delete your whole account,
-what is removed, and what is kept.</p>
+<h2>The deal</h2>
+<p>You get a link that looks like <strong>picotally.com/r/yourname</strong>. Anyone who signs up through it and pays for the PicoTally web plan earns you <strong>30% of every payment we receive from them, for as long as they keep paying.</strong> Not for a year. For as long as they are a customer.</p>
+<p>On the $9.99 Pro plan that is about $3 a month per customer; on the $19.99 Pro&nbsp;Max plan about $6. Ten customers who stay is $30 to $60 a month, every month.</p>
 
-<p>Deleting your account is <strong>permanent and cannot be undone</strong>. Your
-invoices, quotes, expenses and customer records are your business records &mdash;
-export or save anything you may need before you start.</p>
-
-<h2>1. Delete individual records, and keep your account</h2>
-
-<p>You do not have to delete your account to remove data. Anything you have
-entered can be deleted individually from inside the app, at any time, and the
-deletion syncs to our servers:</p>
-
+<h2>How it works</h2>
 <ul>
-  <li><strong>Invoices and quotes</strong> &mdash; open the job, then <strong>&hellip; &rarr; Delete</strong></li>
-  <li><strong>Customers</strong> &mdash; open the customer, then <strong>Delete</strong>. Their name, email, phone and address go with them.</li>
-  <li><strong>Expenses and receipt images</strong> &mdash; open the expense, then <strong>Delete</strong></li>
-  <li><strong>Projects, job notes and voice memos</strong> &mdash; delete from the job they belong to</li>
+  <li>Share your link anywhere you like: a text, a Facebook group, a video description, a business card.</li>
+  <li>The link remembers you for 90 days in that person's browser, so they can sign up later and it still counts.</li>
+  <li>The customer's first month is free. Your share starts with their first real payment.</li>
+  <li>We pay you monthly, by PayPal, Zelle or Venmo, after a 30-day hold on each payment (that is how long a customer can ask for a refund).</li>
 </ul>
 
-<p>Deleting a record removes it from your device and from our database. It is not
-recoverable, so export anything you may need first.</p>
-
-<p>If you would rather we removed specific data for you, email
-<a href="mailto:support@picotally.com?subject=Delete%20specific%20data">support@picotally.com</a>
-from the address on your account and tell us what to remove. We action these
-within <strong>30 days</strong>, usually within a few business days.</p>
-
-<h2>2. Delete your account from inside the app</h2>
-
-<p>This is the fastest route and completes in seconds. It works the same way in the phone apps and in the web app at app.picotally.com.</p>
-
-<ol>
-  <li>Open <strong>PicoTally</strong> and sign in.</li>
-  <li>Go to <strong>Settings &rarr; Account</strong>.</li>
-  <li>Tap <strong>Delete Account</strong>.</li>
-  <li>Confirm when prompted.</li>
-</ol>
-
-<p>Use this route rather than simply uninstalling the app. Uninstalling removes
-the app but, on iOS, leaves keychain entries behind until the device is wiped.
-The in-app flow clears them.</p>
-
-<h2>3. Delete your account without the app</h2>
-
-<p>If you have already uninstalled PicoTally, or cannot sign in, email us and we
-will delete the account for you.</p>
-
-<ol>
-  <li>Email <a href="mailto:support@picotally.com?subject=Delete%20my%20account"><strong>support@picotally.com</strong></a>
-      from the email address on the account.</li>
-  <li>Use the subject line <strong>&ldquo;Delete my account&rdquo;</strong>.</li>
-  <li>We reply to confirm the request came from you, then delete the account.</li>
-</ol>
-
-<p>Requests are actioned within <strong>30 days</strong>, and usually within a few
-business days. We ask that the request come from the account&rsquo;s own email
-address so that nobody else can delete your records.</p>
-
-<h2>4. What is deleted with your account</h2>
-
-<p>Everything tied to your user ID is removed from our database:</p>
-
+<h2>The rules</h2>
 <ul>
-  <li>Invoices, quotes, and the documents generated from them</li>
-  <li>Expenses and receipt images</li>
-  <li>Customers and their names, emails, phone numbers and addresses</li>
-  <li>Jobs, project notes, and voice memos</li>
-  <li>Uploaded logos and photos</li>
-  <li>Your business profile, settings and document templates</li>
-  <li>Your subscription and payment status records</li>
-  <li>Your authentication record &mdash; the account itself</li>
+  <li><strong>Web plan only.</strong> Apple and Google do not tell us which link an app-store subscriber came from, so only sign-ups through the browser can be credited. Your link sends phone visitors to the browser sign-up for that reason.</li>
+  <li><strong>On money we actually receive,</strong> net of refunds and failed payments.</li>
+  <li><strong>No self-referrals.</strong> Your own account, your own business, or accounts you control do not count.</li>
+  <li><strong>Say that you get paid.</strong> Wherever you recommend PicoTally, make the relationship clear. One line does it: &ldquo;I get a share of what PicoTally customers pay if you sign up through my link.&rdquo; That is the law (the FTC's endorsement rules), and it is also just honest.</li>
+  <li><strong>Never ask for App Store or Google Play reviews.</strong> Apple and Google forbid rewarded reviews and would penalize the app, not you. Recommend us anywhere else you like.</li>
+  <li><strong>Be truthful.</strong> Only claim what the app actually does. If you are not sure, ask us.</li>
+  <li><strong>Rate changes apply to future referrals only.</strong> We may change the share for new referrals with 30 days' notice. Customers you already referred keep earning you the share you signed up under, for as long as they pay.</li>
+  <li><strong>Taxes.</strong> Partners must be US residents. If we pay you $600 or more in a calendar year, we will send you a 1099 form and will ask for the details it needs.</li>
+  <li>We can end the program with 30 days' notice; referrals already earning keep earning. We can remove a partner who breaks these rules.</li>
 </ul>
 
-<p>The same flow also clears your device: the encrypted local database is wiped,
-its encryption key is removed from the iOS Keychain / Android Keystore, and any
-saved sign-in credentials are cleared.</p>
+<h2>How to join</h2>
+<p>Email <a href="mailto:support@picotally.com">support@picotally.com</a> with your name, where you would share the link, and how you would like to be paid. You will get your link the same day.</p>
 
-<h2>5. What is kept, and for how long</h2>
-
-<table>
-  <tr><th>What</th><th>Why</th><th>How long</th></tr>
-  <tr>
-    <td>Encrypted database backups</td>
-    <td>Infrastructure recovery only. We do not access backups except to recover from a failure.</td>
-    <td><strong>Up to 7 days</strong>, then rotated out and unrecoverable</td>
-  </tr>
-  <tr>
-    <td>Payment webhook audit logs</td>
-    <td>Fraud detection and financial record-keeping. These hold transaction metadata only &mdash; amount, currency, status. <strong>No card numbers and no personal account information.</strong></td>
-    <td>Retained as business records</td>
-  </tr>
-</table>
-
-<p>Nothing else is retained. We do not keep a shadow copy of your business data,
-and we do not sell or transfer your data to advertisers or data brokers.</p>
-
-<h2>6. Cancel your subscription separately</h2>
-
-<p><strong>Deleting your account does not cancel an active subscription.</strong>
-Subscriptions are billed by whichever store or processor you signed up through,
-and only that provider can cancel them. Cancel before deleting your account:</p>
-
-<ul>
-  <li><strong>Google Play</strong> &mdash; Play Store &rarr; profile &rarr; Payments and subscriptions &rarr; Subscriptions</li>
-  <li><strong>Apple</strong> &mdash; Settings &rarr; [your name] &rarr; Subscriptions on your iPhone or iPad</li>
-  <li><strong>Card payment on the web</strong> &mdash; in PicoTally, Settings &rarr; Account &rarr; Manage Subscription opens your Stripe billing portal, where you can cancel. If you cannot sign in, email <a href="mailto:support@picotally.com">support@picotally.com</a> and we will send you a billing portal link</li>
-</ul>
-
-<h2>7. Questions</h2>
-
-<p>If anything here is unclear, or you want to check what data we hold before
-deciding, email <a href="mailto:support@picotally.com">support@picotally.com</a>.</p>
-
-<p>See also our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms of Service</a>.</p>
-
+<p><a href="/">&larr; Back to PicoTally</a></p>
   </div>
 </main>
 
@@ -543,7 +343,6 @@ deciding, email <a href="mailto:support@picotally.com">support@picotally.com</a>
   </div>
 </footer>
 
-<!-- Early-access modal -->
 
 </body>
 </html>
