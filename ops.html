@@ -618,16 +618,19 @@
   }
   function renderReferrals(rows) {
     if (!rows.length) { $("ref-body").innerHTML = '<span class="ref-msg">No partners yet. Add one below; their link is picotally.com/r/&lt;code&gt;.</span>'; return; }
-    var h = '<table class="ref-table"><thead><tr><th>Partner</th><th>Link</th><th>Signups</th><th>Paying</th><th>Owed</th><th>Pending (hold)</th><th>Paid YTD</th><th>Paid total</th><th>Last payout</th><th></th></tr></thead><tbody>';
+    var h = '<table class="ref-table"><thead><tr><th>Partner</th><th>Link</th><th>Agreement</th><th>W-9</th><th>Signups</th><th>Paying</th><th>Owed</th><th>Pending (hold)</th><th>Deductions</th><th>Paid YTD</th><th>Paid total</th><th>Last payout</th><th></th></tr></thead><tbody>';
     rows.forEach(function (p) {
       var owed = Number(p.owed_cents || 0);
       h += '<tr>' +
         '<td>' + esc(p.name) + (p.active ? '' : ' <span class="muted">(inactive)</span>') + '<br><span class="muted">' + esc(p.code) + ' · ' + (Number(p.rate_bps) / 100) + '% · ' + esc(p.payout_method || '—') + '</span></td>' +
         '<td><span class="muted">picotally.com/r/' + esc(p.code) + '</span><br><a class="muted" href="' + esc(p.dashboard_link || '#') + '" target="_blank" rel="noopener">their dashboard ↗</a></td>' +
+        '<td>' + (p.agreement_accepted_version === p.agreement_required_version ? 'v' + esc(p.agreement_accepted_version) + '<br><span class="muted">' + esc(p.agreement_accepted_at || '') + '</span>' : '<span class="muted">not accepted (v' + esc(p.agreement_required_version || '?') + ' needed)</span>') + '</td>' +
+        '<td>' + (p.w9_received_on ? esc(p.w9_received_on) : '<span class="muted">missing</span>') + '<br><button class="btn" data-ref-w9="' + esc(p.code) + '" data-has="' + (p.w9_received_on ? '1' : '0') + '">' + (p.w9_received_on ? 'Clear' : 'Received today') + '</button></td>' +
         '<td class="num">' + Number(p.referred_signups || 0) + '</td>' +
         '<td class="num">' + Number(p.paying_customers || 0) + '</td>' +
         '<td class="num">' + cents(owed) + '</td>' +
         '<td class="num">' + cents(p.pending_cents) + '</td>' +
+        '<td class="num">' + (Number(p.deductions_pending_cents || 0) > 0 ? '−' + cents(p.deductions_pending_cents) : '—') + '</td>' +
         '<td class="num">' + cents(p.paid_ytd_cents) + (Number(p.paid_ytd_cents || 0) >= 60000 ? ' <span class="muted" title="1099-NEC needed in January">1099</span>' : '') + '</td>' +
         '<td class="num">' + cents(p.paid_total_cents) + (Number(p.refund_after_payout_cents || 0) > 0 ? ' <span class="muted" title="refunded after payout">↺' + cents(p.refund_after_payout_cents) + '</span>' : '') + '</td>' +
         '<td>' + esc(p.last_payout_on || '—') + '</td>' +
@@ -643,8 +646,26 @@
         var row = rows.filter(function (p) { return p.code === code; })[0];
         if (!window.confirm("Record a payout of " + cents(row.owed_cents) + " to " + row.name + " (" + (row.payout_method || "method not set") + ")? Only click after the money has actually been sent.")) return;
         b.disabled = true;
-        refCall({ action: "mark_paid", code: code, method: row.payout_method || null }).then(loadReferrals)
+        refCall({ action: "mark_paid", code: code, method: row.payout_method || null })
+          .then(function (j) {
+            if (j && j.paid === false) {
+              var why = { agreement_not_accepted: "the partner has not accepted the current agreement", w9_missing: "no W-9 on file", partner_inactive: "the partner is paused", below_minimum: "below the minimum payout (owed " + cents(j.owed_cents) + " minus deductions " + cents(j.deductions_cents) + " < " + cents(j.minimum_cents) + ")", nothing_owed: "nothing is owed" }[j.reason] || j.reason;
+              window.alert("Not paid: " + why + ".");
+            } else if (j && j.paid) {
+              window.alert("Recorded a payout of " + cents(j.total_cents) + (Number(j.deductions_cents || 0) > 0 ? " (after " + cents(j.deductions_cents) + " in deductions)" : "") + ".");
+            }
+            return loadReferrals();
+          })
           .catch(function (e) { window.alert("Could not mark paid: " + (e.message || e)); b.disabled = false; });
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref-w9]'), function (b) {
+      b.addEventListener("click", function () {
+        var code = b.getAttribute("data-ref-w9"), has = b.getAttribute("data-has") === "1";
+        if (!has && !window.confirm("Record that " + code + "'s W-9 is on file (kept outside this system)?")) return;
+        var on = has ? null : new Date().toISOString().slice(0, 10);
+        refCall({ action: "set_w9", code: code, on: on }).then(loadReferrals)
+          .catch(function (e) { window.alert("Could not update: " + (e.message || e)); });
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ref-active]'), function (b) {
