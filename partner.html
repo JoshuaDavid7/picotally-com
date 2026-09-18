@@ -315,14 +315,14 @@
         <div class="pd-stat"><div class="n" id="s-owed">$0.00</div><div class="l">ready for your next payout</div></div>
         <div class="pd-stat"><div class="n" id="s-pending">$0.00</div><div class="l">in the 30-day hold</div></div>
       </div>
-      <p class="pd-note">Your share is <strong id="s-rate">30%</strong> of every payment we receive from a customer who signed up through your link, for as long as they pay. Each payment sits in a 30-day hold (the refund window) and then becomes ready to pay; payouts go out monthly. Customers who signed up but are still in their free month appear in the first number and start counting once their first real payment lands. Last payout: <span id="s-lastpayout">none yet</span>.</p>
+      <p class="pd-note">Your share is <strong id="s-rate">35%</strong> of the net of every payment from a customer who signed up through your link, for as long as they pay. Net means the payment minus card processing (2.9% + 30&cent;) minus PicoTally's published service cost for that plan: <span id="s-costs">$1.50 a month on Pro, $4.00 on Pro&nbsp;Max</span>. On today's prices that is about <strong id="s-example">$2.76 per Pro customer and $5.28 per Pro&nbsp;Max customer, every month</strong>. The service-cost line is the same for every customer on a plan; it moves only when our own costs move, with 30 days' notice. Each payment sits in a 30-day hold (the refund window) and then becomes ready to pay; payouts go out monthly. Customers still in their free month appear in the first number and start counting once their first real payment lands. Last payout: <span id="s-lastpayout">none yet</span>. Plan split: <span id="s-split">&mdash;</span>.</p>
 
       <h2>By month</h2>
       <table class="pd-table" id="pd-months"><thead><tr><th>Month</th><th class="num">Your share</th></tr></thead><tbody></tbody></table>
 
       <h2>Your customers</h2>
       <p class="pd-note">Numbered, never named: what each of your customers has paid PicoTally, and your share of it.</p>
-      <table class="pd-table" id="pd-customers"><thead><tr><th>Customer</th><th>First payment</th><th class="num">Payments</th><th class="num">Paid to date</th><th class="num">Your share</th></tr></thead><tbody></tbody></table>
+      <table class="pd-table" id="pd-customers"><thead><tr><th>Customer</th><th>Plan</th><th>First payment</th><th class="num">Payments</th><th class="num">Paid to date</th><th class="num">Net</th><th class="num">Your share</th></tr></thead><tbody></tbody></table>
 
       <p class="pd-note">The program terms are at <a href="/partners">picotally.com/partners</a>. Questions or a payout detail to change: <a href="mailto:support@picotally.com">support@picotally.com</a>.</p>
     </div>
@@ -355,11 +355,22 @@
       $("s-owed").textContent = money(d.owed_cents);
       $("s-pending").textContent = money(d.pending_cents);
       $("s-rate").textContent = (Number(d.rate_bps) / 100) + "%";
+      var pc = d.plan_costs || {};
+      if (pc.pro && pc.pro_max) {
+        var bps = Number(pc.pro.processing_bps || 290), fixed = Number(pc.pro.processing_fixed_cents || 30), rate = Number(d.rate_bps) / 10000;
+        var fee = function (a) { return Math.round(a * bps / 10000) + fixed; };
+        var ex = function (price, cost) { return money(Math.floor(Math.max(0, price - fee(price) - cost) * rate)); };
+        $("s-costs").textContent = money(pc.pro.service_cost_cents) + " a month on Pro, " + money(pc.pro_max.service_cost_cents) + " on Pro Max";
+        $("s-example").textContent = ex(999, Number(pc.pro.service_cost_cents)) + " per Pro customer and " + ex(1999, Number(pc.pro_max.service_cost_cents)) + " per Pro Max customer, every month";
+      }
+      var split = d.plan_split || {};
+      $("s-split").textContent = (Number(split.pro || 0)) + " on Pro, " + (Number(split.pro_max || 0)) + " on Pro Max";
       $("s-lastpayout").textContent = d.last_payout_on || "none yet";
       var mb = $("pd-months").querySelector("tbody");
       mb.innerHTML = (d.months && d.months.length) ? d.months.map(function (m) { return "<tr><td>" + esc(m.month) + "</td><td class=\"num\">" + money(m.earned_cents) + "</td></tr>"; }).join("") : "<tr><td colspan=\"2\" class=\"pd-note\">Nothing yet. Your first share appears the month your first customer makes a real payment.</td></tr>";
       var cb = $("pd-customers").querySelector("tbody");
-      cb.innerHTML = (d.customers && d.customers.length) ? d.customers.map(function (c) { return "<tr><td>Customer " + c.n + "</td><td>" + esc(c.first_payment) + "</td><td class=\"num\">" + c.payments + "</td><td class=\"num\">" + money(c.paid_cents) + "</td><td class=\"num\">" + money(c.your_share_cents) + "</td></tr>"; }).join("") : "<tr><td colspan=\"5\" class=\"pd-note\">No paying customers yet.</td></tr>";
+      var planName = function (p) { return p === "pro_max" ? "Pro Max" : p === "pro" ? "Pro" : "\u2014"; };
+      cb.innerHTML = (d.customers && d.customers.length) ? d.customers.map(function (c) { return "<tr><td>Customer " + c.n + "</td><td>" + planName(c.plan) + "</td><td>" + esc(c.first_payment) + "</td><td class=\"num\">" + c.payments + "</td><td class=\"num\">" + money(c.paid_cents) + "</td><td class=\"num\">" + money(c.net_cents) + "</td><td class=\"num\">" + money(c.your_share_cents) + "</td></tr>"; }).join("") : "<tr><td colspan=\"7\" class=\"pd-note\">No paying customers yet.</td></tr>";
       $("pd-body").hidden = false;
     })
     .catch(fail);
