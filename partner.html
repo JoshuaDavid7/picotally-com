@@ -401,7 +401,7 @@
       else { $("pd-agree-req").textContent = d.agreement_required_version || ""; }
       var minTxt = "Payouts go out monthly once your balance is at least " + money(d.payout_min_cents || 2500) + "; smaller balances roll over.";
       var dedTxt = Number(d.deductions_pending_cents || 0) > 0 ? " A refund or chargeback on a payment we already paid you for means " + money(d.deductions_pending_cents) + " will come off your next payout." : "";
-      $("pd-w9").innerHTML = (d.w9_received ? "Your W-9 is on file. " : "<strong>We also need a completed IRS Form W-9 before your first payout.</strong> Email it to <a href=\"mailto:support@picotally.com\">support@picotally.com</a> and we'll confirm here. ") + esc(minTxt) + esc(dedTxt);
+      $("pd-w9").innerHTML = (d.w9_received ? "Your W-9 is on file. " : "<strong>We also need a completed IRS Form W-9 before your first payout.</strong> We will send you a secure request for it from our tax-filing service, which holds it for us. Please do not email the form, or your taxpayer number, to anyone here. If you would rather not use a Social Security number, a free EIN from the IRS works just as well. ") + esc(minTxt) + esc(dedTxt);
       $("pd-accept").addEventListener("submit", function (ev) {
         ev.preventDefault();
         if (!$("pd-accept-check").checked) return;
