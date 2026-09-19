@@ -299,6 +299,9 @@
     .ref-add-form input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); color: var(--ink); font: inherit; font-size: 13px; }
     .ref-msg { font-size: 13px; color: var(--ink-dim); }
     .ref-wrap { overflow-x: auto; }
+    .ref-detail td { background: var(--panel-2); padding: 10px 12px; }
+    .ref-det-body { overflow-x: auto; }
+    .ref-det-body table { margin: 0; }
 </style>
 </head>
 <body>
@@ -616,6 +619,72 @@
     return refCall({ action: "report" }).then(function (j) { renderReferrals(j.partners || []); })
       .catch(function (e) { $("ref-body").innerHTML = '<span class="ref-msg">Could not load partners: ' + esc(String(e.message || e)) + '</span>'; });
   }
+  function detailRow(code) { return document.querySelector('[data-det="' + code + '"]'); }
+  function showDetail(code, html) {
+    var tr = detailRow(code); if (!tr) return;
+    tr.hidden = false; tr.querySelector('.ref-det-body').innerHTML = html;
+  }
+  /** Who came from this partner — including the ones who never paid. */
+  function loadCustomers(code) {
+    showDetail(code, 'Loading…');
+    return refCall({ action: "customers", code: code }).then(function (j) {
+      var rows = j.customers || [];
+      if (!rows.length) { showDetail(code, '<span class="ref-msg">Nobody has signed up through this link yet.</span>'); return; }
+      var h = '<table class="ref-table"><thead><tr><th>Business</th><th>Email</th><th>Signed up</th><th>Plan</th><th class="num">Payments</th><th class="num">They paid</th><th class="num">Your share</th><th>Last payment</th></tr></thead><tbody>';
+      rows.forEach(function (c) {
+        h += '<tr><td>' + esc(c.business) + '</td>' +
+          '<td class="muted">' + esc(c.email || '—') + '</td>' +
+          '<td>' + esc(c.signed_up || '—') + '</td>' +
+          '<td>' + esc(c.plan) + (c.paying ? '' : ' <span class="muted">(not paying)</span>') + '</td>' +
+          '<td class="num">' + Number(c.payments || 0) + '</td>' +
+          '<td class="num">' + cents(c.they_paid_cents) + '</td>' +
+          '<td class="num">' + cents(c.your_share_cents) + '</td>' +
+          '<td>' + esc(c.last_payment || '—') + '</td></tr>';
+      });
+      showDetail(code, h + '</tbody></table>');
+    }).catch(function (e) { showDetail(code, '<span class="ref-msg">Could not load: ' + esc(String(e.message || e)) + '</span>'); });
+  }
+  /** Every payout ever recorded, voided ones included, with what it covered. */
+  function loadPayouts(code) {
+    showDetail(code, 'Loading…');
+    return refCall({ action: "payouts", code: code }).then(function (j) {
+      var rows = j.payouts || [];
+      if (!rows.length) { showDetail(code, '<span class="ref-msg">No payouts recorded yet.</span>'); return; }
+      var h = '<table class="ref-table"><thead><tr><th>Paid on</th><th class="num">Amount</th><th>Method</th><th>Covers</th><th>Note</th><th></th></tr></thead><tbody>';
+      rows.forEach(function (o) {
+        h += '<tr>' +
+          '<td>' + esc(o.paid_on) + (o.voided ? ' <span class="muted">· VOIDED ' + esc(o.voided_on || '') + '</span>' : '') + '</td>' +
+          '<td class="num">' + cents(o.total_cents) + (Number(o.deducted_cents || 0) > 0 ? ' <span class="muted">(after −' + cents(o.deducted_cents) + ')</span>' : '') + '</td>' +
+          '<td>' + esc(o.method) + '</td>' +
+          '<td class="muted">' + Number(o.commissions || 0) + ' payment(s)' + (o.covers_from ? ', ' + esc(o.covers_from) + ' → ' + esc(o.covers_to) : '') + '</td>' +
+          '<td class="muted">' + esc(o.voided ? ('Voided: ' + o.void_reason) : (o.note || '')) + '</td>' +
+          '<td>' + (o.voided ? '' : '<button class="btn" data-ref-void="' + esc(o.id) + '" data-code="' + esc(code) + '" data-amt="' + Number(o.total_cents) + '">Void</button>') + '</td>' +
+          '</tr>';
+      });
+      showDetail(code, h + '</tbody></table>');
+      wireVoid();
+    }).catch(function (e) { showDetail(code, '<span class="ref-msg">Could not load: ' + esc(String(e.message || e)) + '</span>'); });
+  }
+  /** Reversing a mis-click. The row is kept with the reason; money returns to owed. */
+  function wireVoid() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref-void]'), function (b) {
+      if (b.getAttribute('data-wired')) return;
+      b.setAttribute('data-wired', '1');
+      b.addEventListener("click", function () {
+        var id = b.getAttribute('data-ref-void'), code = b.getAttribute('data-code');
+        var reason = window.prompt('Void this payout of ' + cents(b.getAttribute('data-amt')) + '?\n\nThe record is kept with your reason, and the money goes back to owed. Use this if you recorded a payment you did not actually send.\n\nReason:');
+        if (!reason || !reason.trim()) return;
+        b.disabled = true;
+        refCall({ action: "void_payout", payout_id: id, reason: reason.trim() })
+          .then(function (j) {
+            if (j && j.voided === false) { window.alert('Not voided: ' + (j.reason || 'unknown')); b.disabled = false; return; }
+            window.alert('Voided. ' + Number(j.commissions_released || 0) + ' payment(s) went back to owed.');
+            return loadReferrals().then(function () { return loadPayouts(code); });
+          })
+          .catch(function (e) { window.alert('Could not void: ' + (e.message || e)); b.disabled = false; });
+      });
+    });
+  }
   function renderReferrals(rows) {
     if (!rows.length) { $("ref-body").innerHTML = '<span class="ref-msg">No partners yet. Add one below; their link is picotally.com/r/&lt;code&gt;.</span>'; return; }
     var h = '<table class="ref-table"><thead><tr><th>Partner</th><th>Link</th><th>Agreement</th><th>W-9</th><th>Signups</th><th>Paying</th><th>Owed</th><th>Pending (hold)</th><th>Deductions</th><th>Paid YTD</th><th>Paid total</th><th>Last payout</th><th></th></tr></thead><tbody>';
@@ -635,8 +704,11 @@
         '<td class="num">' + cents(p.paid_total_cents) + (Number(p.refund_after_payout_cents || 0) > 0 ? ' <span class="muted" title="refunded after payout">↺' + cents(p.refund_after_payout_cents) + '</span>' : '') + '</td>' +
         '<td>' + esc(p.last_payout_on || '—') + '</td>' +
         '<td><button class="btn" data-ref-pay="' + esc(p.code) + '"' + (owed > 0 ? '' : ' disabled') + '>Mark paid</button> ' +
+        '<button class="btn" data-ref-cust="' + esc(p.code) + '">Customers</button> ' +
+        '<button class="btn" data-ref-pays="' + esc(p.code) + '">Payouts</button> ' +
         '<button class="btn" data-ref-active="' + esc(p.code) + '" data-active="' + (p.active ? '1' : '0') + '">' + (p.active ? 'Pause' : 'Resume') + '</button></td>' +
-        '</tr>';
+        '</tr>' +
+        '<tr class="ref-detail" data-det="' + esc(p.code) + '" hidden><td colspan="13"><div class="ref-det-body">Loading…</div></td></tr>';
     });
     h += '</tbody></table>';
     $("ref-body").innerHTML = h;
@@ -657,6 +729,20 @@
             return loadReferrals();
           })
           .catch(function (e) { window.alert("Could not mark paid: " + (e.message || e)); b.disabled = false; });
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref-cust]'), function (b) {
+      b.addEventListener("click", function () {
+        var code = b.getAttribute("data-ref-cust"), tr = detailRow(code);
+        if (!tr.hidden && tr.getAttribute('data-showing') === 'cust') { tr.hidden = true; return; }
+        tr.setAttribute('data-showing', 'cust'); loadCustomers(code);
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ref-pays]'), function (b) {
+      b.addEventListener("click", function () {
+        var code = b.getAttribute("data-ref-pays"), tr = detailRow(code);
+        if (!tr.hidden && tr.getAttribute('data-showing') === 'pays') { tr.hidden = true; return; }
+        tr.setAttribute('data-showing', 'pays'); loadPayouts(code);
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-ref-w9]'), function (b) {
