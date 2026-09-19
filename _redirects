@@ -17,6 +17,8 @@
 # with ?ref=<code>, which the page keeps for 90 days and carries into the app.
 /r/*              /?ref=:splat           302
 
-# Frozen agreement versions: /partner-agreement/1.1 serves the copy a
-# partner accepted, which must never change even after a newer version ships.
-/partner-agreement/*   /partner-agreement-:splat.html   200
+# NOTE: a /partner-agreement/<v> -> /partner-agreement-<v>.html rewrite was
+# tried here and does NOT work — Cloudflare Pages answers that path with a 308
+# and never reaches the file. Pages already serves partner-agreement-1.1.html
+# at /partner-agreement-1.1 natively, which is the URL the acceptance email
+# links to. No rule needed.
