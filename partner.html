@@ -346,6 +346,10 @@
       <h2>By month</h2>
       <table class="pd-table" id="pd-months"><thead><tr><th>Month</th><th class="num">Your share</th></tr></thead><tbody></tbody></table>
 
+      <h2>Payouts</h2>
+      <p class="pd-note">Every payment we have sent you. If a line says voided, we recorded a payout and then reversed it — the amount went back into your balance above, and the reason is shown.</p>
+      <table class="pd-table" id="pd-payouts"><thead><tr><th>Date</th><th class="num">Amount</th><th>Method</th><th>Note</th></tr></thead><tbody></tbody></table>
+
       <p class="pd-note">The program terms are at <a href="/partners">picotally.com/partners</a>. Questions or a payout detail to change: <a href="mailto:support@picotally.com">support@picotally.com</a>.</p>
     </div>
   </div>
@@ -417,6 +421,10 @@
       });
       var mb = $("pd-months").querySelector("tbody");
       mb.innerHTML = (d.months && d.months.length) ? d.months.map(function (m) { return "<tr><td>" + esc(m.month) + "</td><td class=\"num\">" + money(m.earned_cents) + "</td></tr>"; }).join("") : "<tr><td colspan=\"2\" class=\"pd-note\">Nothing yet. Your first share appears the month your first customer makes a real payment.</td></tr>";
+      var pb = $("pd-payouts").querySelector("tbody");
+      pb.innerHTML = (d.payouts && d.payouts.length) ? d.payouts.map(function (o) {
+        return "<tr><td>" + esc(o.paid_on) + "</td><td class=\"num\">" + money(o.amount_cents) + "</td><td>" + esc(o.method) + "</td><td class=\"pd-note\">" + (o.voided ? "Voided \u2014 " + esc(o.void_reason) : "") + "</td></tr>";
+      }).join("") : "<tr><td colspan=\"4\" class=\"pd-note\">No payouts yet. Your first one goes out the month after your first customer's first payment clears the 30-day hold.</td></tr>";
       $("pd-body").hidden = false;
     })
     .catch(fail);
