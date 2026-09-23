@@ -685,6 +685,15 @@
       });
     });
   }
+  // 1099-NEC reporting threshold, in cents.
+  //
+  // It was $600 for decades. The 2025 law (OBBBA) raised it to $2,000 for
+  // payments made from 2026 onward, and indexes it for inflation after that.
+  // This flag is a REMINDER to look, not tax advice — a CPA confirms before
+  // anything is filed. If the threshold moves again, it changes HERE, and the
+  // partner-facing pages deliberately say "if the law requires" rather than a
+  // number, so they never go stale.
+  var TAX_1099_THRESHOLD_CENTS = 200000;
   function renderReferrals(rows) {
     if (!rows.length) { $("ref-body").innerHTML = '<span class="ref-msg">No partners yet. Add one below; their link is picotally.com/r/&lt;code&gt;.</span>'; return; }
     var h = '<table class="ref-table"><thead><tr><th>Partner</th><th>Link</th><th>Agreement</th><th>W-9</th><th>Signups</th><th>Paying</th><th>Owed</th><th>Pending (hold)</th><th>Deductions</th><th>Paid YTD</th><th>Paid total</th><th>Last payout</th><th></th></tr></thead><tbody>';
@@ -700,7 +709,7 @@
         '<td class="num">' + cents(owed) + '</td>' +
         '<td class="num">' + cents(p.pending_cents) + '</td>' +
         '<td class="num">' + (Number(p.deductions_pending_cents || 0) > 0 ? '−' + cents(p.deductions_pending_cents) : '—') + '</td>' +
-        '<td class="num">' + cents(p.paid_ytd_cents) + (Number(p.paid_ytd_cents || 0) >= 60000 ? ' <span class="muted" title="1099-NEC needed in January">1099</span>' : '') + '</td>' +
+        '<td class="num">' + cents(p.paid_ytd_cents) + (Number(p.paid_ytd_cents || 0) >= TAX_1099_THRESHOLD_CENTS ? ' <span class="muted" title="1099-NEC likely needed in January — threshold is $2,000 for payments made from 2026; confirm with a CPA">1099</span>' : '') + '</td>' +
         '<td class="num">' + cents(p.paid_total_cents) + (Number(p.refund_after_payout_cents || 0) > 0 ? ' <span class="muted" title="refunded after payout">↺' + cents(p.refund_after_payout_cents) + '</span>' : '') + '</td>' +
         '<td>' + esc(p.last_payout_on || '—') + '</td>' +
         '<td><button class="btn" data-ref-pay="' + esc(p.code) + '"' + (owed > 0 ? '' : ' disabled') + '>Mark paid</button> ' +
