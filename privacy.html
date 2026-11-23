@@ -387,7 +387,7 @@
   <div class="container-narrow">
     <div class="eyebrow">Legal</div>
     <h1>Privacy Policy</h1>
-    <p class="effective">Effective November 22, 2026</p>
+    <p class="effective">Effective November 23, 2026</p>
   </div>
 </header>
 
@@ -439,7 +439,7 @@
     Receipt scanning is a separate flow again: the text read off the receipt is sent to <strong>Google Gemini</strong> for itemisation (the receipt image itself is never sent to Gemini). All AI calls are processed server-side via secure edge functions; no AI provider keys are embedded in the app.</li>
   <li><strong>On-device OCR</strong>. Google ML Kit extracts text from receipt images entirely on your device, so no image is sent to any AI provider to be read. The receipt photo itself is still uploaded to your own Supabase storage, so it syncs across your devices and stays attached to the expense as evidence.</li>
   <li><strong>Payments</strong>, when your customer pays an invoice through its pay link or QR code, Stripe processes the transaction. We store the payment status and a reference to the Stripe session, never anyone&rsquo;s card details.</li>
-<li><strong>Email</strong>, sign-in, password and account emails to you, and the invoices, quotes and receipts you choose to email to a customer, are delivered through Resend. We may also email you about your account or subscription, to answer your support requests, and occasionally to ask for feedback about the service. You can ask us to stop the feedback emails at any time.</li>
+<li><strong>Email</strong>, sign-in, password and account emails to you, and the invoices, quotes and receipts you choose to email to a customer, are delivered through Resend. We may also email you about your account or subscription, to answer your support requests, and occasionally to ask for feedback about the service. You can ask us to stop the feedback emails at any time. We may also send you product updates and offers by email. Every such email includes a way to unsubscribe.</li>
 <li><strong>&ldquo;Hey&nbsp;Pico&rdquo; wake word</strong> (phone apps, Pro&nbsp;Max), when you turn it on, the phone listens for the phrase using a small model that runs entirely on the device. Nothing is recorded or transmitted until the phrase is detected and a voice session begins, which the app shows on screen.</li>
   <li><strong>Crash reporting</strong>, if enabled, anonymous crash data is sent to Sentry. No personally identifiable information is included.</li>
   <li><strong>Usage analytics</strong>, we record a small, fixed set of product events through <strong>TelemetryDeck</strong> &mdash; the app was opened, onboarding finished, an invoice was sent, a receipt was scanned, voice was started, the paywall was viewed, a free month started, a subscription started &mdash; so we can see which features earn their keep and where new users get stuck. Each signal carries your app version, platform, plan tier, a random session ID, and the hashed account ID described above. It never carries your name, email, customer records, invoice or quote contents, notes, or any dollar amount. We use this only to improve the product; it is not sold, shared, or used for advertising.</li>
