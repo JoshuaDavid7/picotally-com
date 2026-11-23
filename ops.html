@@ -299,6 +299,9 @@
     .ref-add-form input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); color: var(--ink); font: inherit; font-size: 13px; }
     .ref-msg { font-size: 13px; color: var(--ink-dim); }
     .ref-wrap { overflow-x: auto; }
+    .cust-foot { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 10px 16px 14px; }
+    .cust-toggle { font-size: 13px; color: var(--ink-dim); display: inline-flex; gap: 6px; align-items: center; }
+    .cust-ended td { color: var(--ink-faint); }
     .ref-detail td { background: var(--panel-2); padding: 10px 12px; }
     .ref-det-body { overflow-x: auto; }
     .ref-det-body table { margin: 0; }
@@ -344,6 +347,19 @@
   <section class="panel">
     <div class="panel-head"><h2>Financials</h2><span class="panel-sub" id="fin-sub"></span></div>
     <div id="fin-body"></div>
+  </section>
+
+  <!-- 1a · PAYING CUSTOMERS — who pays, on which plan, and whether they
+       are staying. Account and billing facts and usage counts only: never
+       the contents of anyone's documents (privacy policy, 2026-11-22). -->
+  <section class="panel" id="cust-panel">
+    <div class="panel-head"><h2>Paying customers</h2><span class="panel-sub" id="cust-sub">Who is paying, on which plan, and whether they are staying</span></div>
+    <div class="ref-wrap" id="cust-body">Loading…</div>
+    <div class="cust-foot">
+      <button class="btn" id="cust-refresh" type="button">Refresh from Google Play</button>
+      <label class="cust-toggle"><input type="checkbox" id="cust-show-internal"> Show my own test accounts</label>
+      <span class="ref-msg" id="cust-msg"></span>
+    </div>
   </section>
 
   <!-- 1b · PARTNERS — the referral program: who is owed what -->
@@ -589,6 +605,7 @@
     $("stamp").textContent = "checked " + ago(d.generated_at);
     renderWarnings(d.config_warnings || []);
     renderFinancials(d);
+    loadCustomersPanel();
     loadReferrals();
     renderSystems(d);
     renderCost(d.cost_confidence || {}, d.cost_overview, d.plans, d.committed_monthly_usd);
@@ -604,6 +621,91 @@
    * connection) and say so instead of pretending. Nothing here is typed;
    * every figure names its source.
    */
+  // ── Paying customers ──────────────────────────────────────
+  // One row per paying account and store. The endpoint returns account and
+  // billing facts and usage COUNTS only; it has no way to return document
+  // contents, and this panel must never ask it to.
+  var CUSTOMERS = SUPABASE_URL + "/functions/v1/ops_customers";
+  var custRows = [];
+  function custCall(body) {
+    return authedFetch(CUSTOMERS, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || r.status); return j; }); });
+  }
+  function day(iso) { return iso ? new Date(iso).toISOString().slice(0, 10) : "—"; }
+  function custLive(c) { return c.status === "active" || c.status === "billing_retry" || c.status === "grace_period"; }
+  /** The one status word the owner acts on, with its tone. */
+  function custState(c) {
+    if (!custLive(c)) return ["Ended", "t-dead"];
+    if (c.stale) return ["Out of date", "t-unknown"];
+    if (c.status === "billing_retry" || c.status === "grace_period") return ["Payment failing", "t-crit"];
+    if (c.will_renew === false) return ["Leaving", "t-warn"];
+    if (c.will_renew === true) return ["Renewing", "t-ok"];
+    return ["Paying", "t-accent"];
+  }
+  function custStateNote(c) {
+    if (!custLive(c)) return "ended " + day(c.paid_through);
+    if (c.stale) return "paid period ended " + day(c.paid_through) + "; the store has not told us what happened since";
+    if (c.will_renew === false) return "renewal is off; access ends " + day(c.paid_through);
+    if (c.will_renew === true) return "next charge " + day(c.paid_through);
+    return "paid through " + day(c.paid_through) + "; renewal not yet reported by the store";
+  }
+  var STORE_NAME = { apple: "App Store", google: "Google Play", stripe: "Website" };
+  var PLAN_NAME = { pro: "Pro", pro_max: "Pro Max" };
+  function loadCustomersPanel() {
+    $("cust-body").textContent = "Loading…";
+    return custCall({ action: "list" }).then(function (j) { custRows = j.customers || []; renderCustomersPanel(); })
+      .catch(function (e) { $("cust-body").innerHTML = '<span class="ref-msg">Could not load customers: ' + esc(String(e.message || e)) + '</span>'; });
+  }
+  function renderCustomersPanel() {
+    var showInternal = $("cust-show-internal").checked;
+    var rows = custRows.filter(function (c) { return showInternal || !c.internal; });
+    var hidden = custRows.length - rows.length;
+    var live = rows.filter(custLive);
+    var leaving = live.filter(function (c) { return c.will_renew === false; }).length;
+    $("cust-sub").textContent = live.length + " paying" +
+      (leaving ? " · " + leaving + " leaving" : "") +
+      (hidden ? " · " + hidden + " of your own test subscriptions hidden" : "");
+    if (!rows.length) {
+      $("cust-body").innerHTML = '<span class="ref-msg">No paying customers yet' + (hidden ? ' besides your own test subscriptions' : '') + '.</span>';
+      return;
+    }
+    var h = '<table class="ref-table"><thead><tr><th>Customer</th><th>Plan</th><th>Where</th><th>Status</th><th>Since</th><th>Documents</th><th>Expenses</th><th>Last activity</th><th>Signed up</th></tr></thead><tbody>';
+    rows.forEach(function (c) {
+      var st = custState(c);
+      h += '<tr' + (custLive(c) ? '' : ' class="cust-ended"') + '>' +
+        '<td>' + esc(c.email || '—') +
+          (c.internal ? ' <span class="muted">(yours)</span>' : '') +
+          (c.has_free_grant ? ' <span class="muted" title="This account also has a free plan you granted">+ free grant</span>' : '') + '</td>' +
+        '<td>' + esc(PLAN_NAME[c.tier] || '—') + '</td>' +
+        '<td>' + esc(STORE_NAME[c.platform] || c.platform) + '</td>' +
+        '<td><span class="pill ' + st[1] + '">' + st[0] + '</span><br><span class="muted">' + esc(custStateNote(c)) + '</span></td>' +
+        '<td>' + day(c.started_at) + '</td>' +
+        '<td class="num">' + Number(c.documents || 0) + '</td>' +
+        '<td class="num">' + Number(c.expenses || 0) + '</td>' +
+        '<td>' + (c.last_activity_at ? day(c.last_activity_at) : '<span class="muted">never</span>') + '</td>' +
+        '<td>' + day(c.signed_up_at) + '</td>' +
+        '</tr>';
+    });
+    h += '</tbody></table>';
+    $("cust-body").innerHTML = h;
+  }
+  $("cust-show-internal").addEventListener("change", renderCustomersPanel);
+  $("cust-refresh").addEventListener("click", function () {
+    var b = $("cust-refresh");
+    b.disabled = true; $("cust-msg").textContent = "Asking Google Play…";
+    custCall({ action: "refresh" })
+      .then(function (j) {
+        custRows = j.customers || []; renderCustomersPanel();
+        $("cust-msg").textContent = "Refreshed " + Number(j.refreshed || 0) + " Google Play subscription" + (Number(j.refreshed || 0) === 1 ? "" : "s") +
+          (Number(j.failed || 0) ? "; " + j.failed + " could not be read" : "") + ". App Store rows update only when Apple notifies us.";
+      })
+      .catch(function (e) { $("cust-msg").textContent = "Could not refresh: " + (e.message || e); })
+      .then(function () { b.disabled = false; });
+  });
+
   // ── Partners (referral program) ───────────────────────────
   var REFERRALS = SUPABASE_URL + "/functions/v1/ops_referrals";
   function refCall(body) {
